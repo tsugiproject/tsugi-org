@@ -5,8 +5,7 @@ $T = $CFG->wwwroot . '/';
 $adminmenu = isset($_COOKIE['adminmenu']) && $_COOKIE['adminmenu'] == "true";
 $set = new \Tsugi\UI\MenuSet();
 $set->setHome('<img style="width:4em; padding: 4px; border-radius: 4px; background-color:white;" src="'. $CFG->staticroot . '/img/logos/tsugi-logo.png' .'">', $CFG->apphome);
-// $set->addLeft('Get Started', $R.'install.php');
-$set->addLeft('Get Started', 'https://github.com/tsugiproject/tsugi/blob/master/docs/INSTALL.md');
+$set->addLeft('Get Started', $R .'md/INSTALL.md');
 $set->addLeft('Documentation', $R .'md/');
 if ( isset($CFG->lessons) ) {
     $set->addLeft('Lessons', $T.'lessons.php');
