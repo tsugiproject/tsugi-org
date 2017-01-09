@@ -18,7 +18,7 @@ if ( isset($_SESSION['id']) ) {
 }
 */
 
-$set->addLeft('YouTube', 'https://www.youtube.com/playlist?list=PLlRFEj9H3Oj7Bp8-DfGpfAfDBiblRfl5p');
+$set->addLeft('YouTube', 'https://www.youtube.com/playlist?list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw');
 $set->addLeft('GitHub', 'https://github.com/tsugiproject/tsugi');
 
 if ( isset($_SESSION['id']) ) {
