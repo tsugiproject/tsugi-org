@@ -38,8 +38,6 @@ There is also a
 [Java version of Tsugi](https://github.com/tsugiproject/tsugi-java-servlet) 
 that is in development.
 
-\-- Chuck
-Fri Jun 12 21:34:55 EDT 2015
 
 Learning Tools Interoperability™ (LTI™) is a
 trademark of IMS Global Learning Consortium, Inc. in
