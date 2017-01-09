@@ -44,21 +44,13 @@ you can log in to this site and request an account to use with your IMS LTI comp
 Here is some LTI 1.0 documentation as to how to use these tools when you have a key / secret:</p>
 
 <ul>
-<li><a href="https://github.com/tsugiproject/tsugi/blob/master/docs/LAUNCHING.md" target="_blank">Configuring LTI 1.0 Launches</a></li>
-</ul>
-<p>Here are some documentation pages for this project:</p>
-
-<ul>
-<li><a href="https://github.com/tsugiproject/tsugi/blob/master/docs/ABOUT.md" target="_blank">About The Project</a></li>
-<li><a href="https://www.youtube.com/playlist?list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw" target="_blank">Tsugi YouTube Channel</a></li>
-<li><a href="https://github.com/tsugiproject/tsugi/blob/master/docs/INSTALL.md" target="_blank">Installing Tsugi</a></li>
-<li><a href="https://github.com/tsugiproject/tsugi/blob/master/docs/DEVELOP.md" target="_blank">Developing Tsugi Applications</a></li>
+<li><a href="md/LAUNCHING.md">Configuring LTI 1.0 Launches</a></li>
 </ul>
 <p>
   You can join the Tsugi developer's list at
   <ul>
     <li><a href="https://groups.google.com/a/apereo.org/forum/#!forum/tsugi-dev" target="_new">Google Group</a> - once you 
-    have joined the group you can sent email to tsugi-dev@apereo.org.</li>
+    have joined the group you can send email to tsugi-dev@apereo.org.</li>
   </ul>
 </p>
 <!--
