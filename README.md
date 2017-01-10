@@ -1,5 +1,5 @@
-Web Applications for Everybody (WA4E)
-=====================================
+WThe Tsugi Learning Applications Framework
+==========================================
 
 Course materials for www.tsugi.org
 
@@ -15,12 +15,10 @@ Check out this repo into a top level folder in htdocs
     cd /Applications/MAMP/htdocs
     git clone https://github.com/tsugiproject/tsugi-org.git
 
-Go into the newly checked out folder and get a copy of Tsugi as well as the exercises and
-exercise solutions:
+Go into the newly checked out folder and get a copy of Tsugi as well as the exercises:
 
     cd tsugi-org
     git clone https://github.com/tsugiproject/tsugi.git
-    git clone https://github.com/tsugiproject/tsugi-php-solutions.git solutions
     git clone https://github.com/tsugiproject/tsugi-php-exercises exercises
 
 Create a database in your SQL server if you don't already have one:
@@ -56,7 +54,7 @@ some of the following values are the values I use on my MAMP:
     
     ... 
     
-    $CFG->tool_folders = array("admin", "../tools", "../mod", "../exercises", "../solutions");
+    $CFG->tool_folders = array("admin", "../tools", "../mod", "../exercises");
     $CFG->install_folder = $CFG->dirroot.'./../mod'; // Tsugi as a store
     
     ...
