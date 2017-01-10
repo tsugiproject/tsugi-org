@@ -1,5 +1,5 @@
-WThe Tsugi Learning Applications Framework
-==========================================
+The Tsugi Learning Applications Framework
+=========================================
 
 Course materials for www.tsugi.org
 
