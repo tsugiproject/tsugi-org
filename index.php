@@ -53,20 +53,5 @@ Here is some LTI 1.0 documentation as to how to use these tools when you have a 
     have joined the group you can send email to tsugi-dev@apereo.org.</li>
   </ul>
 </p>
-<!--
-<?php
-echo(Output::safe_var_dump($_SESSION));
-var_dump($USER);
-?>
--->
-</div>
 <?php 
-
-$foot = '
-<p style="font-size: 75%; margin-top: 5em;">
-Copyright Creative Commons Attribution 3.0 - Charles R. Severance
-</p>';
-
-$OUTPUT->setAppFooter($foot);
-
-$OUTPUT->footer();
+require_once "foot.php";

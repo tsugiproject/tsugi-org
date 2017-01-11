@@ -47,6 +47,8 @@ if ( isset($_SESSION['id']) ) {
     $set->addRight('Login', $T.'login.php');
 }
 
+$set->addRight('Support', $T.'support.php');
+
 // Set the topNav for the session
 $OUTPUT->topNavSession($set);
 
