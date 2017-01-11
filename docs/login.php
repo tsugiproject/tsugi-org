@@ -16,7 +16,7 @@ $CFG-&gt;google_map_api_key = false; // 'Ve8eH49498430843cIA9IGl8';</code></pre>
 <p>Make sure to add the proper JavaScript origins and authorized redirect urls
 in your Google credentials configuration.</p>
 <p>As a sample, 
-here are some of my JavaScript Origins:</p>
+here are some of my JavaScript origins:</p>
 <pre><code>https://online.dr-chuck.com
 http://localhost
 https://online.dr-chuck.com
@@ -40,6 +40,10 @@ https://www.py4e.com/tsugi/login.php
 https://www.wa4e.com/tsugi/login.php
 http://localhost/wa4e/tsugi/login.php</code></pre>
 <p>Again, the port seems not to matter.</p>
+<p>
+This works both for localhost instances as well as instances on the
+web which is nice for testing.
+</p>
 
 </div>
 <?php
