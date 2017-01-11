@@ -10,9 +10,9 @@ require_once "../nav.php";
 target="_blank">https://console.developers.google.com/apis/credentials</a>,
 create a new OAuth 2.0 credential for a web application, get the key 
 and secret, and put them into the Tsugi configuration file:</p>
-<pre><code>$CFG-&gt;google_client_id = false; // '96041-nljpjj8jlv4.apps.googleusercontent.com';
-$CFG-&gt;google_client_secret = false; // '6Q7w_x4ESrl29a';
-$CFG-&gt;google_map_api_key = false; // 'Ve8eH49498430843cIA9IGl8';</code></pre>
+<pre><code>$CFG-&gt;google_client_id = '96041-nl...jpjj8jlv4.apps.googleusercontent.com';
+$CFG-&gt;google_client_secret = '6Q7w...ESrl29a';
+$CFG-&gt;google_map_api_key = 'Ve8eH49498....43cIA9IGl8';</code></pre>
 <p>Make sure to add the proper JavaScript origins and authorized redirect urls
 in your Google credentials configuration.</p>
 <p>As a sample, 
