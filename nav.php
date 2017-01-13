@@ -13,6 +13,7 @@ if ( isset($CFG->lessons) ) {
 $set->addLeft('GitHub', $R.'docs/repos.php');
 $set->addLeft('Get Started', $R .'docs/install.php');
 $set->addLeft('YouTube', 'https://www.youtube.com/playlist?list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw');
+$set->addLeft('Discuss', 'https://groups.google.com/a/apereo.org/forum/#!forum/tsugi-dev');
 
 if ( isset($_SESSION['id']) ) {
     $submenu = new \Tsugi\UI\Menu();
