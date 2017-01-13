@@ -3,22 +3,26 @@ require_once "../top.php";
 require_once "../nav.php";
 ?>
 <div id="container">
+ <div class="jumbotron">
+<p>
 <ul>
-<li><a href="repos.php">Tsugi Repositories in GitHub</a></li>
-<li><a href="install.php">Installing Tsugi</a></li>
-<li><a href="login.php">Using  Google Login</a></li>
+<li><p><a href="../tsugi/lessons.php">Developer Tutorials</a></p></li>
+<li><p><a href="repos.php">Tsugi Repositories in GitHub</a></p></li>
+<li><p><a href="install.php">Installing Tsugi</a></p></li>
+<li><p><a href="login.php">Using  Google Login</a></p></li>
 <!--
-<li><a href="../md/CHECKOUT_ALL.md">Checking Code Out</a></li>
+<li><p><a href="../md/CHECKOUT_ALL.md">Checking Code Out</a></p></li>
 -->
-<li><a href="../md/CODING.md">Coding Style</a></li>
-<li><a href="../md/DEVELOP.md">How to Develop</a></li>
-<li><a href="../md/GITHUB.md">How to use GitHub</a></li>
-<li><a href="../md/I18N.md">iInternationalizing a Tsugi Tool</a></li>
-<li><a href="../md/LAUNCHING.md">Launching Tsugi</a></li>
-<li><a href="../md/PHPDOC.md">How to use PHP Doc</a></li>
-<li><a href="../md/README.md">README</a></li>
-<li><a href="../md/README_CANVAS_APP_STORE.md">Using Tsugi as an App Store in Canvas</a></li>
+<li><p><a href="../md/CODING.md">Coding Style</a></p></li>
+<li><p><a href="../md/DEVELOP.md">How to Develop</a></p></li>
+<li><p><a href="../md/GITHUB.md">Installing Git</a></p></li>
+<li><p><a href="../md/I18N.md">Internationalizing a Tsugi Tool</a></p></li>
+<li><p><a href="../md/LAUNCHING.md">Launching a Tsugi Tool from an LMS</a></p></li>
+<li><p><a href="../md/PHPDOC.md">How to use PHP Doc</a></p></li>
+<li><p><a href="../md/README_CANVAS_APP_STORE.md">Using Tsugi as an App Store in Canvas</a></p></li>
 </ul>
+</p>
+</div>
 </div>
 <?php
 $OUTPUT->footer();

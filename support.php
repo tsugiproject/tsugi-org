@@ -8,6 +8,7 @@ require_once "nav.php";
 
 ?>
 <div id="container">
+ <div class="jumbotron">
 <!--
 <div style="margin-left: 10px; float:right">
 <iframe width="400" height="225" src="https://www.youtube.com/embed/tuXySrvw8TE?rel=0" frameborder="0" allowfullscreen></iframe>
@@ -15,41 +16,41 @@ require_once "nav.php";
 -->
 <h1>Supporting Tsugi</h1>
 <p>
-This is an open source effort that is still in the early development phases.
+This is an open source effort that is still in active development and evolution.
 We can use lots of help and financial support.  Here are some ways to support
 Tsugi.
 <ul>
-<li>Join the 
+<li><p>Join the 
 <a href="https://www.apereo.org/" target="_blank">Apereo Foundation</a>.
 Tsugi is an incubating project within Apereo and any support you give
 to Apereo by joining, participating, and/or coming to Apereo meetings
 helps the cause of all Apereo projects.
-</li>
-<li>
+</p></li>
+<li><p>
 Contribute funds to the 
 <a href="https://www.apereo.org/" target="_blank">Apereo Foundation</a>
 tagged for the Tsugi project.  This give us funds to spend on
 things like students, support travel to meetings, graphic design, etc.
-</li>
-<li>
+</p></li>
+<li><p>
 If you want to fund Dr. Chuck's research efforts (like a grant) on Tsugi at the
 <a href="http://www.si.umich.edu" taget="_blank">University of Michigan
 School of Information</a> please contact him.
-</li>
-<li>
+</p></li>
+<li><p>
 If you are a granting or philanthropic organization interested in improving 
-educational technology and thing that Tsugi might be a good addition to 
+educational technology and think that Tsugi might be a good addition to 
 your project portfolio, please contact Chuck to get a proposal developed.
-</li>
-<li>
+</p></li>
+<li><p>
 If you have an educational technology grant and would like to use Tsugi 
 and provide some funds to our project to help make your project a success,
 it would be much appreciated.  Again, contact Chuck.
-</li>
-<li>
+</p></li>
+<li><p>
 If none of the above make sense to you, just hit the "donate" button below
 and I will make sure the funds are applied as best appropriate.
-</li>
+</p></li>
 </ul>
 </p>
 <center>
@@ -61,6 +62,7 @@ and I will make sure the funds are applied as best appropriate.
 <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
 </form>
 </center>
+</div>
 <?php 
 require_once "foot.php";
 
