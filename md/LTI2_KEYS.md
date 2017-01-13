@@ -33,7 +33,7 @@ real transaction) copies the new info to the old info and nulls out the new info
 Launch handling looks at the old secret first and if that fails or old secret is null, 
 it checks new secret.  You can see this new logic at line in:
 
-https://github.com/csev/tsugi/blob/master/lib/ltix.class.php
+https://github.com/tsugiproject/tsugi/blob/master/lib/ltix.class.php
 
 Uniqueness of oauth_consumer_key values in LTI 2.x
 --------------------------------------------------
@@ -46,7 +46,7 @@ there is tricky interplay between the user_id (local owner of the key in Tsugi) 
 and the INSERT / UPDATE (update will be needed for re-registration).  This logic can be seen 
 in:
 
-https://github.com/csev/tsugi/blob/master/lti/lti2.php
+https://github.com/tsugiproject/tsugi/blob/master/lti/lti2.php
 
 Basically the goal of that code is to make sure that whichever user "gets" a particular
 key - all other registrations or re-registrations for that key are rejected unless the same

@@ -105,7 +105,7 @@ is only available to inctructors that contact Dr. Chuck.</p></li>
 <li><p>
 <a href="https://github.com/tsugiproject/tsugi-laravel-sample" target="_blank">Tsugi Laravel</a><br/>
 This is the beginnings of a library to make the
-<a href="https://github.com/csev/tsugi-php" target="_blank">Tsugi PHP</a>
+<a href="https://github.com/tsugiproject/tsugi-php" target="_blank">Tsugi PHP</a>
 library usable in Laravel applications.
 </p>
 </ul>

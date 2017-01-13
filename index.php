@@ -50,7 +50,7 @@ Here is some LTI 1.0 documentation as to how to use these tools when you have a 
 <p>
   You can join the Tsugi developer's list at
   <ul>
-    <li><p><a href="https://groups.google.com/a/apereo.org/forum/#!forum/tsugi-dev" target="_new">Google Group</a> - once you 
+    <li><p><a href="https://groups.google.com/a/apereo.org/forum/#!forum/tsugi-dev" target="_blank">Google Group</a> - once you 
     have joined the group you can send email to tsugi-dev@apereo.org.</p></li>
   </ul>
 </p>
