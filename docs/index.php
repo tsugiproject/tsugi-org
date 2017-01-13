@@ -4,6 +4,7 @@ require_once "../nav.php";
 ?>
 <div id="container">
 <ul>
+<li><a href="repos.php">Tsugi Repositories in GitHub</a></li>
 <li><a href="install.php">Installing Tsugi</a></li>
 <li><a href="login.php">Using  Google Login</a></li>
 <!--

@@ -8,24 +8,22 @@ $set->setHome('<img style="width:4em; padding: 4px; border-radius: 4px; backgrou
 $set->addLeft('Get Started', $R .'docs/install.php');
 $set->addLeft('Documentation', $R .'docs/');
 if ( isset($CFG->lessons) ) {
-    $set->addLeft('Lessons', $T.'lessons.php');
+    $set->addLeft('Developing', $T.'lessons.php');
 }
-/*
-if ( isset($_SESSION['id']) ) {
-	if ( isset($CFG->disqushost) ) $set->addLeft('Discuss', $T.'discuss.php');
-	else if ( isset($CFG->disquschannel) ) $set->addLeft('Discuss', $CFG->disquschannel);
-	$set->addLeft('Assignments', $T.'assignments.php');
-}
-*/
 
+$set->addLeft('GitHub', $R.'docs/repos.php');
 $set->addLeft('YouTube', 'https://www.youtube.com/playlist?list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw');
-$set->addLeft('GitHub', 'https://github.com/tsugiproject/tsugi');
 
 if ( isset($_SESSION['id']) ) {
     $submenu = new \Tsugi\UI\Menu();
     $submenu->addLink('Profile', $T.'profile.php');
     if ( isset($CFG->google_map_api_key) && $adminmenu ) {
         $submenu->addLink('Map', $T.'map.php');
+    }
+    if ( isset($_SESSION['id']) ) {
+	if ( isset($CFG->disqushost) ) $set->addLeft('Discuss', $T.'discuss.php');
+	else if ( isset($CFG->disquschannel) ) $set->addLeft('Discuss', $CFG->disquschannel);
+	$submenu->addLink('Assignments', $T.'assignments.php');
     }
     $submenu->addLink('Badges', $T.'badges.php');
     if ( $CFG->DEVELOPER ) {
