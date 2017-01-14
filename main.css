@@ -1,0 +1,35 @@
+/* ---------Single Page Website CSS by Kelly King ----------*/
+
+#page1 {
+	height:1100px;
+	width:1000px;
+	background:#afc9ff;
+	padding-top:110px;
+	}
+	
+#page2 {
+	height:1100px;
+	width:1000px;
+	background:#777cdc;
+	padding-top:150px;
+	}
+	
+#page3 {
+	height:1100px;
+	width:1000px;
+	background:#9b70c0;
+	padding-top:150px;
+	}
+
+#page4 {
+	height:1100px;
+	width:1000px;
+	background:#9b70c0;
+	padding-top:150px;
+	}
+	
+.page-padding {height:90px; width:100%;}
+
+a { color:white; text-decoration:none;}
+	
+a:hover { text-decoration:underline;}

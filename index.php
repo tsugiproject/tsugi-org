@@ -12,7 +12,8 @@ require_once "nav.php";
 require_once "tsugi/admin/sanity-db.php";
 ?>
 <div id="container">
- <div class="jumbotron">
+ <div id="page1" class="jumbotron">
+    <a name="index"></a>
 <!--
 <div style="margin-left: 10px; float:right">
 <iframe width="400" height="225" src="https://www.youtube.com/embed/tuXySrvw8TE?rel=0" frameborder="0" allowfullscreen></iframe>
@@ -54,6 +55,65 @@ Here is some LTI 1.0 documentation as to how to use these tools when you have a 
     have joined the group you can send email to tsugi-dev@apereo.org.</p></li>
   </ul>
 </p>
+</div>
+ <div id="page2" class="jumbotron">
+        <a name="docs"></a>
+    <div class="page-padding"></div>
+<p>
+<ul>
+<li><p><a href="tsugi/lessons.php">Developer Tutorials</a></p></li>
+<li><p><a href="docs/repos.php">Tsugi Repositories in GitHub</a></p></li>
+<li><p><a href="docs/install.php">Installing Tsugi</a></p></li>
+<li><p><a href="docs/login.php">Using  Google Login</a></p></li>
+<!--
+<li><p><a href="../md/CHECKOUT_ALL.md">Checking Code Out</a></p></li>
+-->
+<li><p><a href="md/CODING.md">Coding Style</a></p></li>
+<li><p><a href="md/DEVELOP.md">How to Develop</a></p></li>
+<li><p><a href="md/GITHUB.md">Installing Git</a></p></li>
+<li><p><a href="md/I18N.md">Internationalizing a Tsugi Tool</a></p></li>
+<li><p><a href="md/LAUNCHING.md">Launching a Tsugi Tool from an LMS</a></p></li>
+<li><p><a href="md/PHPDOC.md">How to use PHP Doc</a></p></li>
+<li><p><a href="md/README_CANVAS_APP_STORE.md">Using Tsugi as an App Store in Canvas</a></p></li>
+</ul>
+</p>
+</div>
+<hr/>
+ <div id="page3" class="jumbotron">
+        <a name="about"></a>
+    <div class="page-padding"></div>
+
+<center style="padding-bottom: 20px;">
+<a href="http://www.tsugi.org" target="_new">
+<img style="width: 80%; max-width:360px;" src="https://www.dr-chuck.net/tsugi-static/img/logos/tsugi-logo-incubating.png">
+</a>
+</center>
+<p>
+Tsugi is a framework that handles much of the low-level detail of
+building multi-tenant tool that makes use of the 
+IMS Learning Tools Interoperability™ (LTI)™ and other learning
+tool interoperability standards.
+<a href="http://www.tsugi.org" target="_blank">The Tsugi Framework</a> 
+provides library and database code to receive and model all
+of the incoming LTI data in database tables and sets up a session
+with the important information about the LMS, user, and course.
+</p>
+<p>
+If you are interested in 
+<a href="support.php">Supporting the Tsugi Effort</a>, please let us know.
+<p>
+Tsugi is currently an 
+<a href="https://www.apereo.org/incubation" target="_blank">incubation project</a> in the 
+<a href="http://www.apereo.org/" target="_new">Apereo Foundation</a>.
+<p>
+Learning Tools Interoperability™ (LTI™) is a
+trademark of <a href="http://www.imsglobal.org/" target="_blank">IMS Global Learning Consortium, Inc.</a>
+in the United States and/or other countries.
+</p>
+</div>
+<hr/>
+
+
 </div>
 </div>
 <?php 

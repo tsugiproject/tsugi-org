@@ -2,15 +2,6 @@
 "title": "Building Learning Applications with Tsugi",
 "description" : "These tutorials walk through the various topics and exercises to learn how to develop with Tsugi.  If you login and do the exercises you will earn Mozilla Open Badges.",
 "count": true,
-"badges": [
-    {
-        "title" : "Tsugi Community Member in Good Standing",
-        "image" : "00_hello_world.png",
-        "threshold" : "0.0",
-        "assignments" : [
-        ]
-    }
-],
 "modules": [
 {
     "title": "Overview of Tsugi",

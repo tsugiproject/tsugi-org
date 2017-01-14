@@ -5,14 +5,13 @@ $T = $CFG->wwwroot . '/';
 $adminmenu = isset($_COOKIE['adminmenu']) && $_COOKIE['adminmenu'] == "true";
 $set = new \Tsugi\UI\MenuSet();
 $set->setHome('<img style="width:4em; padding: 4px; border-radius: 4px; background-color:white;" src="'. $CFG->staticroot . '/img/logos/tsugi-logo.png' .'">', $CFG->apphome);
-$set->addLeft('Documentation', $R .'docs/');
+$set->addLeft('Documentation', $R .'#docs');
+$set->addLeft('GitHub', $R.'docs/repos.php');
+$set->addLeft('Get Started', $R .'docs/install.php');
 if ( isset($CFG->lessons) ) {
     $set->addLeft('Tutorials', $T.'lessons.php');
 }
-
-$set->addLeft('GitHub', $R.'docs/repos.php');
-$set->addLeft('Get Started', $R .'docs/install.php');
-$set->addLeft('YouTube', 'https://www.youtube.com/playlist?list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw');
+$set->addLeft('Videos', 'https://www.youtube.com/playlist?list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw');
 $set->addLeft('Discuss', 'https://groups.google.com/a/apereo.org/forum/#!forum/tsugi-dev');
 
 if ( isset($_SESSION['id']) ) {
@@ -26,7 +25,6 @@ if ( isset($_SESSION['id']) ) {
 	else if ( isset($CFG->disquschannel) ) $set->addLeft('Discuss', $CFG->disquschannel);
 	$submenu->addLink('Assignments', $T.'assignments.php');
     }
-    $submenu->addLink('Badges', $T.'badges.php');
     if ( $CFG->DEVELOPER ) {
         $submenu->addLink('Test LTI Tools', $T . 'dev.php');
     }
@@ -46,10 +44,16 @@ if ( isset($_SESSION['id']) ) {
     $set->addRight('Login', $T.'login.php');
 }
 
-$set->addRight('About', $R.'about.php');
+$set->addRight('About', $R.'#about');
 
 // Set the topNav for the session
 $OUTPUT->topNavSession($set);
 
 $OUTPUT->topNav();
+?>
+<!--
+<img class="tp-kbimg" src="images/marist.png" style="z-index: -1000; position: fixed; height: 357px; width: 1246px; transform: translate3d(0px, 0px, 0px) scale(1.1, 1.1); transform-origin: 0% 0% 0px;" width="1920" height="550">
+-->
+<?php
 $OUTPUT->flashMessages();
+
