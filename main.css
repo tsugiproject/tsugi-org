@@ -4,6 +4,8 @@
 	height:1100px;
 	width:1000px;
 	background:#afc9ff;
+        filter:alpha(opacity=70);
+        opacity:0.9;
 	padding-top:110px;
 	}
 	
@@ -11,6 +13,8 @@
 	height:1100px;
 	width:1000px;
 	background:#777cdc;
+        filter:alpha(opacity=70);
+        opacity:0.9;
 	padding-top:150px;
 	}
 	
@@ -18,6 +22,8 @@
 	height:1100px;
 	width:1000px;
 	background:#9b70c0;
+        filter:alpha(opacity=70);
+        opacity:0.9;
 	padding-top:150px;
 	}
 
@@ -25,6 +31,8 @@
 	height:1100px;
 	width:1000px;
 	background:#9b70c0;
+        filter:alpha(opacity=70);
+        opacity:0.9;
 	padding-top:150px;
 	}
 	

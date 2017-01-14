@@ -33,4 +33,4 @@ $OUTPUT->footerStart();
   });
 });</script>
 <?php
-$OUTPUT->footerEnd();
+if ( (! isset($footerEnd)) || $footerEnd ) $OUTPUT->footerEnd();

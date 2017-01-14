@@ -12,6 +12,7 @@ require_once "nav.php";
 require_once "tsugi/admin/sanity-db.php";
 ?>
 <div id="container">
+ <a name="index">
  <div id="page1" class="jumbotron">
     <a name="index"></a>
 <!--
@@ -78,7 +79,6 @@ Here is some LTI 1.0 documentation as to how to use these tools when you have a 
 </ul>
 </p>
 </div>
-<hr/>
  <div id="page3" class="jumbotron">
         <a name="about"></a>
     <div class="page-padding"></div>
@@ -111,10 +111,16 @@ trademark of <a href="http://www.imsglobal.org/" target="_blank">IMS Global Lear
 in the United States and/or other countries.
 </p>
 </div>
-<hr/>
 
 
 </div>
 </div>
 <?php 
+$footerEnd=false;
 require_once "foot.php";
+?>
+<script>
+$('body').prepend(' <img src="images/bgbg.jpg" style="z-index: -1000; position: fixed; top:-10%; height: 110%; width: 100%;">');
+</script>
+<?php
+$OUTPUT->footerEnd();

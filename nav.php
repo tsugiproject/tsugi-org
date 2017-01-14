@@ -4,7 +4,7 @@ $R = $CFG->apphome . '/';
 $T = $CFG->wwwroot . '/';
 $adminmenu = isset($_COOKIE['adminmenu']) && $_COOKIE['adminmenu'] == "true";
 $set = new \Tsugi\UI\MenuSet();
-$set->setHome('<img style="width:4em; padding: 4px; border-radius: 4px; background-color:white;" src="'. $CFG->staticroot . '/img/logos/tsugi-logo.png' .'">', $CFG->apphome);
+$set->setHome('<img style="width:4em; padding: 4px; border-radius: 4px; background-color:white;" src="'. $CFG->staticroot . '/img/logos/tsugi-logo.png' .'">', $CFG->apphome."#index");
 $set->addLeft('Documentation', $R .'#docs');
 $set->addLeft('GitHub', $R.'docs/repos.php');
 $set->addLeft('Get Started', $R .'docs/install.php');
@@ -50,10 +50,5 @@ $set->addRight('About', $R.'#about');
 $OUTPUT->topNavSession($set);
 
 $OUTPUT->topNav();
-?>
-<!--
-<img class="tp-kbimg" src="images/marist.png" style="z-index: -1000; position: fixed; height: 357px; width: 1246px; transform: translate3d(0px, 0px, 0px) scale(1.1, 1.1); transform-origin: 0% 0% 0px;" width="1920" height="550">
--->
-<?php
 $OUTPUT->flashMessages();
 
