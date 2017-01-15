@@ -79,6 +79,7 @@ Here is some LTI 1.0 documentation as to how to use these tools when you have a 
 <li><p><a href="md/LAUNCHING.md">Launching a Tsugi Tool from an LMS</a></p></li>
 <li><p><a href="md/PHPDOC.md">How to use PHP Doc</a></p></li>
 <li><p><a href="md/README_CANVAS_APP_STORE.md">Using Tsugi as an App Store in Canvas</a></p></li>
+<li><p><a href="exercises" target="_blank">Workshop Exercises for Tsugi</a></p></li>
 <li><p><a href="#about">About Tsugi</a></p></li>
 </ul>
 </p>
