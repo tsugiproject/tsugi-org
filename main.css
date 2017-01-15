@@ -2,6 +2,10 @@
 
 /* from http://www.adventuresinwebdesign.com/samples/anchors/blog/ */
 
+body {
+        background-color: #707070;
+}
+
 #page1 {
 	height:1100px;
 	width:1000px;
@@ -32,7 +36,7 @@
 #page4 {
 	height:1100px;
 	width:1000px;
-	background:#9b70c0;
+	background:#7b50a0;
         filter:alpha(opacity=70);
         opacity:0.9;
 	padding-top:150px;
