@@ -6,6 +6,9 @@ use \Tsugi\UI\Output;
 require "check.php" ; 
 
 require_once "top.php";
+?>
+<link rel="stylesheet" type="text/css" href="css/main.css" />
+<?php
 require_once "nav.php";
 
 // Help the installer through the setup process 

@@ -20,7 +20,6 @@ if ( $PDOX !== false ) LTIX::loginSecureCookie();
 
 $OUTPUT->header();
 ?>
-<link rel="stylesheet" type="text/css" href="main.css" />
 <style>
 a[target="_blank"]:after {
     font-family: "FontAwesome";
