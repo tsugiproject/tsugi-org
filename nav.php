@@ -7,7 +7,7 @@ $set = new \Tsugi\UI\MenuSet();
 $set->setHome('<img style="width:4em; padding: 4px; border-radius: 4px; background-color:white;" src="'. $CFG->staticroot . '/img/logos/tsugi-logo.png' .'">', $CFG->apphome."#index");
 $set->addLeft('Documentation', $R .'#docs');
 $set->addLeft('GitHub', $R.'docs/repos.php');
-$set->addLeft('Get Started', $R .'docs/install.php');
+$set->addLeft('Install', $R .'docs/install.php');
 if ( isset($CFG->lessons) ) {
     $set->addLeft('Tutorials', $T.'lessons.php');
 }

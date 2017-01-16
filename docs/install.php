@@ -3,6 +3,9 @@ require_once "../top.php";
 require_once "../nav.php";
 ?>
 <div id="container">
+<div style="margin-left: 10px; float:right">
+<iframe width="400" height="225" src="https://www.youtube.com/embed/mbA_SRNJcYk?rel=0" frameborder="0" allowfullscreen></iframe>
+</div>
 <h1>Installing TSUGI</h1>
 <p>I have recorded an
 <a href="https://www.youtube.com/watch?v=mbA_SRNJcYk&index=1&list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw" target="_blank">Installation video</a>
