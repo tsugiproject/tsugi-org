@@ -20,6 +20,9 @@ Go into the newly checked out folder and get a copy of Tsugi as well as the exer
     cd tsugi-org
     git clone https://github.com/tsugiproject/tsugi.git
     git clone https://github.com/tsugiproject/tsugi-php-exercises exercises
+    git clone https://github.com/tsugiproject/tsugi-php-solutions solutions
+
+The solutions repo is private and if you not a member of the project, you don't really need it.
 
 Create a database in your SQL server if you don't already have one:
 
@@ -54,7 +57,8 @@ some of the following values are the values I use on my MAMP:
     
     ... 
     
-    $CFG->tool_folders = array("admin", "../tools", "../mod", "../exercises");
+    $CFG->tool_folders = array("admin", "../tools", "../mod", 
+        "../exercises", "../solutions");
     $CFG->install_folder = $CFG->dirroot.'./../mod'; // Tsugi as a store
     
     ...
@@ -67,7 +71,7 @@ put the following into "Authorized JavaScript Origins":
 
         http://localhost
 
-And this into Authorized redirect URIs:
+And this into authorized redirect URIs:
 
     http://localhost/tsugi-org/tsugi/login.php
 
