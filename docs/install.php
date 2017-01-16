@@ -5,7 +5,7 @@ require_once "../nav.php";
 <div id="container">
 <h1>Installing TSUGI</h1>
 <p>I have recorded an
-<a href="https://www.youtube.com/watch?v=Na_QDXp-Y7o&index=1&list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw" target="_blank">Installation video</a>
+<a href="https://www.youtube.com/watch?v=mbA_SRNJcYk&index=1&list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw" target="_blank">Installation video</a>
 describing the install/config steps
 for this software on YouTube:
 <h2>Pre-Requisites</h2>
