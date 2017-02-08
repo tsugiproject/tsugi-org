@@ -63,6 +63,7 @@ Here is some LTI 1.0 documentation as to how to use these tools when you have a 
  <div id="page2" class="jumbotron">
         <a name="docs"></a>
     <div class="page-padding"></div>
+<img src="images/tsugi-knife-transparent.png" style="height: 150px; float: right">
 <p>
 <ul>
 <li><p><a href="tsugi/lessons.php">Developer Tutorials</a></p></li>
