@@ -23,7 +23,7 @@ require_once "tsugi/admin/sanity-db.php";
 <iframe width="400" height="225" src="https://www.youtube.com/embed/tuXySrvw8TE?rel=0" frameborder="0" allowfullscreen></iframe>
 </div>
 -->
-<h1>A Framework for Building Learning Tools</h1>
+<h1>A Framework for Building Learning Tools and Content</h1>
 <p>Welcome to the Tsugi project. 
 Our goal is to build a scalable multi-tenant "tool" hosting environment based on the 
 emerging IMS standards to help move the industry toward a 
