@@ -40,18 +40,22 @@ IMS Digital Revolution</a>
 <a href="https://www.youtube.com/watch?v=iDcoWH9PO6I&amp;index=2&amp;list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw"
 target="_blank">Tsugi Overview</a>
 </p></li>
-</ul><p>If you want to see this code actually working, you can play with the online demo:</p>
+</ul><p>You can play with the Tsugi developer console on this site:</p>
 
 <ul>
-<li><p><a href="https://lti-tools.dr-chuck.com/tsugi/" target="_blank">https://lti-tools.dr-chuck.com/tsugi/</a></p></li>
-</ul><p>Please do not use the testing key/secret for anything that is production.   The data associated with the key "12345" 
-is regularly cleared off this system without any notification.   If you want to use this system as a test, 
-you can log in to this site and request an account to use with your IMS LTI compatible LMS.  
-Here is some LTI 1.0 documentation as to how to use these tools when you have a key / secret:</p>
-
-<ul>
-<li><p><a href="md/LAUNCHING.md">Configuring LTI 1.0 Launches</a></p></li>
-</ul>
+<li><p><a href="/tsugi/dev.php">Developer Console</a></p></li>
+</ul><p>Please do not use the testing key/secret for anything 
+that is production.   The data associated with the key "12345" 
+is regularly cleared off this system without any notification.   
+</p>
+<p>
+If you want to use Tsugi tools in your courses, see sites like
+<a href="https://www.wa4e.com" target="_blank">www.wa4e.com</a>
+or
+<a href="https://www.py4e.com" target="_blank">www.py4e.com</a>.  
+Log into the site, and select "LMS Integration" to apply for a
+key that you can safely use in your classes.
+</p>
 <p>
   You can join the Tsugi developer's list at
   <ul>

@@ -25,7 +25,7 @@ into your instance of Tsugi using <b>github</b> from the Administrator interface
 target="_blank">Tsugi Static Content</a><br>
 The static content (JavaScript, Images, CSS, etc.) for Tsugi is shared across the 
 various versions so it is kept in a separate repository.  It is also hosted using
-<a href="http://www.cloudflare.com" target="_blank">CloudFlare</a> for high performane
+<a href="http://www.cloudflare.com" target="_blank">CloudFlare</a> for high performance
 cached access worldwide to reduce load on Tsugi application servers.  The URL for the
 static content is:
 <p>
