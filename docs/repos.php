@@ -84,6 +84,15 @@ and can be added to your <b>composer.json</b> as follows:
 </pre>
 </p>
 </li>
+<li><a href="https://github.com/tsugiproject/koseu-php" 
+target="_blank">Koseu LMS/MOOC Platform</a><br>
+The code to support adding a Tsugi-powerd LMS to a web site will be re-factored into 
+into own project named "Koseu (코스)".  This will include the lessons, badges, 
+and gradebook functionality currently in Tsugi.  The initial plan is to evolve these
+tools to use the 
+<a href="http://silex.sensiolabs.org/" target="_blank">Silex</a> PHP framework.
+</p>
+</li>
 <li><p><a href="https://github.com/tsugiproject/tsugi-php-module" target="_blank">Tsugi Module (Sample)</a><br/>
 Copy this if you want to start a fresh Tsugi Module from scratch.  If you are building
 a new tool from scratch, you should build it as a "Tsugi Module" following all 
@@ -128,7 +137,22 @@ exercises the various Tsugi implementations with LTI launches and does validatio
 each work with the Tsugi data model properly.
 </p>
 </li>
+<li><p>We are working with the 
+<a href="http://ai.umich.edu/" target="_blank">University of Michigan Academic Innovation</a>
+to develop a DJango version of Tsugi.
+</p></li>
+<li><p>We are working with the 
+<a href="https://openstax.org/" target="_blank">openstax</a>
+to develop a Ruby version of Tsugi.
+</p></li>
+<li><p>We have written an NSF grant (still pending)
+to support the building of a Flash version of Tsugi.
+</p></li>
 </ul>
+<p>
+We are always looking for help to move the Tsugi project forward or support Tsugi in a
+a new language / framework.
+</p>
 
 </div>
 <?php
