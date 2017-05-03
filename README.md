@@ -107,9 +107,15 @@ unlocking the admin console.  Run the "Upgrade Database" option and
 it should create lots of tables in the database and the red warning
 message about bad database, should go away.
 
-Got into the database and the `lti_key` table, find the row with the `key_key`
+Go into the database and the `lti_key` table, find the row with the `key_key`
 of google.com and put a value in the `secret` column - anything will do - 
 just don't leave it empty or the internal LTI tools will not launch.
+
+    UPDATE lti_key SET secret = '35nKN...lDzRbw' WHERE key_key="google.com";
+
+If you don't do this, the lessons tool will not be able to launch LTI 
+links even if you do log in.  Make sure to log out and back into Tsugi
+in your browsers once this has been done.
 
 Using the Application
 ---------------------
