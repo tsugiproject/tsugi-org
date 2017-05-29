@@ -26,7 +26,7 @@ if ( isset($_SESSION['id']) ) {
 	$submenu->addLink('Assignments', $T.'assignments.php');
     }
     if ( $CFG->DEVELOPER ) {
-        $submenu->addLink('Test LTI Tools', $T . 'dev.php');
+        $submenu->addLink('Test LTI Tools', $T . 'dev');
     }
     if ( $CFG->providekeys ) {
         $submenu->addLink('Use this Service', $T . 'admin/key/index.php');

@@ -43,7 +43,7 @@ target="_blank">Tsugi Overview</a>
 </ul><p>You can play with the Tsugi developer console on this site:</p>
 
 <ul>
-<li><p><a href="/tsugi/dev.php">Developer Console</a></p></li>
+<li><p><a href="/tsugi/dev">Developer Console</a></p></li>
 </ul><p>Please do not use the testing key/secret for anything 
 that is production.   The data associated with the key "12345" 
 is regularly cleared off this system without any notification.   

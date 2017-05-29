@@ -27,13 +27,22 @@ body {
 #page3 {
 	height:1100px;
 	width:1000px;
+	background:#777cdc;
+        filter:alpha(opacity=70);
+        opacity:0.9;
+	padding-top:150px;
+	}
+	
+#page4 {
+	height:1100px;
+	width:1000px;
 	background:#9b70c0;
         filter:alpha(opacity=70);
         opacity:0.9;
 	padding-top:150px;
 	}
 
-#page4 {
+#page5 {
 	height:1100px;
 	width:1000px;
 	background:#7b50a0;
