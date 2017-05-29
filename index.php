@@ -89,7 +89,27 @@ key that you can safely use in your classes.
 </ul>
 </p>
 </div>
-<div id="page3" class="jumbotron">
+ <div id="page3" class="jumbotron">
+        <a name="adopt"></a>
+    <div class="page-padding"></div>
+<img src="images/tsugi-knife-transparent.png" style="height: 150px; float: right">
+<h2>Tsugi In Production</h2>
+<p>
+<ul>
+<li><p><a href="http://easyochem.nsm.iup.edu/openochem/" target="_blank">OpenOChem - Open source, Collaborative, Assessment System for Organic Chemistry
+</a></p></li>
+<li><p><a href="https://www.py4e.com" target="_blank">Python for Everybody</a></p></li>
+<li><p><a href="https://www.wa4e.com" target="_blank">Web Applications for Everybody</a></p></li>
+</ul>
+</p>
+<p>If you have a production instance of Tsugi and would like to be listed here,
+please contact me or send a Pull Request for 
+<a href="https://github.com/tsugiproject/tsugi-org/blob/master/index.php" target="_blank">this page</a>
+via GitHub.  If you provide me with a mailing address, I will send you a Tsugi Swiss Army
+Knife (while supplies last).
+</p>
+</div>
+<div id="page4" class="jumbotron">
     <a name="about"></a>
     <div class="page-padding"></div>
 
@@ -122,7 +142,7 @@ in the United States and/or other countries.
 </p>
 </div>
 
-<div id="page4" class="jumbotron">
+<div id="page5" class="jumbotron">
     <a name="support"></a>
     <div class="page-padding"></div>
 <h1>Supporting Tsugi</h1>
