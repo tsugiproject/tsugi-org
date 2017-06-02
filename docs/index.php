@@ -6,10 +6,10 @@ require_once "../nav.php";
  <div class="jumbotron">
 <p>
 <ul>
-<li><p><a href="../tsugi/lessons.php">Developer Tutorials</a></p></li>
-<li><p><a href="repos.php">Tsugi Repositories in GitHub</a></p></li>
-<li><p><a href="install.php">Installing Tsugi</a></p></li>
-<li><p><a href="login.php">Using  Google Login</a></p></li>
+<li><p><a href="../lessons">Developer Tutorials</a></p></li>
+<li><p><a href="repos">Tsugi Repositories in GitHub</a></p></li>
+<li><p><a href="install">Installing Tsugi</a></p></li>
+<li><p><a href="login">Using  Google Login</a></p></li>
 <!--
 <li><p><a href="../md/CHECKOUT_ALL.md">Checking Code Out</a></p></li>
 -->

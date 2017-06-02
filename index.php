@@ -70,10 +70,10 @@ key that you can safely use in your classes.
 <img src="images/tsugi-knife-transparent.png" style="height: 150px; float: right">
 <p>
 <ul>
-<li><p><a href="tsugi/lessons.php">Developer Tutorials</a></p></li>
-<li><p><a href="docs/repos.php">Tsugi Repositories in GitHub</a></p></li>
-<li><p><a href="docs/install.php">Installing Tsugi</a></p></li>
-<li><p><a href="docs/login.php">Using  Google Login</a></p></li>
+<li><p><a href="lessons">Developer Tutorials</a></p></li>
+<li><p><a href="docs/repos">Tsugi Repositories in GitHub</a></p></li>
+<li><p><a href="docs/install">Installing Tsugi</a></p></li>
+<li><p><a href="docs/login">Using  Google Login</a></p></li>
 <!--
 <li><p><a href="../md/CHECKOUT_ALL.md">Checking Code Out</a></p></li>
 -->
