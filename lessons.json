@@ -19,6 +19,18 @@
         }
     ]
 },
+{
+    "title": "Building Web Applications",
+    "anchor": "wa4e",
+    "icon" : "fa-clone",
+    "description": "If you don't know how to use PHP, MySQL, and JavaScript, to build web applications, we recommend you take the on-line course called 'Web Applications for Everybody'.",
+    "references" : [
+        {
+            "title" : "Web Applications for Everybody",
+            "href" : "https://www.wa4e.com/"
+        }
+    ]
+},
 { 
     "title": "Installing PHP and SQL",
     "anchor": "install",
