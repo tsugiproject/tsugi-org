@@ -28,7 +28,7 @@ Here is a video tutorial that covers the _mod/attend_ Tsugi tool:
 This page is a work in progress as more documentation is developed but
 for now this is the documentation I have:
 
-* [TSUGI API Documentation](http://do1.dr-chuck.com/tsugi/phpdoc/)
+* [TSUGI API Documentation](http://api.tsugi.org/)
 * [Coding Standards](CODING.md)
 * [Video: TSUGI Data Model](https://www.youtube.com/watch?v=zXdNQGuXvuo&list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw&index=4)
 * [Internationalizing and Localizing](I18N.md)

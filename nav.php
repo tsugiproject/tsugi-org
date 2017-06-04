@@ -12,7 +12,7 @@ if ( isset($CFG->lessons) ) {
     $set->addLeft('Tutorials', $R.'lessons');
 }
 $set->addLeft('Videos', 'https://www.youtube.com/playlist?list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw');
-$set->addLeft('Discuss', 'https://groups.google.com/a/apereo.org/forum/#!forum/tsugi-dev');
+$set->addLeft('Discuss', 'https://developer.tsugi.org');
 
 if ( isset($_SESSION['id']) ) {
     $submenu = new \Tsugi\UI\Menu();
