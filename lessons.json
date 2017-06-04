@@ -100,6 +100,18 @@
         ]
     }
 },
+{
+    "title": "Join the Tsugi Developer List",
+    "anchor": "dev-list",
+    "icon" : "fa-clone",
+    "description": "It is a great idea to join the Tsugi Developers list to get help and notifications about the project.",
+    "references" : [
+        {
+            "title" : "Tsugi Developer List",
+            "href" : "https://developer.tsugi.org"
+        }
+    ]
+},
 { 
     "title": "Installing Tsugi",
     "anchor": "install-tsugi",
