@@ -42,8 +42,8 @@ to put in the appropriate values.  Make sure to change all the secrets.
 If you are just getting started turn on DEVELOPER mode so you can launch
 the tools easily.  Each of the fields is documented in the config-dist.php
 file - here is some additional documentation on the configuration values:</p>
-<p><a href="http://do1.dr-chuck.com/tsugi/phpdoc/classes/Tsugi.Config.ConfigInfo.html"
-target="_blank">http://do1.dr-chuck.com/tsugi/phpdoc/classes/Tsugi.Config.ConfigInfo.html</a></p>
+<p><a href="http://do1.dr-chuck.com/tsugi/phpdoc/Tsugi/Config/ConfigInfo.html"
+target="_blank">http://do1.dr-chuck.com/tsugi/phpdoc/Tsugi/Config/ConfigInfo.html</a></p>
 </li>
 <li>
 <p>Go to the main page, and click on &quot;Admin&quot; to make all the database

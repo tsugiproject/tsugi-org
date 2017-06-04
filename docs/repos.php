@@ -72,7 +72,7 @@ a Common Cartridge Export and IMS ContentItem App Store for all tools.
 <li><a href="https://github.com/tsugiproject/tsugi-php" 
 target="_blank">Tsugi PHP Library</a><br>
 This contains the library code for the 
-<a href="http://do1.dr-chuck.com/tsugi/phpdoc/namespaces/Tsugi.html" target="_blank">
+<a href="http://do1.dr-chuck.com/tsugi/phpdoc/" target="_blank">
 Tsugi PHP library</a>.  This is used in all of the PHP applications.  
 This library is released on 
 <a href="https://packagist.org/packages/tsugi/lib" target="_blank">Packagist</a>
