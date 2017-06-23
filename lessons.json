@@ -189,11 +189,15 @@
     "references" : [
         {
             "title" : "PyTsugi (GitHub)",
-            "href" : "https://github.com/tsugiproject/tsugi-php"
+            "href" : "https://github.com/tsugiproject/pytsugi"
         },
         {
             "title" : "Using PyTsugi in Web2Py (GitHub)",
             "href" : "https://github.com/tsugiproject/pytsugi-web2py"
+        },
+        {
+            "title" : "PyTsugi (on PyPi)",
+            "href" : "https://pypi.python.org/pypi/pytsugi"
         }
     ]
 }
