@@ -11,7 +11,7 @@
     "anchor": "overview",
     "icon" : "fa-clone",
     "description": "This gives some context around what Tsugi is and why Tsugi is being developed.",
-    "slides": "lectures/01-Mini.pptx",
+    "slides": "lectures/00-Mini.pptx",
     "videos" : [
         {
             "title" : "Overview of Tsugi",
