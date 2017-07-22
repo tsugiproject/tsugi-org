@@ -154,6 +154,12 @@
             "title" : "Building a single page Tsugi tool using tmpljs",
             "youtube" : "KU1XUsdypq0"
         }
+    ],
+    "references" : [
+        {
+            "title" : "Attendance Tool in GitHub",
+            "href" : "https://github.com/tsugitools/attend"
+        }
     ]
 },
 {
