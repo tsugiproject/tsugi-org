@@ -120,7 +120,13 @@
     "videos" : {
         "title": "Installing the Tsugi Environment",
         "youtube": "mbA_SRNJcYk"
-    }
+    },
+    "references" : [
+        {
+            "title" : "Installing Tsugi",
+            "href" : "docs/install"
+        }
+    ]
 },
 {
     "title": "Building the Attendance Tool",
