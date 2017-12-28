@@ -11,7 +11,7 @@ if ( isset($CFG->lessons) ) {
     $set->addLeft('Tutorials', $R.'lessons');
 }
 $set->addLeft('GitHub', $R.'docs/repos');
-$set->addLeft('Discuss', 'https://developer.tsugi.org');
+$set->addLeft('Discuss', 'https://developers.tsugi.org');
 
 if ( isset($_SESSION['id']) ) {
     $submenu = new \Tsugi\UI\Menu();
