@@ -40,21 +40,12 @@ IMS Digital Revolution</a>
 <a href="https://www.youtube.com/watch?v=iDcoWH9PO6I&amp;index=2&amp;list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw"
 target="_blank">Tsugi Overview</a>
 </p></li>
-</ul><p>You can play with the Tsugi developer console on this site:</p>
-
-<ul>
-<li><p><a href="/tsugi/dev">Developer Console</a></p></li>
-</ul><p>Please do not use the testing key/secret for anything 
-that is production.   The data associated with the key "12345" 
-is regularly cleared off this system without any notification.   
-</p>
+</ul>
 <p>
-If you want to use Tsugi tools in your courses, see sites like
-<a href="https://www.wa4e.com" target="_blank">www.wa4e.com</a>
-or
-<a href="https://www.py4e.com" target="_blank">www.py4e.com</a>.  
-Log into the site, and select "LMS Integration" to apply for a
-key that you can safely use in your classes.
+If you want to use Tsugi tools in your courses, you can use
+the free App Store at
+<a href="https://www.tsugicloud.org" target="_blank">TsugiCloud</a>.
+Go to the site, and apply for a key that you can safely use in your classes.
 </p>
 <p>
   You can join the Tsugi developer's list at

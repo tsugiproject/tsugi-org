@@ -7,12 +7,10 @@ $set = new \Tsugi\UI\MenuSet();
 // $set->setHome('<img style="top: -5px; width:4em; padding: 4px; border-radius: 4px; background-color:white;" src="'. $CFG->staticroot . '/img/logos/tsugi-logo.png' .'">', $CFG->apphome."#index");
 $set->setHome('TSUGI', $CFG->apphome."#index");
 $set->addLeft('Documentation', $R .'#docs');
-$set->addLeft('GitHub', $R.'docs/repos');
-$set->addLeft('Install', $R .'docs/install');
 if ( isset($CFG->lessons) ) {
     $set->addLeft('Tutorials', $R.'lessons');
 }
-$set->addLeft('Videos', 'https://www.youtube.com/playlist?list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw');
+$set->addLeft('GitHub', $R.'docs/repos');
 $set->addLeft('Discuss', 'https://developer.tsugi.org');
 
 if ( isset($_SESSION['id']) ) {
@@ -22,15 +20,11 @@ if ( isset($_SESSION['id']) ) {
         $submenu->addLink('Map', $R.'map');
     }
     if ( isset($_SESSION['id']) ) {
-	if ( isset($CFG->disqushost) ) $set->addLeft('Discuss', $R.'discuss');
-	else if ( isset($CFG->disquschannel) ) $set->addLeft('Discuss', $CFG->disquschannel);
 	$submenu->addLink('Assignments', $R.'assignments');
     }
-    if ( $CFG->DEVELOPER ) {
-        $submenu->addLink('Test LTI Tools', $T . 'dev');
-    }
+    $submenu->addLink('Tsugi App Store', 'https://www.tsugicloud.org');
     if ( $CFG->providekeys ) {
-        $submenu->addLink('Use this Service', $T . 'admin/key/index');
+        $submenu->addLink('Use this Service', $T . 'settings');
     }
     if ( isset($_COOKIE['adminmenu']) && $_COOKIE['adminmenu'] == "true" ) {
         $submenu->addLink('Administer', $T . 'admin/');
