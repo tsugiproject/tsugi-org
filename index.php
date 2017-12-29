@@ -45,7 +45,7 @@ target="_blank">Tsugi Overview</a>
 If you want to use Tsugi tools in your courses, you can use
 the free App Store at
 <a href="https://www.tsugicloud.org" target="_blank">TsugiCloud</a>.
-Go to the site, and apply for a key that you can safely use in your classes.
+Go to the site, apply for a key and use the tools.
 </p>
 <p>
   You can join the Tsugi developer's list at
