@@ -16,6 +16,7 @@ require_once "../nav.php";
 <li><p><a href="../md/CODING.md">Coding Style</a></p></li>
 <li><p><a href="../md/DEVELOP.md">How to Develop</a></p></li>
 <li><p><a href="../md/GITHUB.md">Installing Git</a></p></li>
+<li><p><a href="../md/GITPATCH.md">Submittiing a Change Using Git</a></p></li>
 <li><p><a href="../md/I18N.md">Internationalizing a Tsugi Tool</a></p></li>
 <li><p><a href="../md/LAUNCHING.md">Launching a Tsugi Tool from an LMS</a></p></li>
 <li><p><a href="../md/PHPDOC.md">How to use PHP Doc</a></p></li>
