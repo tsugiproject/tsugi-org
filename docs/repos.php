@@ -137,17 +137,10 @@ exercises the various Tsugi implementations with LTI launches and does validatio
 each work with the Tsugi data model properly.
 </p>
 </li>
-<li><p>We are working with the 
-<a href="http://ai.umich.edu/" target="_blank">University of Michigan Academic Innovation</a>
-to develop a DJango version of Tsugi.
-</p></li>
-<li><p>We are working with the 
-<a href="https://openstax.org/" target="_blank">openstax</a>
-to develop a Ruby version of Tsugi.
-</p></li>
-<li><p>We have written an NSF grant (still pending)
-to support the building of a Flash version of Tsugi.
-</p></li>
+<li><p>We developed an early Python 3 
+<a href="https://github.com/tsugiproject/pytsugi" target="_blank">Python 3</a>
+Tsugi implementation and an example of using this library in 
+<a href="https://github.com/tsugiproject/pytsugi-web2py" target="_blank">Web2Py</a>.
 </ul>
 <p>
 We are always looking for help to move the Tsugi project forward or support Tsugi in a
