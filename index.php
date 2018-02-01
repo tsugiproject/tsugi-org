@@ -26,15 +26,15 @@ require_once "tsugi/admin/sanity-db.php";
 <h1>Building Learning Tools</h1>
 <p>Welcome to the Tsugi project. Tsugi enables you to quickly build learning tools and integrate
 them into learning management systems.
-If you want to use Tsugi tools in your courses, you can use
-the free App Store at
-<a href="https://www.tsugicloud.org" target="_blank">TsugiCloud</a>.
-Go to the site, apply for a key and use the tools.
 </p>
-<p>
-  You can join the Tsugi developer's list at
   <ul>
-    <li><p><a href="https://developers.tsugi.org" target="_blank">Google Group</a> - once you 
+<li><p>If you want to use Tsugi tools in your learning system or Google Classroom,
+you can use the free App Store at
+<a href="https://www.tsugicloud.org" target="_blank">TsugiCloud</a>.
+</p></li>
+    <li><p>
+You can join the Tsugi developer's list at
+<a href="https://developers.tsugi.org" target="_blank">Google Group</a> - once you 
     have joined the group you can send email to tsugi-dev@apereo.org.</p></li>
   </ul>
 </p>

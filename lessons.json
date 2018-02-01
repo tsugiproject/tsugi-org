@@ -23,15 +23,11 @@
     "title": "Using Tsugi Tools",
     "anchor": "tsugitools",
     "icon" : "fa-cloud",
-    "description": "TsugiCloud provides free hosting for open source Tsugi tools.  Developers can submit their tools to TsugiCloud and teachers can use those tools for free.",
+    "description": "TsugiCloud provides free hosting for open source Tsugi tools.  Teachers can use TsugiCloud tools in their Learning Management Systems (LMS) or Google Classroom for free.  Developers can submit their tools to TsugiCloud for free hosting and use by teachers.   Developers can also host their own Tsugi app store if they like.",
     "references" : [
         {
             "title" : "TsugiCloud",
             "href" : "https://www.tsugicloud.org/"
-        },
-        {
-            "title": "Bonus: Brian Behlendorf on the Apache Software Foundation",
-            "href": "https://www.youtube.com/watch?v=6kRMlfIBMCY"
         }    ]
 },
 {
