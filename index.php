@@ -23,25 +23,9 @@ require_once "tsugi/admin/sanity-db.php";
 <iframe width="400" height="225" src="https://www.youtube.com/embed/tuXySrvw8TE?rel=0" frameborder="0" allowfullscreen></iframe>
 </div>
 -->
-<h1>A Framework for Building Learning Tools and Content</h1>
-<p>Welcome to the Tsugi project. 
-Our goal is to build a scalable multi-tenant "tool" hosting environment based on the 
-emerging IMS standards to help move the industry toward a 
-<a href="http://www.ngdle.org" target="_blank">Next Generation Digital Learning Environment</a> (NGDLE).  </p>
-
-<ul>
-<li><p>Video Presentation: 
-<a href="https://www.youtube.com/watch?v=R-SCdBaF-WY&list=PLysC4Zd9-FmDiBsX9o4shY48iM4PFLfsQ" target="_blank">
-IMS Digital Revolution</a>
-</p></li>
-<li><p>Video Presentation:
-<a href="https://www.youtube.com/watch?v=EfSsFs-2lqg" target="_blank">IMS LTI as Research</a></p></li>
-<li><p>Video Presentation: 
-<a href="https://www.youtube.com/watch?v=iDcoWH9PO6I&amp;index=2&amp;list=PLlRFEj9H3Oj5WZUjVjTJVBN18ozYSWMhw"
-target="_blank">Tsugi Overview</a>
-</p></li>
-</ul>
-<p>
+<h1>Building Learning Tools</h1>
+<p>Welcome to the Tsugi project. Tsugi enables you to quickly build learning tools and integrate
+them into learning management systems.
 If you want to use Tsugi tools in your courses, you can use
 the free App Store at
 <a href="https://www.tsugicloud.org" target="_blank">TsugiCloud</a>.
@@ -58,9 +42,10 @@ Go to the site, apply for a key and use the tools.
  <div id="page2" class="jumbotron">
         <a name="docs"></a>
     <div class="page-padding"></div>
-<img src="images/tsugi-knife-transparent.png" style="height: 150px; float: right">
+<img src="images/tsugicloud_logo.png" style="width: 150px; float: right">
 <p>
 <ul>
+<li><p><a href="https://www.tsugicloud.org" target="_blank">TsugiCloud - A Free App Store</a></p></li>
 <li><p><a href="lessons">Developer Tutorials</a></p></li>
 <li><p><a href="docs/repos">Tsugi Repositories in GitHub</a></p></li>
 <li><p><a href="docs/install">Installing Tsugi</a></p></li>

@@ -20,6 +20,21 @@
     ]
 },
 {
+    "title": "Using Tsugi Tools",
+    "anchor": "tsugitools",
+    "icon" : "fa-cloud",
+    "description": "TsugiCloud provides free hosting for open source Tsugi tools.  Developers can submit their tools to TsugiCloud and teachers can use those tools for free.",
+    "references" : [
+        {
+            "title" : "TsugiCloud",
+            "href" : "https://www.tsugicloud.org/"
+        },
+        {
+            "title": "Bonus: Brian Behlendorf on the Apache Software Foundation",
+            "href": "https://www.youtube.com/watch?v=6kRMlfIBMCY"
+        }    ]
+},
+{
     "title": "Building Web Applications",
     "anchor": "wa4e",
     "icon" : "fa-clone",
