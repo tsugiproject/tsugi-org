@@ -32,9 +32,22 @@
     ],
     "references" : [
         {
-            "title" : "TsugiCloud",
+            "title" : "TsugiCloud (free Tsugi Hosting)",
             "href" : "https://www.tsugicloud.org/"
-        }    ]
+        },
+        {
+            "title" : "Using TsugiCloud with Google Classroom",
+            "href" : "https://www.tsugicloud.org/about/documentation/howto/classroom"
+        },
+        {
+            "title" : "Using TsugiCloud with Canvas",
+            "href" : "https://www.tsugicloud.org/about/documentation/howto/canvas"
+        },
+        {
+            "title" : "Using TsugiCloud with Sakai",
+            "href" : "https://www.tsugicloud.org/about/documentation/howto/sakai"
+        }
+    ]
 },
 {
     "title": "Building Web Applications",
