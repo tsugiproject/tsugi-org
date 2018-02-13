@@ -28,6 +28,10 @@
         {
             "title" : "Using TsugiCloud in Google Classroom",
             "youtube" : "SeAsoA_fJo0"
+        },
+        {
+            "title" : "Using TsugiCloud in Sakai",
+            "youtube" : "au2_C_2PgIA"
         }
     ],
     "references" : [
@@ -50,13 +54,17 @@
     ]
 },
 {
-    "title": "Building Web Applications",
+    "title": "Pre-Requisite: Learning PHP and MySQL",
     "anchor": "wa4e",
     "icon" : "fa-clone",
-    "description": "Pre-Requisite: If you don't know how to use PHP, MySQL, and JavaScript, to build web applications, we recommend you take the on-line course called 'Web Applications for Everybody'.",
+    "description": "If you don't know how to use PHP, MySQL, and JavaScript, to build web applications, we recommend you take 'Web Applications for Everybody'.  You can earn a certificate on Coursera or take the course at our free online web site.",
     "references" : [
         {
-            "title" : "Web Applications for Everybody",
+            "title" : "Web Applications for Everybody Specialization (Coursera)",
+            "href" : "https://www.coursera.org/specializations/web-applications/"
+        },
+        {
+            "title" : "Web Applications for Everybody (WA4E)",
             "href" : "https://www.wa4e.com/"
         }
     ]
@@ -149,7 +157,7 @@
     "description": "The first task is to work through the installation steps including installing a text editor, installing MAMP or XAMPP (or equivalent), creating a MySql Database, and writing a PHP program.",
     "videos" : {
         "title": "Installing the Tsugi Environment",
-        "youtube": "mbA_SRNJcYk"
+        "youtube": "ik_eyP5_tF0"
     },
     "references" : [
         {
