@@ -1,0 +1,36 @@
+
+Lecture Slides:
+
+http://www.tsugi.org/docs/lectures
+
+Install PHP and GIT:
+
+http://www.php-intro.com/install
+
+Checkout Tsugi and static into htdocs:
+
+https://github.com/csev/tsugi
+
+    https://github.com/csev/tsugi/blob/master/docs/INSTALL.md
+
+https://github.com/csev/tsugi-php-mod/blob/master/README.md
+
+   cd tsugi
+   git clone https://github.com/csev/tsugi-php-mod mod
+
+
+Optional - check out tsugi-static.
+
+https://github.com/csev/tsugi-static (optional)
+
+Setup Tsugi:
+
+http://localhost:8888/tsugi
+
+   Will be database creation and run the admin tool
+
+Add the sample module
+
+https://github.com/csev/tsugi-php-module
+
+

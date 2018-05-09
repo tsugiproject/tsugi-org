@@ -1,0 +1,36 @@
+
+Casa:
+
+https://trunk-mysql.nightly.sakaiproject.org/imsblti/provider/casa.json
+
+https://lti-tools.dr-chuck.com/tsugi/lti/store/casa.json
+
+http://casa.paulgray.net/
+
+Tsugi Content Item:
+
+https://lti-tools.dr-chuck.com/tsugi/lti/store/
+Key: 12345 / secret
+
+Sakai ContentItem:
+
+https://trunk-mysql.nightly.sakaiproject.org/imsblti/provider/content.item
+key: 12345 / secret
+
+Sakai/LTI 2.0:
+
+https://lti-tools.dr-chuck.com/tsugi/lti/register.php
+Must sign up for an account and apply for a key
+
+Canvas/ContentItem + Config Extensions
+
+https://trunk-mysql.nightly.sakaiproject.org/imsblti/provider/canvas-config.xml
+Note: need to figure out how to make the config work on this
+
+https://sakai.ngrok.io/imsblti/provider/canvas-config.xml
+
+Make sure 12345 consumer is not trusted
+
+https://lti-tools.dr-chuck.com/tsugi/lti/store/canvas-config.xml
+
+https://umich.instructure.com/
