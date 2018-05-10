@@ -3,7 +3,7 @@ require_once "../top.php";
 require_once "../nav.php";
 ?>
 <div id="container">
-<h1>Tsugi in Github</h2>
+<h1>Tsugi in Github</h1>
 <p>Tsugi has two organizations and a number of repositories.  This page serves as 
 an index into those repositories.
 The <a href="https://github.com/tsugiproject/" target="_blank">tsugiproject</a>
@@ -118,7 +118,66 @@ This is the beginnings of a library to make the
 library usable in Laravel applications.
 </p>
 </ul>
-<h1>Tsugi In Other Languages</h2>
+<h2>Tsugi In The Cloud</h2>
+<p>
+We have a number of repositories that include varius resources for Tsugi into the cloud on
+Amazon Web services or Kubernetes in Google or Azure.  These scripts are used to construct
+the various production services at 
+<a href="https://www.tsugicloud.org" target="_blank">www.tsugicloud.org</a> or
+<a href="https://www.learnxp.com" target="_blank">www.learnxp.com</a>
+(a Tsugi 
+<a href="https://www.apereo.org/affiliates/learning-experiences" target="_blank">commercial partner</a>).
+<ul>
+<li><p>
+<a href="https://github.com/tsugicloud/" target="_blank">
+The overall TsugiCloud Repository</a>
+</p>
+</li>
+<li><p>
+<a href="https://github.com/tsugiproject/docker-php" target="_blank">
+Docker recipes</a>
+This repo describes how to produce Docker containers for Tsugi PHP.
+These can be used locally to create versions ranging from
+<a href="https://dev.tsugicloud.org/">developer instances of Tsugi</a>
+to versions that accept user configuration data for a scalable production
+deployment.
+</p>
+</li>
+<li><p>
+<a href="https://github.com/tsugicloud/kube" target="_blank">
+Kuberbetes recipes</a>
+This repo describes how to take the above Docker containers and
+place them in Google's cloud compute engine.  They are a work in
+progress and should be used as examples and starting points for 
+your own production.
+</p>
+</li>
+<li><p>
+<a href="https://github.com/tsugicloud/ami-sql" target="_blank">
+Building a Tsugi AMI on Amazon Web Services</a> - 
+This repo is used to produce the Amazon-hosted scalable instances of Tsugi
+for 
+<a href="https://www.tsugicloud.org" target="_blank">TsugiCloud</a> and
+<a href="https://www.learnxp.com" target="_blank">Learning Experiences</a>.
+These instances make use of AWS
+<a href="https://aws.amazon.com/rds/aurora" target="_blank">Aurora</a>,
+<a href="https://aws.amazon.com/dynamodb" target="_blank">DynamoDB</a>,
+<a href="https://aws.amazon.com/efs" target="_blank">Elastic File System</a>,
+<a href="https://aws.amazon.com/elasticloadbalancing" target="_blank">Application Load Balance</a>
+to deploy a highly available, scalable and resiliant Tsugi deployment.
+For your own Tsugi deployments you should consider this as examples and
+starting points.
+</p>
+</li>
+</ul>
+<p>
+There is more to do.  The above repositories provide building blocks that can be used
+to manually construct cloud instances of Tsugi.  Ultimately once more production experience
+is gained with these building blocks they will likely evolve into TerraForm and Ansible recipes
+to automate creating complete Tsugiu clusters.
+</p>
+
+<h1>Tsugi In Other Languages</h1>
 <p>
 Tsugi is best supported in the PHP languages but these languages are emerging and will evolve as there
 is interest.
@@ -141,6 +200,10 @@ each work with the Tsugi data model properly.
 <a href="https://github.com/tsugiproject/pytsugi" target="_blank">Python 3</a>
 Tsugi implementation and an example of using this library in 
 <a href="https://github.com/tsugiproject/pytsugi-web2py" target="_blank">Web2Py</a>.
+</p></li>
+<li>
+<p>We are looking into a special version of Tsugi that uses DJango and Tsugi APIs to
+greatly simplify the development of a class of Tsugi tools.
 </ul>
 <p>
 We are always looking for help to move the Tsugi project forward or support Tsugi in a
