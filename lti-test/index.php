@@ -11,8 +11,6 @@ session_start();
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body style="font-family:sans-serif;">
-<a href="http://www.sakaiger.com" target="_new">
-<img src="http://www.sakaiger.com/images/Sakaiger.png" align="right"></a>
 <h1>LTI Unit Tests</h1>
 <p>
 This code is sample code and unit test code for IMS LTI 1.0, 1.1, and
