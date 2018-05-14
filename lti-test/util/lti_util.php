@@ -25,6 +25,14 @@ function htmlent_utf8($string) {
 	return htmlentities($string,ENT_QUOTES,$encoding = 'UTF-8');
 }
 
+function isHttps() {
+    $retval = false;
+    if ( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ) $retval = true;
+    if ( isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ) $retval = true;
+    return $retval;
+}
+
+
 $ltiUtilTogglePre_div_id = 1;
 // Useful for debugging
 function ltiUtilTogglePre($title, $content) {
@@ -293,7 +301,7 @@ class BLTI {
         $email = $this->getUserEmail();
         if ( $email === false ) return false;
         $size = 40;
-        $grav_url = $_SERVER['HTTPS'] ? 'https://' : 'http://';
+        $grav_url = isHttps() ? 'https://' : 'http://';
         $grav_url = $grav_url . "www.gravatar.com/avatar.php?gravatar_id=".md5( strtolower($email) )."&size=".$size;
         return $grav_url;
     }
@@ -393,7 +401,7 @@ class BLTI {
         if ( $url === false ) {
       $host = $_SERVER['HTTP_HOST'];
       $uri = $_SERVER['PHP_SELF'];
-      $location = $_SERVER['HTTPS'] ? 'https://' : 'http://';
+      $location = isHttps() ? 'https://' : 'http://';
       $location = $location . $host . $uri;
     } else {
       $location = $url;
@@ -657,9 +665,7 @@ function do_body_request($url, $method, $data, $optional_headers = null)
   }
 
   function curPageURL() {
-    $pageURL = (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != "on")
-             ? 'http'
-             : 'https';
+    $pageURL = isHttps() ? 'https' : 'http';
     $pageURL .= "://";
     $pageURL .= $_SERVER['HTTP_HOST'];
     //$pageURL .= $_SERVER['REQUEST_URI'];
