@@ -28,7 +28,7 @@ require_once "tsugi/admin/sanity-db.php";
 them into learning management systems.
 </p>
   <ul>
-<li><p>If you want to use Tsugi tools in your learning system or Google Classroom,
+<li><p>If you want to use Tsugi tools in your LMS or Google Classroom,
 you can use the free App Store at
 <a href="https://www.tsugicloud.org" target="_blank">TsugiCloud</a>.
 </p></li>
@@ -36,6 +36,10 @@ you can use the free App Store at
 You can join the Tsugi developer's list at
 <a href="https://developers.tsugi.org" target="_blank">Google Group</a> - once you 
     have joined the group you can send email to tsugi-dev@apereo.org.</p></li>
+<li><p>
+We host an LTI <a href="lti-test">Test Harness</a> which can be used
+to test various aspects of LTI.
+</p></li>
   </ul>
 </p>
 </div>

@@ -9,6 +9,8 @@ require_once 'util/mimeparse.php';
 session_start();
 header('Content-Type: text/html; charset=utf-8'); 
 
+$cur_url = curPageURL();
+
 // Initialize, all secrets are 'secret', do not set session, and do not redirect
 $key = isset($_POST['oauth_consumer_key']) ? $_POST['oauth_consumer_key'] : false;
 $secret = "secret";

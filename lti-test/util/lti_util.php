@@ -174,7 +174,8 @@ class BLTI {
 
         $server = new OAuthServer($store);
 
-        $request = OAuthRequest::from_request();
+        $cur_url = curPageURL();
+        $request = OAuthRequest::from_request(null, $cur_url);
 
         $method = new OAuthSignatureMethod_HMAC_SHA1();
         $server->add_signature_method($method);
@@ -266,7 +267,7 @@ class BLTI {
         $familyname = $this->info['lis_person_name_family'];
         $fullname = $this->info['lis_person_name_full'];
         if ( strlen($fullname) > 0 ) return $fullname;
-        if ( strlen($familyname) > 0 and strlen($givenname) > 0 ) return $givenname + $familyname;
+        if ( strlen($familyname) > 0 and strlen($givenname) > 0 ) return $givenname . ' ' . $familyname;
         if ( strlen($givenname) > 0 ) return $givenname;
         if ( strlen($familyname) > 0 ) return $familyname;
         return $this->getUserEmail();
