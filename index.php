@@ -37,8 +37,8 @@ You can join the Tsugi developer's list at
 <a href="https://developers.tsugi.org" target="_blank">Google Group</a> - once you 
     have joined the group you can send email to tsugi-dev@apereo.org.</p></li>
 <li><p>
-We host an LTI <a href="lti-test">Test Harness</a> which can be used
-to test various aspects of LTI.
+We host an LTI 1.1 <a href="lti-test">Test Harness</a> which can be used
+to test various aspects of LTI 1.1.
 </p></li>
   </ul>
 </p>
@@ -77,17 +77,18 @@ to test various aspects of LTI.
 <h2>Tsugi In Production</h2>
 <p>
 <ul>
+<li><p><a href="https://www.tsugicloud.org" target="_blank">TsugiCLoud</a> - A free hosted server for Tsugi tools.</p></li>
 <li><p><a href="http://easyochem.nsm.iup.edu/openochem/" target="_blank">OpenOChem - Open source, Collaborative, Assessment System for Organic Chemistry
 </a></p></li>
 <li><p><a href="https://www.py4e.com" target="_blank">Python for Everybody</a></p></li>
 <li><p><a href="https://www.wa4e.com" target="_blank">Web Applications for Everybody</a></p></li>
+<li><p><a href="https://www.learnxp.com" target="_blank">Learning Experiences</a> - A commercially hosted server for Tsugi tools.</p></li>
 </ul>
 </p>
 <p>If you have a production instance of Tsugi and would like to be listed here,
 please contact me or send a Pull Request for 
 <a href="https://github.com/tsugiproject/tsugi-org/blob/master/index.php" target="_blank">this page</a>
-via GitHub.  If you provide me with a mailing address, I will send you a Tsugi Swiss Army
-Knife (while supplies last).
+via GitHub.  
 </p>
 </div>
 <div id="page4" class="jumbotron">
@@ -96,7 +97,7 @@ Knife (while supplies last).
 
 <center style="padding-bottom: 20px;">
 <a href="http://www.tsugi.org" target="_new">
-<img style="width: 80%; max-width:360px;" src="https://www.dr-chuck.net/tsugi-static/img/logos/tsugi-logo-incubating.png">
+<img style="width: 80%; max-width:360px;" src="https://static.tsugi.org/img/logos/tsugi-logo-incubating.png">
 </a>
 </center>
 <p>

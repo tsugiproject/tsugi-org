@@ -170,7 +170,7 @@
     "title": "Building the Attendance Tool",
     "anchor": "devintro",
     "icon" : "fa-clone",
-    "description": "This is a series of videos about developing a Tsugi tool in PHP.  You should watch the first two videos before watching videos 3-5 so you understand how a tool functions within Tsugi and how the Tsugi APIs are set up and function.  Video 3 covers the Silex framework, video 4 covers Handlebars, and video 5 shows a single page Tsugi Application using the tmpljs templating language.",
+    "description": "This is a series of videos about developing a Tsugi tool in PHP.  You should watch the first two videos before watching videos 3-5 so you understand how a tool functions within Tsugi and how the Tsugi APIs are set up and function.  Video 3 covers Handlebars, and video 4 shows a single page Tsugi Application using the tmpljs templating language.",
     "videos" : [
         {
             "title" : "Overview of the Attendance Tool",
@@ -181,16 +181,18 @@
             "youtube" : "oYDT1QoX9EA"
         },
         {
-            "title" : "Building a Tsugi tool in Silex",
-            "youtube" : "-SJqIp9BNcY"
-        },
-        {
             "title" : "Building a Tsugi tool using Handlebars",
             "youtube" : "WFr2cgcSZM0"
         },
         {
             "title" : "Building a single page Tsugi tool using tmpljs",
             "youtube" : "KU1XUsdypq0"
+        }
+    ],
+    "obsolete-videos" : [
+        {
+            "title" : "Building a Tsugi tool in Silex",
+            "youtube" : "-SJqIp9BNcY"
         }
     ],
     "references" : [

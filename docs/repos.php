@@ -29,8 +29,8 @@ various versions so it is kept in a separate repository.  It is also hosted usin
 cached access worldwide to reduce load on Tsugi application servers.  The URL for the
 static content is:
 <p>
-<a href="http://www.dr-chuck.net/tsugi-static/" target="_blank"
->http://www.dr-chuck.net/tsugi-static/</a>
+<a href="https://static.tsugi.org/" target="_blank"
+>https://static.tsugi.org/</a>
 </p>
 <p>
 As part of configuring a Tsugi instance, you can control what URL is used to 
@@ -52,21 +52,11 @@ to host and track Tsugi tutorials and badges.
 target="_blank">Tsugi Administration, Developer, and Management Console</a><br>
 This is the starting point for any Tsugi effort.  It sets up the databases, 
 manages keys, installs and hosts tools, functions as a test platform, 
-developer test harness
-and lets you manage your
-Tsugi installation.  Even if you are using 
-<a href="https://github.com/tsugiproject/tsugi-java" target="_blank"
->Tsugi Java</a>, 
-<a href="https://github.com/tsugiproject/tsugi-node" target="_blank"
->Tsugi Node</a>, 
-or
-<a href="https://github.com/tsugiproject/tsugi-laravel-sample" target="_blank"
->Tsugi Laravel</a>, you need to install the administration console to set things
-up for the Tsugi Run time.
+developer test harness and lets you manage your Tsugi installation.  
 </p>
 <p>
-The Administration console also contains support for an LTI 2.0 provider,
-a Common Cartridge Export and IMS ContentItem App Store for all tools.
+The Administration console also contains support for an IMS LTI versions
+a Common Cartridge Export and IMS ContentItem / Deep Linking App Store for all tools.
 </p>
 </li>
 <li><a href="https://github.com/tsugiproject/tsugi-php" 
@@ -79,7 +69,7 @@ This library is released on
 and can be added to your <b>composer.json</b> as follows:
 <pre>
 "require": {
-    "tsugi/lib": ">=0.3.1"
+    "tsugi/lib": ">=0.5.1"
 }
 </pre>
 </p>
@@ -88,9 +78,10 @@ and can be added to your <b>composer.json</b> as follows:
 target="_blank">Koseu LMS/MOOC Platform</a><br>
 The code to support adding a Tsugi-powerd LMS to a web site will be re-factored into 
 into own project named "Koseu (코스)".  This will include the lessons, badges, 
-and gradebook functionality currently in Tsugi.  The initial plan is to evolve these
-tools to use the 
+and gradebook functionality currently in Tsugi.
+Some of these tools are written using the (deprecated as of 2018)
 <a href="http://silex.sensiolabs.org/" target="_blank">Silex</a> PHP framework.
+These tools will be rewritten over time not to depend on Silex.
 </p>
 </li>
 <li><p><a href="https://github.com/tsugiproject/tsugi-php-module" target="_blank">Tsugi Module (Sample)</a><br/>
@@ -110,18 +101,19 @@ own Tsugi Module.</p></li>
 This is a set of exercises of increasing difficulty suitable for a class or 
 workshop.  Working solutions are provided online.  Source code for working solutions
 is only available to inctructors that contact Dr. Chuck.</p></li>
-
 <li><p>
-<a href="https://github.com/tsugiproject/tsugi-laravel-sample" target="_blank">Tsugi Laravel</a><br/>
-This is the beginnings of a library to make the
-<a href="https://github.com/tsugiproject/tsugi-php" target="_blank">Tsugi PHP</a>
-library usable in Laravel applications.
+<a href="https://github.com/tsugiproject/tsugi-python-test">Tsugi Functionality Test</a><br/>
+While there is not yet a Python version of Tsugi, there is a functionality test that 
+exercises the various Tsugi implementations with LTI launches and does validation that they
+each work with the Tsugi data model properly.
 </p>
+</li>
+
 </ul>
 <h2>Tsugi In The Cloud</h2>
 <p>
 We have a number of repositories that include varius resources for Tsugi into the cloud on
-Amazon Web services or Kubernetes in Google or Azure.  These scripts are used to construct
+Amazon Web services.  These scripts are used to construct
 the various production services at 
 <a href="https://www.tsugicloud.org" target="_blank">www.tsugicloud.org</a> or
 <a href="https://www.learnxp.com" target="_blank">www.learnxp.com</a>
@@ -134,25 +126,6 @@ The overall TsugiCloud Repository</a>
 </p>
 </li>
 <li><p>
-<a href="https://github.com/tsugiproject/docker-php" target="_blank">
-Docker recipes</a>
-This repo describes how to produce Docker containers for Tsugi PHP.
-These can be used locally to create versions ranging from
-<a href="https://dev.tsugicloud.org/">developer instances of Tsugi</a>
-to versions that accept user configuration data for a scalable production
-deployment.
-</p>
-</li>
-<li><p>
-<a href="https://github.com/tsugicloud/kube" target="_blank">
-Kuberbetes recipes</a>
-This repo describes how to take the above Docker containers and
-place them in Google's cloud compute engine.  They are a work in
-progress and should be used as examples and starting points for 
-your own production.
-</p>
-</li>
-<li><p>
 <a href="https://github.com/tsugicloud/ami-sql" target="_blank">
 Building a Tsugi AMI on Amazon Web Services</a> - 
 This repo is used to produce the Amazon-hosted scalable instances of Tsugi
@@ -161,20 +134,30 @@ for
 <a href="https://www.learnxp.com" target="_blank">Learning Experiences</a>.
 These instances make use of AWS
 <a href="https://aws.amazon.com/rds/aurora" target="_blank">Aurora</a>,
-<a href="https://aws.amazon.com/dynamodb" target="_blank">DynamoDB</a>,
+<a href="https://aws.amazon.com/memcached/" target="_blank">Memcached</a>,
 <a href="https://aws.amazon.com/efs" target="_blank">Elastic File System</a>,
-<a href="https://aws.amazon.com/elasticloadbalancing" target="_blank">Application Load Balance</a>
+<a href="https://aws.amazon.com/elasticloadbalancing" target="_blank">Application Load Balancing</a>
 to deploy a highly available, scalable and resiliant Tsugi deployment.
 For your own Tsugi deployments you should consider this as examples and
 starting points.
 </p>
 </li>
+<li><p>
+<a href="https://github.com/tsugiproject/docker-php" target="_blank">
+Docker recipes</a>
+This repo describes how to produce Docker containers for Tsugi PHP.
+These can be used locally to create versions ranging from
+<a href="https://dev.tsugicloud.org/">developer instances of Tsugi</a>
+to versions that accept user configuration data for a scalable production
+deployment. 
+</p>
+</li>
 </ul>
 <p>
-There is more to do.  The above repositories provide building blocks that can be used
-to manually construct cloud instances of Tsugi.  Ultimately once more production experience
-is gained with these building blocks they will likely evolve into TerraForm and Ansible recipes
-to automate creating complete Tsugiu clusters.
+At this point scalable instances are best run on AWS since there are so many supporting services
+that keep socts low while allowing high scalability.  Docker/Kubernetes on Azure  or
+Google Cloud is just so much less mature so production deployments simply take more resources
+and DevOps talent.   
 </p>
 
 <h1>Tsugi In Other Languages</h1>
@@ -186,28 +169,57 @@ is interest.
 <a href="https://github.com/tsugiproject/tsugi-java-servlet">Tsugi Java</a><br/>
 This is a reasonably complete implementation of the Tsugi run-time in Java.  
 It shares low level IMS libraries with Sakai and is ready for production use.</p></li>
+</ul>
+<p>
+Former language efforts in Tsugi beyond PHP and Java are now deprecated.
+
+<h1>Deprecated Work</h1>
+<p>
+This is initial work that was produced in hopes that a community would emerge around it
+but when there was insufficient interest, the honest thing to do is deprecate it.
+<ul>
 <li><p>
-<a href="https://github.com/tsugiproject/tsugi-node-sample">Tsugi NodeJS</a><br/>
-- This is early pre-emergent code.</p></li>
-<li><p>
-<a href="https://github.com/tsugiproject/tsugi-python-test">Tsugi Functionality Test</a><br/>
-While there is not yet a Python version of Tsugi, there is a functionality test that 
-exercises the various Tsugi implementations with LTI launches and does validation that they
-each work with the Tsugi data model properly.
+<a href="https://github.com/tsugicloud/kube" target="_blank">
+Kuberbetes/Docker recipes</a>
+A great deal of effort was made to host Tsugi at scale using Kubernetes
+on Google Cloud. The recipes are solid as far as they go but Google
+Cloud is just too immature to be the suggested technique for hosting Tsugi at
+scale.  Amazon has serverless Aurora, Elastic File System, and Elasticache -
+they are both very cost effective and simple to deploy and use.  At some point
+if the Google Cloud (or Azure) ends up with a better suite of support
+services, this effort can be restarted.  Alternatvely if there is a region where
+Kubernetes is the *only* solution available - this can be evolved into production
+ready capabilities with some additional effort.
 </p>
 </li>
+<li><p>
+<a href="https://aws.amazon.com/dynamodb" target="_blank">DynamoDB</a> was initially used
+for sessions storage / failover but ultimately it was slow and expensive compared to 
+<a href="https://aws.amazon.com/memcached/" target="_blank">Memcached</a>.
+</p>
+</li>
+<li><p>
+<a href="https://github.com/tsugiproject/tsugi-node-sample">Tsugi NodeJS</a><br/>
+- This was pre-emergent code but is deprecated until there is more interest.</p></li>
 <li><p>We developed an early Python 3 
 <a href="https://github.com/tsugiproject/pytsugi" target="_blank">Python 3</a>
 Tsugi implementation and an example of using this library in 
-<a href="https://github.com/tsugiproject/pytsugi-web2py" target="_blank">Web2Py</a>.
+<a href="https://github.com/tsugiproject/pytsugi-web2py" target="_blank">Web2Py</a>
+but this is now deprecated.
 </p></li>
-<li>
-<p>We are looking into a special version of Tsugi that uses DJango and Tsugi APIs to
-greatly simplify the development of a class of Tsugi tools.
+<li><p>
+<a href="https://github.com/tsugiproject/tsugi-laravel-sample" target="_blank">Tsugi Laravel</a><br/>
+This is the beginnings of a library to make the
+<a href="https://github.com/tsugiproject/tsugi-php" target="_blank">Tsugi PHP</a>
+library usable in Laravel applications.
+</p>
+</li>
 </ul>
 <p>
-We are always looking for help to move the Tsugi project forward or support Tsugi in a
-a new language / framework.
+As of late 2018, we are designing and will build a next-generation tool hosting framework
+based on Tsugi exporting its functionality via web services.  This will allow
+a far greater diversity in tool impementation environment choices and better meet
+the privacy requirements of the GDPR.
 </p>
 
 </div>
