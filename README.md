@@ -24,11 +24,21 @@ Go into the newly checked out folder and get a copy of Tsugi as well as the exer
 
 The solutions repo is private and if you not a member of the project, you don't really need it.
 
-Create a database in your SQL server if you don't already have one:
+Create a database:
 
     CREATE DATABASE tsugi DEFAULT CHARACTER SET utf8;
+
+Create a user in MySQL 5.x and give it permissions on the table:
+
     GRANT ALL ON tsugi.* TO 'ltiuser'@'localhost' IDENTIFIED BY 'ltipassword';
     GRANT ALL ON tsugi.* TO 'ltiuser'@'127.0.0.1' IDENTIFIED BY 'ltipassword';
+
+For MySQL 8.x the stntax is a bit different:
+
+    CREATE USER 'ltiuser'@'localhost' IDENTIFIED BY 'ltipassword';
+    CREATE USER 'ltiuser'@'127.0.0.1' IDENTIFIED BY 'ltipassword';
+    GRANT ALL ON tsugi.* TO 'ltiuser'@'127.0.0.1';
+    GRANT ALL ON tsugi.* TO 'ltiuser'@'localhost';
 
 Still in the tsugi folder set up config.php:
 
