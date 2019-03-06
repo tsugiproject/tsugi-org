@@ -19,15 +19,11 @@ is sent from the Learning Management System / Platform.
   <strong>Error:</strong> <?= htmlentities($error) ?>
 </div>
 <?php } ?>
-<p>
-One of the first things to check is to make sure that both the tool and LMS / platform
-are officially certifified at 
-<a href="https://www.imsglobal.org/cc/statuschart.cfm">https://www.imsglobal.org/cc/statuschart.cfm</a>
-</p>
 <?php
 if ( strpos($error,'OAuth validation fail key') === 0 ) {
 ?>
-<p>The most typical cause of this error is a mis-match between the OAuth Consumer Key and Secret between
+<p><b>Detail:</b>
+The most typical cause of this error is a mis-match between the OAuth Consumer Key and Secret between
 the LMS and tool.   If you are testing a new tool for the first time, there might be a mis-match between 
 the URL that the LMS thinking it is launching to and the URL that tool things of itself as serving from.
 Sometimes the LMS is launching to an 'https://' url and the tool thinks that it is serving on 'http://'.
@@ -41,8 +37,45 @@ Secret: secret
 or launch your tool from <a href="https://www.tsugi.org/lti-test/lms.php" target="_blank">https://www.tsugi.org/lti-test/lms.php</a>.
 </p>
 <?php
+} else if ( strpos($error,"Invalid Key Id (header.kid), could not find public key") === 0 ) {
+?>
+<p><b>Detail:</b>
+The tool has received a broken LTI 1.3 launch.  A common cause of this is when you are using the
+IMS certification suite where they are sending broken launches on purpose to insure the tool has
+a suitable error message (like this).
+</p>
+<?php
+} else if ( strpos($error,"Bad LTI version") === 0 ) {
+?>
+<p><b>Detail:</b> The tool has received a launch that looks like LTI 1.3 but is missing or has the incorrect version.
+A common cause of this is when you are using the
+IMS certification suite where they are sending broken launches on purpose to insure the tool has
+a suitable error message (like this).
+<p>
+If you are receiving this message from a launch from an acutal LMS it is lilely mis-configured or generating
+bad launches.
+</p>
+<?php
+} else if ( strpos($error,"This tool should be launched from a learning system using LTI") === 0 ) {
+?>
+<p><b>Detail:</b> This tool did not receive a proper launch and there wither was no tool session
+from a prior lauch.   If this is the initial lauch, the LMS probably sent broken data.  If you have been 
+using the tool for a while, it may have lost its session due to a bug in the tool.
+</p>
+<?php
+} else if ( strpos($error,"Missing") === 0 ) {
+?>
+<p><b>Detail:</b> This tool did not receive a required item for this launch.   Your LMS or testing system
+is probably sending a launch improperly.
+</p>
+<?php
 }
 ?>
+<p>
+One of the first things to check is to make sure that both the tool and LMS / platform
+are officially certified at 
+<a href="https://www.imsglobal.org/cc/statuschart.cfm">https://www.imsglobal.org/cc/statuschart.cfm</a>
+</p>
 </div>
 <?php 
 require_once "foot.php";
