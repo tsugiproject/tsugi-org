@@ -1,0 +1,72 @@
+
+Building Tsugi Applications in Django
+-------------------------------------
+
+Make an account on 
+
+www.pythonanywhere.com
+
+Start a shell
+
+cd    #Get into your homr directory
+mkvirtualenv django2 --python=/usr/bin/python3.6
+workon django2
+pip install django
+
+python3 -m django --version
+
+git clone https://github.com/tsugiproject/djtest
+
+cd djtest
+pip install -r requirements.txt
+
+In the PYAW web interface navigate to the Web tab to create a new 
+web application. If you have not already done so, add a new web 
+application. Select manual configuration and Python 3.6. Once the 
+webapp is created, you need to make a few changes to the settings 
+for the web app and your application.
+
+source code: /home/--your-account---/djtest
+working directory: /home/--your-account---/djtest
+virtualenv: /home/--your-account---/.virtualenvs/django2
+
+Then edit the WGSI Configuration File and put the following 
+code into it. 
+
+import os
+import sys
+
+path = os.path.expanduser('~/djtest')
+if path not in sys.path:
+    sys.path.insert(0, path)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'djtest.settings'
+from django.core.wsgi import get_wsgi_application
+from django.contrib.staticfiles.handlers import StaticFilesHandler
+application = StaticFilesHandler(get_wsgi_application())
+
+Then restart your web application and attempt to go 
+
+https://--your-account--.pythonanywhere.com/grade/
+
+You literally should get a "403" error because it is not an LTI launch - just like
+what you get when you go to:
+
+https://djtools.tsugicloud.org/grade/
+
+Now have Chuck connect your tool into TsugiCloud.
+
+Launch the tool from Tsugi Cloud:
+
+https://test.tsugicloud.org/tsugi/store/
+
+Make an account on 
+
+https://dev1.sakaiproject.org/
+
+Make a site, add Lessons and Gradebook.  Then in Lessons, "Add Learning App" from Tsugi Store and
+select your new tool.  Make *sure* it opens in a new tab since it uses cookies :(
+
+If you want to test grade flow, make sure to make a second student account to join your site
+and launch to send back a grade.
+
+
