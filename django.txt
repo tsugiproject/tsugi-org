@@ -20,6 +20,10 @@ git clone https://github.com/tsugiproject/djtest
 cd djtest
 pip install -r requirements.txt
 
+Then create the needed database file:
+
+python3 manage.py migrate
+
 In the PYAW web interface navigate to the Web tab to create a new 
 web application. If you have not already done so, add a new web 
 application. Select manual configuration and Python 3.6. Once the 
