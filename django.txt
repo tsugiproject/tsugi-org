@@ -61,7 +61,7 @@ https://test.tsugicloud.org/tsugi/store/
 
 Make an account on 
 
-https://dev1.sakaiproject.org/
+https://dev1.sakaicloud.com
 
 Make a site, add Lessons and Gradebook.  Then in Lessons, "Add Learning App" from Tsugi Store and
 select your new tool.  Make *sure* it opens in a new tab since it uses cookies :(
