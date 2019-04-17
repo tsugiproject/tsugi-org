@@ -86,21 +86,29 @@ Test launch the tool from the TsugiCloud store:
 
 https://dev1.tsugicloud.org/tsugi/store/
 
+Find your tool, click on "Details" and then "Test".  This
+will test launch the tool from within Tsugi.  It should work
+and show a button "Open in New Window" - press it and your tool
+should appear in a new tab.
+
+Next we will launch your tool from Sakai.
+
 Make an account on 
 
 https://dev1.sakaicloud.com
 
-Make a site, add Lessons and Gradebook.
+Make a site, add the Lessons and Gradebook tools.
 
 Then in Lessons, "Add Learning App" and select "Dev1" from the list.
-If "Dev1" is not in the Add Learning App list have Chuck add it.
+If "Dev1" is not in the "Add Learning App" list have Chuck add it.
 
-Once you are in "Add Learning App" scroll down and find your app and install
-it in Lessons.
+Once you are in the "Add Learning App" dialog, scroll down and 
+find your app and install it in Lessons.
 
 If you want to test grade flow, make sure to make a second student
-account to join your site and launch your tool to send back a grade that actually
-makes it to the gradebook.  Instructors can't receive grades.
+account to join your site and launch your tool to send back a
+grade that actually makes it to the gradebook.  Instructors
+can't receive grades.
 
 Then, go back to your PythonAnywhere account, and edit the file
 
