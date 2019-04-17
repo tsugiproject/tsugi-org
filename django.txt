@@ -73,8 +73,9 @@ https://dev1.tsugicloud.org/tsugi/admin
 
 Select "Manage External Tools" and "Add Tool".
 
-The "Launch Endpoint" must be unique.  Make be your account name on pythonanywhere.
-The URL for reveiving launches needs to be
+The "Launch Endpoint" must be unique.  The simplest thing
+is to just use your account name on pythonanywhere.
+The URL for receiving launches needs to be
 
 https://--your-account--.pythonanywhere.com/grade/launch
 
