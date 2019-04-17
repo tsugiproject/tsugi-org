@@ -99,8 +99,9 @@ https://dev1.sakaicloud.com
 
 Make a site, add the Lessons and Gradebook tools.
 
-Then in Lessons, "Add Learning App" and select "Dev1" from the list.
-If "Dev1" is not in the "Add Learning App" list have Chuck add it.
+Then in Lessons, "Add Content" -> "Add Learning App" and
+select "Dev1" from the list.  If "Dev1" is not in the
+"Add Learning App" list have Chuck add it.
 
 Once you are in the "Add Learning App" dialog, scroll down and 
 find your app and install it in Lessons.
