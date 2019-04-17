@@ -6,9 +6,9 @@ Make an account on
 
 www.pythonanywhere.com
 
-Start a shell
+Start a shell on PythonAnywhere
 
-cd    #Get into your homr directory
+cd    #Get into your home directory
 mkvirtualenv django2 --python=/usr/bin/python3.6
 workon django2
 pip install django
@@ -30,12 +30,20 @@ application. Select manual configuration and Python 3.6. Once the
 webapp is created, you need to make a few changes to the settings 
 for the web app and your application.
 
+Create a duplicate tab in the current web browser with shell open. 
+In the duplicate tab in top right corner click on the three line 
+drop down and select Web. Click on Add a new web app. Click next 
+until you get to Select a Python Web Framework. Select Manual 
+Configuration. Select the Python version to be Python 3.6. 
+Click Next to finish Manual Configuration for Web App. 
+
+
 source code: /home/--your-account---/djtest
 working directory: /home/--your-account---/djtest
 virtualenv: /home/--your-account---/.virtualenvs/django2
 
-Then edit the WGSI Configuration File and put the following 
-code into it. 
+Then edit the WGSI Configuration File and replace the contents of the file
+with the following code:
 
 import os
 import sys
@@ -47,6 +55,8 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'djtest.settings'
 from django.core.wsgi import get_wsgi_application
 from django.contrib.staticfiles.handlers import StaticFilesHandler
 application = StaticFilesHandler(get_wsgi_application())
+
+
 
 Then restart your web application and attempt to go 
 
@@ -86,9 +96,6 @@ If "Dev1" is not in the Add Learning App list have Chuck add it.
 
 Once you are in "Add Learning App" scroll down and find your app and install
 it in Lessons.
-
-Then edit the entry in Lessons to make it open in a new window because the Django
-code uses a cookie session.
 
 If you want to test grade flow, make sure to make a second student
 account to join your site and launch your tool to send back a grade that actually
