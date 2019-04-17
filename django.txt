@@ -8,7 +8,7 @@ www.pythonanywhere.com
 
 Start a shell on PythonAnywhere
 
-cd    #Get into your home directory
+cd
 mkvirtualenv django2 --python=/usr/bin/python3.6
 workon django2
 pip install django
