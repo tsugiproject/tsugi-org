@@ -57,20 +57,51 @@ what you get when you go to:
 
 https://djtools.tsugicloud.org/grade/
 
-Now have Chuck connect your tool into TsugiCloud.
+Adding to to an instance of Tsugi.  Go to (password sakaiger):
 
-Launch the tool from Tsugi Cloud:
+https://dev1.tsugicloud.org/tsugi/admin
 
-https://test.tsugicloud.org/tsugi/store/
+Select "Manage External Tools" and "Add Tool".
+
+The "Launch Endpoint" must be unique.  Make be your account name on pythonanywhere.
+The URL for reveiving launches needs to be
+
+https://--your-account--.pythonanywhere.com/grade/launch
+
+Additional Settings is the JSON shown below the field.  Make *sure* to
+remove the // comment after pasting it in.  Yes the field is only one line.
+
+Test launch the tool from the TsugiCloud store:
+
+https://dev1.tsugicloud.org/tsugi/store/
 
 Make an account on 
 
 https://dev1.sakaicloud.com
 
-Make a site, add Lessons and Gradebook.  Then in Lessons, "Add Learning App" from Tsugi Store and
-select your new tool.  Make *sure* it opens in a new tab since it uses cookies :(
+Make a site, add Lessons and Gradebook.
 
-If you want to test grade flow, make sure to make a second student account to join your site
-and launch to send back a grade.
+Then in Lessons, "Add Learning App" and select "Dev1" from the list.
+If "Dev1" is not in the Add Learning App list have Chuck add it.
+
+Once you are in "Add Learning App" scroll down and find your app and install
+it in Lessons.
+
+Then edit the entry in Lessons to make it open in a new window because the Django
+code uses a cookie session.
+
+If you want to test grade flow, make sure to make a second student
+account to join your site and launch your tool to send back a grade that actually
+makes it to the gradebook.  Instructors can't receive grades.
+
+Then, go back to your PythonAnywhere account, and edit the file
+
+~/djtest/grade/templates/grade/main.html
+
+Add your name to the <h1> tag, then go into the PythonAnywhere account Web Tab
+and "Reload" your application and then re-launch it from Sakai.
+
+Congratulations - you just built, installed, and modified a Django-based
+Tsugi tool.
 
 
