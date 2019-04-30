@@ -57,30 +57,41 @@ from django.contrib.staticfiles.handlers import StaticFilesHandler
 application = StaticFilesHandler(get_wsgi_application())
 
 
-
 Then restart your web application and attempt to go 
 
 https://--your-account--.pythonanywhere.com/grade/
 
-You literally should get a "403" error because it is not an LTI launch - just like
-what you get when you go to:
+You literally should get a "403 Forbidden" error because it is 
+not an LTI launch - just like what you get when you go to:
 
 https://djtools.tsugicloud.org/grade/
 
-Adding to to an instance of Tsugi.  Go to (password sakaiger):
+Adding to to an instance of Tsugi.  
 
 https://dev1.tsugicloud.org/tsugi/admin
 
-Select "Manage External Tools" and "Add Tool".
+Enter the password "sakaiger" and select "Manage External Tools" and "Add Tool".
 
-The "Launch Endpoint" must be unique.  The simplest thing
-is to just use your account name on pythonanywhere.
+The "Launch Endpoint" must be unique across the whole system.  The simplest thing
+is to just use your account name on pythonanywhere.  The name of the tool is a title
+and can have several words.
+
 The URL for receiving launches needs to be
 
 https://--your-account--.pythonanywhere.com/grade/launch
 
-Additional Settings is the JSON shown below the field.  Make *sure* to
-remove the // comment after pasting it in.  Yes the field is only one line.
+
+Here are my sample settings:
+
+Launch endpoint: drchuck
+Name of the tool: Dr. Chuck's Test
+Launch URL: https://drchuck.pythonanywhere.com/grade/launch
+Icon: fa-random
+
+Set the Additional Settings to the JSON shown below the field.  Yes the field is 
+only one line - the JSON will all fit and it will look better in the edit view.
+
+Ignore the pubic key for now - it is already hard-coded into djtest for this tutorial.
 
 Test launch the tool from the TsugiCloud store:
 
@@ -90,6 +101,9 @@ Find your tool, click on "Details" and then "Test".  This
 will test launch the tool from within Tsugi.  It should work
 and show a button "Open in New Window" - press it and your tool
 should appear in a new tab.
+
+Launching from an LMS
+---------------------
 
 Next we will launch your tool from Sakai.
 
