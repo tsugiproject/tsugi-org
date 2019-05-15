@@ -41,6 +41,7 @@ if ( $contents != false ) {
 } else {
 ?>
 <ul>
+<li><a href="ADVANTAGE.md">Using Tsugi with LTI Advantage</a></li>
 <li><a href="CHECKOUT_ALL.md">Checking Code Out</a></li>
 <li><a href="CODING.md">Coding Style</a></li>
 <li><a href="DEVELOP.md">How to Develop</a></li>
@@ -50,8 +51,8 @@ if ( $contents != false ) {
 <li><a href="LAUNCHING.md">Launching Tsugi</a></li>
 <li><a href="LOGIN.md">Setting up Login via Google</a></li>
 <li><a href="PHPDOC.md">How to use PHP Doc</a></li>
-<li><a href="README.md">README</a></li>
 <li><a href="README_CANVAS_APP_STORE.md">Using Tsugi as an App Store in Canvas</a></li>
+<li><a href="README.md">README</a></li>
 </ul>
 <?php
 }
