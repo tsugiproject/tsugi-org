@@ -26,7 +26,25 @@ These are the data fields needed by the LMS from the tool:
 
 * Tool OpenId Connect Redirect Endpoint(s) - Can be more than one
 
-* Tool OAuth2 Keyset URL (Optional)
+* Tool Public Key (rarely)
+
+* Tool OAuth2 Keyset URL (some LMS's)
+
+Some LMS's will give the tool its public key, and other LMS's will accept a public
+key from the tool.  Other LMS's will expect a keyset URL in lieu of a public key.
+
+Those LMS's that expect a keyset URL should not need a tool public key because
+they will retrieve the tool public key from the keyset URL.   The keyset URL
+is a better approach but is less common because it requires ot the tool to
+(a) maintain its own keys and produce the keyset URL contents.
+
+The reason that more LMS's mint the private keys in their first release of LTI Advantage
+is that it is the required use case for LTI Advantage certification.   The LMS vendors 
+in general are not resistant to switching to tool generated keys and keyset URLs
+because it is better security in the long run.
+
+Tsugi gives you flexibility in its administration UI so it supports all these
+different scenarios.
 
 Data Required by the Tool
 -------------------------
@@ -146,13 +164,28 @@ Examples from Particular LMS Systems
 ====================================
 
 
+Blackboard
+----------
+
+The Blackboard approach is to mint the tool's public and private keys and not 
+require a tool keyset URL.
+
+Set up should be simple, go into your Tsugi, start the process of creating a new issuer,
+and then take the `OIDC Connect` and `OIDC Redirect` endpoints and put them into the 
+"new client" screen in Blackboard.  Once the client is created in Blackboard, you should have all
+the information you need to fill out the Issuer and Tenant/Key data within Tsugi.
+
+The issuer for Blackboard is always https://blackboard.com regardless of client.  Each client
+(i.e. Tsugi instance) will get a unique client-id (issuer screen) and 
+deployment-id (key / tenant screen).
+
 Sakai
 -----
 
-Sakai expects to mint the tool private keys as of Sakai-19.  There are plans to add support for the tool
+Sakai expects to mint the tool private keys as of Sakai-19.0.  There are plans to add support for the tool
 keyset in a later release of Sakai 19.x.   The workflow between Sakai and Tsugi is quite easy if you can 
 be in the admin UI of both tools at the same time.  This can either happen if both systems 
-are administered by the same person ot they can work together exchanging values over Slack or email.
+are administered by the same person or they can work together exchanging values over Slack or email.
 
 First go into Tsugi.   Add an Issuer.   On the issuer screen you can see the `OIDC Connect` 
 and `OIDC Redirect` endpoints.
@@ -168,6 +201,12 @@ Then add or update a tenant/key with the `deployment_id` (always 1 on Sakai for 
 key of the new issuer record.
 
 You should be connected.
+
+You can work through this example using the Sakai and Tsugi nightly servers.  They are nice to 
+experiment with because they reset every night :)
+
+https://trunk-mysql.nightly.sakaiproject.org/portal/  ( admin / admin )
+https://dev1.tsugicloud.org/tsugi/admin/ (sakaiger)
 
 
 A Sample Tsugi Issuer Entry
