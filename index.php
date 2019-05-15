@@ -50,6 +50,7 @@ to test various aspects of LTI 1.1.
 <p>
 <ul>
 <li><p><a href="https://www.tsugicloud.org" target="_blank">TsugiCloud - A Free App Store</a></p></li>
+<li><p><a href="md/ADVANTAGE.md">Using LTI Advantage with Tsugi</a></p></li>
 <li><p><a href="lessons">Developer Tutorials</a></p></li>
 <li><p><a href="docs/repos">Tsugi Repositories in GitHub</a></p></li>
 <li><p><a href="docs/install">Installing Tsugi</a></p></li>
