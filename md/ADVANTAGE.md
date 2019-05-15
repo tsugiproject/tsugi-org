@@ -128,6 +128,92 @@ support LTI 1.1 and LTI Advantage launches if your key/tenant is set up properly
 Creating a New LTI Advantage Only Key/Tenant
 --------------------------------------------
 
+To create a key/tenant to receive launches, once you have successfully configured the issuer in 
+Tsugi and the LMS, insert a new key.  Make the OAuth Consumer key be the client-id from the LMS
+and leave the consumer secret blank.  Set the `deployment_id` from the information provided 
+by the LMS.  The Issuer primary key is the integer value of the issuer key that you just created. 
+Caliper key and Url are optional.   The `user_id` is also optional.
+
 Migrating an LTI 1.1 Key/Tenant to LTI Advantage
 ------------------------------------------------
+
+Go into an exsiting tenant/key with an `oauth_consumer_key` and secret.  Set the `deployment_id`
+(string) and `issuer_id` (integer) and save the entry.  You now have LTI 1.3 launches for
+(issuer, client-id, and deployment_id) and LTI 1.1 launches with oauth_consumer_key and secret.
+If you want to later disallow LTI 1.1 launches, simply set the secret to be empty.
+
+Examples from Particular LMS Systems
+====================================
+
+
+Sakai
+-----
+
+Sakai expects to mint the tool private keys as of Sakai-19.  There are plans to add support for the tool
+keyset in a later release of Sakai 19.x.   The workflow between Sakai and Tsugi is quite easy if you can 
+be in the admin UI of both tools at the same time.  This can either happen if both systems 
+are administered by the same person ot they can work together exchanging values over Slack or email.
+
+First go into Tsugi.   Add an Issuer.   On the issuer screen you can see the `OIDC Connect` 
+and `OIDC Redirect` endpoints.
+
+In Sakai go to Adminstration Workspace, External Tools.  If you already have an LTI 1.1 key/secret, edit it
+and turn on LTI 1.3 and enter the `OIDC Connect` and `OIDC Redirect` endpoints and save the tool.  Then go into the 
+tool viewer on Sakai and you will see all the values including the public an private key for the tool that can
+be pasted into the Tsugi Add Issuer screen.
+
+Then save the issuer and note its primary key.
+
+Then add or update a tenant/key with the `deployment_id` (always 1 on Sakai for now) and the primary
+key of the new issuer record.
+
+You should be connected.
+
+
+A Sample Tsugi Issuer Entry
+===========================
+
+Issuer Key
+
+    https://dev1.sakaicloud.com
+
+LTI 1.3 Client ID (from the Platform)
+
+    ebf1be93-7d8d-4a1f-a7de-f2c8f5407300
+
+LTI 1.3 Platform OAuth2 Well-Known/KeySet URL (from the platform)
+
+    https://dev1.sakaicloud.com/imsblis/lti13/keyset/12
+
+LTI 1.3 Platform OAuth2 Bearer Token Retrieval URL (from the platform)
+
+    https://dev1.sakaicloud.com/imsblis/lti13/token/12
+
+LTI 1.3 Platform OIDC Authentication URL (from the Platform)
+
+    https://dev1.sakaicloud.com/imsoidc/lti13/oidc_auth
+
+LTI 1.3 Platform Public Key (Usually retrieved via keyset url)
+
+    -----BEGIN PUBLIC KEY----- MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA36WKUmzLtUstgwwHdLWJ 1gRcN1EefGjDzJhriozKOE8+cm/tXSPPie1zgjtWKNxDA9pDqJaGqwMfvODcSnuy sUs+jU4V/    [SNIP]    +HfnIKDFsuV4wtwMIcGq0DvuDYxeMKSIRdpLIGlNxZ7k70ZwhQsE86gNVjKMEbm8 Cpcijcn2QfF+EwjSkVKGWkF2XGVA3QaAJ/DwiYtwC2gMhuogb7aCUxF6Q1KWnnwE 2QIDAQAB -----END PUBLIC KEY-----
+
+LTI 1.3 Tool Public Key (Provide to the platform)
+
+    -----BEGIN PUBLIC KEY----- MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzLFI4rkQvMG1rVljj0GY9 PGil3gM3o2JkmvBWk6wow9LJWtGAdPTBeBRb6d/LCJzypoQwzT8jl37yeEmUIW/t/   [SNIP]    fwtrYwFi4O9HHP9S5UbJHe3Yq5YHczF6Ka1/AB4Pgt7Eb wdpN7SsFCChMwxnqMz4/nsDntt9DQNiXcJzeAVeSn/Vbofi4MmKScYiQ3jjZ3SxGg YQGqcRI2dcvp+nZ5tZaWuqWiUyTzwVX92P2mOI6kLpYPWn9xw1XClbC1U44TQIDAQ AB -----END PUBLIC KEY-----
+
+LTI 1.3 Private Key (kept internally only)
+
+    -----BEGIN PRIVATE KEY----- MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDMsUjiuRC8wbWtW WOPQZj08aKXeAzejYmSa8FaTrCjD0sla0YB09MF4FFvp38sInPKmhDDNPyOXfvJ4S RO6v41bD07XECH08TXfUt2ylHsI0S2Ojrof+q8RZHcD+e26DYczIownzdwKBgQCLB GcXMevedzPGoNirvyfLtlD8HtHhx0zj6m9yCvcy6J8KrLUF366EH5Q6zaB0msr3n5    [SNIP]   T/FZUSLUCKr3cJJVHoFAl8VCdgnatoCOTKJV+E+yWTT5xXxhaNQtvuXtBwJIWugMR fZinj3WccbMguAwsgwgxI2hM4VWrRgq4eiFD+wwKBgQDCEy2GP7MiXjjG/hI7NhM3 u0U5ZXiaw0KuTVsUidHnslO/ufoogRPWjZYqQ1hi5RcBkn4M4BdAmFD9tDWhQB9LZ NjgerKfqFY0Zsm4iZJHu6osdiutegyZl2JzKKTMpFwp9bNRBYbd1yrJWcNtaTdpH6 IP5dg8RJ8ALKv/sc1NoQKBgDPny8X4+u74HOacxiOd28LkANAfKJg00IlBv79Abvg rHLYxG/hFNYGSRGDeKK7y+XqpuQCa8ESgjwKcOajjHYZ5+yZQjGjBT1DrO6P/CrZn nIIbOcrGvqZj3CDVAZvFgo11xe5Qn6mOTkUhBloLKdF9cyRiz1FSB0mcndnzTFCQ -----END PRIVATE KEY----- 
+
+LTI 1.3 Tool Keyset Url (Extension - may not be needed/used by LMS)
+
+    https://www.tsugicloud.org/tsugi/lti/keyset?issuer_id=1
+
+LTI 1.3 OpenID Connect Endpoint
+
+    https://www.tsugicloud.org/tsugi/lti/oidc_login
+
+LTI 1.3 Tool Redirect Endpoint
+
+    https://www.tsugicloud.org/tsugi/lti/oidc_launch
 
