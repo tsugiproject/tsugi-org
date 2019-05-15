@@ -104,8 +104,8 @@ The go into the LMS and create your integration.   When it is done, you should g
 the issuer, client id, deployment id, platform keySet URL, platform token retrieval URL, tool public key
 and tool private key.
 
-All of these values except deployment id are entered into the `Add Issuer` screen 
-and you can add the Issuer.  Make note of the integer primary key by viewing the issuer in Tsugi.
+All of the LMS values except deployment id are entered into the `Add Issuer` screen 
+and you can add the Issuer.
 
 Continue to Creating a Tenant / Key below.
 
@@ -123,14 +123,12 @@ Then immediately view the issuer.  At that point you should see all the data tha
 the LMS needs.  Typically the LMS will need the tool public key, the tool keyset url, 
 openID connect endpoint, and tool redirect endpoint.
 
-Note the primary key of the issuer.  You will need that later.
-
 Provide these values to your LMS and they should be able to create your client
 in their system and give you back their issuer, your client-id in their system,
 and the lms keyset URL if you don't already have it.
 
 Now edit the issuer entry in Tsugi, and replace the fields you filled with random stuff
-with the real values and save the issuer, noting the primary key of the issuer.
+with the real values and save the issuer.
 
 Tenant / Keys in Tsugi
 ----------------------
@@ -149,14 +147,15 @@ Creating a New LTI Advantage Only Key/Tenant
 To create a key/tenant to receive launches, once you have successfully configured the issuer in 
 Tsugi and the LMS, insert a new key.  Make the OAuth Consumer key be the client-id from the LMS
 and leave the consumer secret blank.  Set the `deployment_id` from the information provided 
-by the LMS.  The Issuer primary key is the integer value of the issuer key that you just created. 
+by the LMS.  
+Select the issure you just created.
 Caliper key and Url are optional.   The `user_id` is also optional.
 
 Migrating an LTI 1.1 Key/Tenant to LTI Advantage
 ------------------------------------------------
 
 Go into an exsiting tenant/key with an `oauth_consumer_key` and secret.  Set the `deployment_id`
-(string) and `issuer_id` (integer) and save the entry.  You now have LTI 1.3 launches for
+(string) and select the issuer and save the entry.  You now have LTI 1.3 launches for
 (issuer, client-id, and deployment_id) and LTI 1.1 launches with oauth_consumer_key and secret.
 If you want to later disallow LTI 1.1 launches, simply set the secret to be empty.
 
@@ -167,7 +166,8 @@ Examples from Particular LMS Systems
 Blackboard
 ----------
 
-The Blackboard approach is to mint the tool's public and private keys and not 
+The <a href="https://www.blackboard.com" target="_blank">Blackboard</a>
+approach is to mint the tool's public and private keys and not 
 require a tool keyset URL.
 
 Set up should be simple, go into your Tsugi, start the process of creating a new issuer,
@@ -179,10 +179,16 @@ The issuer for Blackboard is always https://blackboard.com regardless of client.
 (i.e. Tsugi instance) will get a unique client-id (issuer screen) and 
 deployment-id (key / tenant screen).
 
+Canvas
+------
+
+Instructions are coming.
+
 Sakai
 -----
 
-Sakai expects to mint the tool private keys as of Sakai-19.0.  There are plans to add support for the tool
+<a href="https://www.sakailms.org" target="_blank">Sakai</a> expects to mint the tool
+private keys as of Sakai-19.0.  There are plans to add support for the tool
 keyset in a later release of Sakai 19.x.   The workflow between Sakai and Tsugi is quite easy if you can 
 be in the admin UI of both tools at the same time.  This can either happen if both systems 
 are administered by the same person or they can work together exchanging values over Slack or email.
@@ -195,19 +201,17 @@ and turn on LTI 1.3 and enter the `OIDC Connect` and `OIDC Redirect` endpoints a
 tool viewer on Sakai and you will see all the values including the public an private key for the tool that can
 be pasted into the Tsugi Add Issuer screen.
 
-Then save the issuer and note its primary key.
+Then add or update a tenant/key with the `deployment_id` (always 1 on Sakai for now) and issuer.
 
-Then add or update a tenant/key with the `deployment_id` (always 1 on Sakai for now) and the primary
-key of the new issuer record.
-
-You should be connected.
+You should be ready to define a tool placement in Sakai and do a launch.  One fun aspect of Sakai
+is that once you set up a tool with both LTI 1.1 and LTI 1.3 values, you can switch back and forth
+between 1.1 and 1.3 launches by simply changing the LTI 1.3 radio button.
 
 You can work through this example using the Sakai and Tsugi nightly servers.  They are nice to 
 experiment with because they reset every night :)
 
 https://trunk-mysql.nightly.sakaiproject.org/portal/  ( admin / admin )
 https://dev1.tsugicloud.org/tsugi/admin/ (sakaiger)
-
 
 A Sample Tsugi Issuer Entry
 ===========================
