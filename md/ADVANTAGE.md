@@ -53,6 +53,8 @@ Data Required by the Tool
 
 * Client Id
 
+* OIDC Connect Authentication URL
+
 * Platform OAuth2 Keyset URL
 
 * Platform OAuth2 Token Retrieval URL
