@@ -40,7 +40,7 @@ or launch your tool from <a href="https://www.tsugi.org/lti-test/lms.php" target
 } else if ( strpos($error,"Could not find tenant/key ") === 0 ) {
 ?>
 <p><b>Detail:</b>
-The tool has received a broken LTI 1.3 launch.  This happens when you have defined an Issuer in
+The tool has received a broken LTI 1.3 launch.  This typically happens when you have defined an Issuer in
 Tsugi but not create a Key/Tenant for the issuer/clientid/deployment_id combination.
 (<a href="md/ADVANTAGE.md" target="_blank">LTI Advantage Documentation</a>)
 </p>
@@ -82,7 +82,7 @@ is probably sending a launch improperly.
 <p>
 One of the first things to check is to make sure that both the tool and LMS / platform
 are officially certified at 
-<a href="https://www.imsglobal.org/cc/statuschart.cfm">https://www.imsglobal.org/cc/statuschart.cfm</a>
+<a href="https://www.imsglobal.org/cc/statuschart.cfm" target="_blank">https://www.imsglobal.org/cc/statuschart.cfm</a>
 </p>
 </div>
 <?php 
