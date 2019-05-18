@@ -37,6 +37,14 @@ Secret: secret
 or launch your tool from <a href="https://www.tsugi.org/lti-test/lms.php" target="_blank">https://www.tsugi.org/lti-test/lms.php</a>.
 </p>
 <?php
+} else if ( strpos($error,"Could not find tenant/key ") === 0 ) {
+?>
+<p><b>Detail:</b>
+The tool has received a broken LTI 1.3 launch.  This happens when you have defined an Issuer in
+Tsugi but not create a Key/Tenant for the issuer/clientid/deployment_id combination.
+(<a href="md/ADVANTAGE.md" target="_blank">LTI Advantage Documentation</a>)
+</p>
+<?php
 } else if ( strpos($error,"Invalid Key Id (header.kid), could not find public key") === 0 ) {
 ?>
 <p><b>Detail:</b>
