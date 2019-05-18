@@ -2,7 +2,7 @@ Using LTI Advantage with Tsugi
 ==============================
 
 LTI Advantage (LTI 1.3) is the latest integration standard between tools and
-LMS systems.  LTI Advantage uses OAuth 2.0 and Java Web Tokens (JWTs) and 
+LMS systems.  LTI Advantage uses OAuth 2.0 and Java Web Tokens (JWTs) and
 so it is more complex to set up than LTI 1.1 - which just needed a key and
 secret.  Tsugi is certified as LTI Advantage compliant.   These instructions
 can help guide you through your LTI Advantage installation.
@@ -22,29 +22,19 @@ Data Required by the LMS
 
 These are the data fields needed by the LMS from the tool:
 
-* Tool OpenID Connect/Initialization Endpoint
+* Tool OpenID Connect/Initialization Endpoint (1)
 
-* Tool OpenId Connect Redirect Endpoint(s) - Can be more than one
+* Tool OpenId Connect Redirect Endpoint(s)
 
-* Tool Public Key (rarely)
+* Tool Public Key (most common)
 
-* Tool OAuth2 Keyset URL (some LMS's)
+* Tool OAuth2 Keyset URL (some LMS's prefer this instead of the Tool Public Key)
 
 Some LMS's will give the tool its public key, and other LMS's will accept a public
 key from the tool.  Other LMS's will expect a keyset URL in lieu of a public key.
 
-Those LMS's that expect a keyset URL should not need a tool public key because
-they will retrieve the tool public key from the keyset URL.   The keyset URL
-is a better approach but is less common because it requires ot the tool to
-(a) maintain its own keys and produce the keyset URL contents.
-
-The reason that more LMS's mint the private keys in their first release of LTI Advantage
-is that it is the required use case for LTI Advantage certification.   The LMS vendors 
-in general are not resistant to switching to tool generated keys and keyset URLs
-because it is better security in the long run.
-
-Tsugi gives you flexibility in its administration UI so it supports all these
-different scenarios.
+For more detail on how these parameters are used in LTI Advantage, see
+the sections titled 'Inside An LTI Advantage Launch' and 'Talking to Services in LTI Advantage'.
 
 Data Required by the Tool
 -------------------------
@@ -53,17 +43,23 @@ Data Required by the Tool
 
 * Client Id
 
-* OIDC Connect Authentication URL
+* Platform OIDC Connect Authentication URL
 
 * Platform OAuth2 Keyset URL
 
 * Platform OAuth2 Token Retrieval URL
 
+Keyset urls are not password protexted.   Since they only hold public keys, there is
+no particular need to hide or shield them.
+
+For more detail on how these parameters are used in LTI Advantage, see
+the sections titled 'Inside An LTI Advantage Launch' and 'Talking to Services in LTI Advantage'.
+
 How the Tool Public and Private Key are Generated
 -------------------------------------------------
 
 There is some variation on how LMS systems expect the Tool Public and Private Keys
-to be generated.  
+to be generated.
 
 The most commmon variation is that the LMS generates the Public
 and Private keys and tells the tool the key values at the moment the tool is integrated
@@ -72,15 +68,15 @@ has the advantage that tools do not need to know how to make key pairs and the L
 can tell the tool to change their keys using some for of out of band communication.
 
 The other variation is that the Tool generates the key pair, and then shares
-the public with the LMS using a keyset URL.  This is the more traditional way
-that two-way OAuth 2.0 is set up.  It has the advantage that the tool's privat key is 
+its public key with the LMS using a keyset URL.  This is the more traditional way
+that two-way OAuth 2.0 is set up.  It has the advantage that the tool's private key is
 never sent across the Internet or shown in a UI.  The disadvantage is that there is
 more code that needs to be written in the tool to handle the scenario.
 
 We can expect that LMS vendors will take one or the other approaches and so tools
-will need to be flexible.  Of course Tsugi handles both scenarios.
+will need to be flexible.  Tsugi handles both scenarios.
 
-Throughout the document there will be steps like "if the LMS is making the Tool keys..." 
+Throughout the document there will be steps like "if the LMS is making the Tool keys..."
 where we call out differences in the processes.
 
 Creating an Issuer in Tsugi
@@ -99,14 +95,14 @@ after you create the issues and view its data.
 (Scenario A - LMS Mints Tool Keys)
 
 If the LMS will be issuing the tool's public and private keys it should not need the
-KeySet url.  It should be able to set up your Tsugi instance with just the `OIDC Connect` 
+KeySet url.  It should be able to set up your Tsugi instance with just the `OIDC Connect`
 and `OIDC Redirect` endpoints.
 
 The go into the LMS and create your integration.   When it is done, you should get back
 the issuer, client id, deployment id, platform keySet URL, platform token retrieval URL, tool public key
 and tool private key.
 
-All of the LMS values except deployment id are entered into the `Add Issuer` screen 
+All of the LMS values except deployment id are entered into the `Add Issuer` screen
 and you can add the Issuer.
 
 Continue to Creating a Tenant / Key below.
@@ -118,11 +114,11 @@ you any of their data.  It is somewhat of a chicken and egg problem.  But it is 
 
 Create an Issuer with fake random data for iany of the fields (issuer, client-id, key set URL,
 token retrieval URL) that the LMS won't provde you in advance.  Leave the platform public key blank
-as it normally is retrieved form the platform keyset URL. 
-Leave the two tool keys blank so Tsugi mints them and save the issuer.  
+as it normally is retrieved form the platform keyset URL.
+Leave the two tool keys blank so Tsugi mints them and save the issuer.
 
 Then immediately view the issuer.  At that point you should see all the data that
-the LMS needs.  Typically the LMS will need the tool public key, the tool keyset url, 
+the LMS needs.  Typically the LMS will need the tool public key, the tool keyset url,
 openID connect endpoint, and tool redirect endpoint.
 
 Provide these values to your LMS and they should be able to create your client
@@ -136,7 +132,7 @@ Tenant / Keys in Tsugi
 ----------------------
 
 Once you have a new Issuer, you can associate the issuer with a tenant/key.
-A "tenant" is like the `oauth_consumer_key` from LTI 1.1. 
+A "tenant" is like the `oauth_consumer_key` from LTI 1.1.
 In LTI 1.3/Advantage the `deployment_id` within an issuer/client-id pair maps to a tenant.
 
 The key structure is where you solve the problem of migrating from LTI 1.1 to LTI Advantage
@@ -146,10 +142,10 @@ support LTI 1.1 and LTI Advantage launches if your key/tenant is set up properly
 Creating a New LTI Advantage Only Key/Tenant
 --------------------------------------------
 
-To create a key/tenant to receive launches, once you have successfully configured the issuer in 
+To create a key/tenant to receive launches, once you have successfully configured the issuer in
 Tsugi and the LMS, insert a new key.  Make the OAuth Consumer key be the client-id from the LMS
-and leave the consumer secret blank.  Set the `deployment_id` from the information provided 
-by the LMS.  
+and leave the consumer secret blank.  Set the `deployment_id` from the information provided
+by the LMS.
 Select the issure you just created.
 Caliper key and Url are optional.   The `user_id` is also optional.
 
@@ -169,16 +165,16 @@ Blackboard
 ----------
 
 The <a href="https://www.blackboard.com" target="_blank">Blackboard</a>
-approach is to mint the tool's public and private keys and not 
+approach is to mint the tool's public and private keys and not
 require a tool keyset URL.
 
 Set up should be simple, go into your Tsugi, start the process of creating a new issuer,
-and then take the `OIDC Connect` and `OIDC Redirect` endpoints and put them into the 
+and then take the `OIDC Connect` and `OIDC Redirect` endpoints and put them into the
 "new client" screen in Blackboard.  Once the client is created in Blackboard, you should have all
 the information you need to fill out the Issuer and Tenant/Key data within Tsugi.
 
 The issuer for Blackboard is always https://blackboard.com regardless of client.  Each client
-(i.e. Tsugi instance) will get a unique client-id (issuer screen) and 
+(i.e. Tsugi instance) will get a unique client-id (issuer screen) and
 deployment-id (key / tenant screen).
 
 Canvas
@@ -191,15 +187,15 @@ Sakai
 
 <a href="https://www.sakailms.org" target="_blank">Sakai</a> expects to mint the tool
 private keys as of Sakai-19.0.  There are plans to add support for the tool
-keyset in a later release of Sakai 19.x.   The workflow between Sakai and Tsugi is quite easy if you can 
-be in the admin UI of both tools at the same time.  This can either happen if both systems 
+keyset in a later release of Sakai 19.x.   The workflow between Sakai and Tsugi is quite easy if you can
+be in the admin UI of both tools at the same time.  This can either happen if both systems
 are administered by the same person or they can work together exchanging values over Slack or email.
 
-First go into Tsugi.   Add an Issuer.   On the issuer screen you can see the `OIDC Connect` 
+First go into Tsugi.   Add an Issuer.   On the issuer screen you can see the `OIDC Connect`
 and `OIDC Redirect` endpoints.
 
 In Sakai go to Adminstration Workspace, External Tools.  If you already have an LTI 1.1 key/secret, edit it
-and turn on LTI 1.3 and enter the `OIDC Connect` and `OIDC Redirect` endpoints and save the tool.  Then go into the 
+and turn on LTI 1.3 and enter the `OIDC Connect` and `OIDC Redirect` endpoints and save the tool.  Then go into the
 tool viewer on Sakai and you will see all the values including the public an private key for the tool that can
 be pasted into the Tsugi Add Issuer screen.
 
@@ -209,11 +205,76 @@ You should be ready to define a tool placement in Sakai and do a launch.  One fu
 is that once you set up a tool with both LTI 1.1 and LTI 1.3 values, you can switch back and forth
 between 1.1 and 1.3 launches by simply changing the LTI 1.3 radio button.
 
-You can work through this example using the Sakai and Tsugi nightly servers.  They are nice to 
+You can work through this example using the Sakai and Tsugi nightly servers.  They are nice to
 experiment with because they reset every night :)
 
 https://trunk-mysql.nightly.sakaiproject.org/portal/  ( admin / admin )
 https://dev1.tsugicloud.org/tsugi/admin/ (sakaiger)
+
+Inside An LTI Advantage Launch
+------------------------------
+
+What we used to call an LTI Launch URL is best called a "Deep Link" in LTIAdvantage.  It is the actual
+tool or content endpoint in the Tool system.  It can be the same for LTI 1.1 and LTI Advantage, but
+when LTI Advantages launches happen, they don't just send data straight to the launch URL.  There is a multi-step
+process this is closely modelled on the OpenID Connect logic flow.
+
+The user starts the process by clicking on a link in the LMS called "Chapter 1" which ultimately wants to
+launch to a url like:
+
+    https://my.cool.stuff.com/books/algebra/chapter-1
+
+In LTI 1.x, the LMS signs a bunch of Post values with the OAuth 1.0 key and posts to that URL.  In LTI Advantage
+there are more steps:
+
+1. The LMS sends the browser to the `Tool OpenID Connect/Initialization Endpoint` with the Issuer.  The Tool
+receives this and generates a `state` value to uniquely identify the current user's browser and then...
+
+2. The tool then sends the browser back to the `Platform OIDC Connect Authentication URL`.  The LMS pulls out
+the `state` value and then...
+
+3. The LMS produces a JWT of all the launch data and the `state` value and signs it, generates an HTML form
+with an `id_token` field and then..
+
+4. The form is auto-submitted to the `Tool OpenId Connect Redirect Endpoint` which receives the data, checks
+the `state`, and if the state matches what the tool expects, redirects to the original "deep link"/"launch url".
+
+5. At the launch url, the JWT is parsed. Within the JWT header there is a key id field (`kid`).  The Tool
+retrieves the `Platform OAuth2 Keyset URL` which is an array of keys, and loks up the Platform Public Key
+in the array using the `kid` as key in the array.  Then that public is used to check the signature in the JWT.
+If all is well, the user session is created and the user is logged into the deep link.
+
+Note that clever tools are encouraged to locally cache the `kid` and corresponding public key locally to avoid
+hitting the `Platform OAuth2 Keyset URL` on every launch to find the public key.
+
+Note that the tool needs to have steps 4 and 5, but things like where the JWT signature is checked can be in 4 or 5
+and it does not matter to the outside world.   Tsugi does steps 4 and 5 exactly as described above so as to keep
+launch logic to deep links very parallel between LTI 1.1 and LTI Advnatage.
+
+Talking to Services in LTI Advantage
+------------------------------------
+
+The pattern for communicating with LMS services is based on OAuth 2.0.  At configuration time, the Tool
+is provided a `Platform OAuth2 Token Retrieval URL`.
+
+If the tool has access to the Names and Roles or Outcome services, the URLs to these services are provided
+to the tool as part of the launch data in the JWT.
+
+If the tool wants to talk to these services, it must first get an "API Token".  This is done by
+making a bit of JSON that includes the `scopes` that indicate which permission the tool is about
+to use (i.e. like the permission to read roles or the permission to create grade book columns).
+These scopes are encoded into a JWT along with the `Client Id` and signed by the `Tool Public Key`
+and sent to the `Platform OAuth2 Token Retrieval URL`.
+
+If the LMS validated the JWT based on the `Tool Public Key` associated with the `Client ID` and
+the Client is allowed to have the permissions requested in the `scope` values, the LMS generates
+a token (typically with a 3600 second expiration) and returns it to the Tool.
+
+The tool then communicates with the API endpoint, simply incliding the Token as one of the HTTP
+headers.
+
+The tools are encouraged to cache the tokens for the duration of their validity (less then an hour)
+and only re-request tokens periodically.
 
 A Sample Tsugi Issuer Entry
 ===========================
@@ -240,15 +301,36 @@ LTI 1.3 Platform OIDC Authentication URL (from the Platform)
 
 LTI 1.3 Platform Public Key (Usually retrieved via keyset url)
 
-    -----BEGIN PUBLIC KEY----- MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA36WKUmzLtUstgwwHdLWJ 1gRcN1EefGjDzJhriozKOE8+cm/tXSPPie1zgjtWKNxDA9pDqJaGqwMfvODcSnuy sUs+jU4V/    [SNIP]    +HfnIKDFsuV4wtwMIcGq0DvuDYxeMKSIRdpLIGlNxZ7k70ZwhQsE86gNVjKMEbm8 Cpcijcn2QfF+EwjSkVKGWkF2XGVA3QaAJ/DwiYtwC2gMhuogb7aCUxF6Q1KWnnwE 2QIDAQAB -----END PUBLIC KEY-----
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2WE8VJ9ZJkNXq5+aqd6t
+    dMCkAnkRP6Q7pIGj2zkyjMOJrzSpAfw5MSru+zUBdBddFqdmIV5tAG/r1NNFzrXd
+    GQpOtduT3FWLJ4rdf9rYNrNHOXLn+yJwYtL/8QbFMJa79VYKAshJK2xBvj1VuEDQ
+    qzlqOGOF+j/Z4yGSiYIvOZjy94+/DkKkfmL0lgWC6IDi/GJ3k6UvH8k2VNhqWgnn
+    3kk5NWDig//jlflaMUYBADUiiPlOY9Jg/CipRrfSfoFrbZfSmN2n7DIaEHr8uCXv
+    MUkj7p0sSkCkzopUO2GYVGkFLiY+ge2/g2h7I/r8EriFS1YFXqO+bs39fXN7FMA4
+    KQIDAQAB
+    -----END PUBLIC KEY-----
 
 LTI 1.3 Tool Public Key (Provide to the platform)
 
-    -----BEGIN PUBLIC KEY----- MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzLFI4rkQvMG1rVljj0GY9 PGil3gM3o2JkmvBWk6wow9LJWtGAdPTBeBRb6d/LCJzypoQwzT8jl37yeEmUIW/t/   [SNIP]    fwtrYwFi4O9HHP9S5UbJHe3Yq5YHczF6Ka1/AB4Pgt7Eb wdpN7SsFCChMwxnqMz4/nsDntt9DQNiXcJzeAVeSn/Vbofi4MmKScYiQ3jjZ3SxGg YQGqcRI2dcvp+nZ5tZaWuqWiUyTzwVX92P2mOI6kLpYPWn9xw1XClbC1U44TQIDAQ AB -----END PUBLIC KEY-----
+    If this is present it is the most recently retrieved public key
+    from the LMS's key set url.   This is rarely set by hand.
 
 LTI 1.3 Private Key (kept internally only)
 
-    -----BEGIN PRIVATE KEY----- MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDMsUjiuRC8wbWtW WOPQZj08aKXeAzejYmSa8FaTrCjD0sla0YB09MF4FFvp38sInPKmhDDNPyOXfvJ4S RO6v41bD07XECH08TXfUt2ylHsI0S2Ojrof+q8RZHcD+e26DYczIownzdwKBgQCLB GcXMevedzPGoNirvyfLtlD8HtHhx0zj6m9yCvcy6J8KrLUF366EH5Q6zaB0msr3n5    [SNIP]   T/FZUSLUCKr3cJJVHoFAl8VCdgnatoCOTKJV+E+yWTT5xXxhaNQtvuXtBwJIWugMR fZinj3WccbMguAwsgwgxI2hM4VWrRgq4eiFD+wwKBgQDCEy2GP7MiXjjG/hI7NhM3 u0U5ZXiaw0KuTVsUidHnslO/ufoogRPWjZYqQ1hi5RcBkn4M4BdAmFD9tDWhQB9LZ NjgerKfqFY0Zsm4iZJHu6osdiutegyZl2JzKKTMpFwp9bNRBYbd1yrJWcNtaTdpH6 IP5dg8RJ8ALKv/sc1NoQKBgDPny8X4+u74HOacxiOd28LkANAfKJg00IlBv79Abvg rHLYxG/hFNYGSRGDeKK7y+XqpuQCa8ESgjwKcOajjHYZ5+yZQjGjBT1DrO6P/CrZn nIIbOcrGvqZj3CDVAZvFgo11xe5Qn6mOTkUhBloLKdF9cyRiz1FSB0mcndnzTFCQ -----END PRIVATE KEY----- 
+    -----BEGIN PRIVATE KEY-----
+    MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDZYTxUn1kmQ1er
+    n5qp3q10wKQCeRE/pDukgaPbOTKMw4mvNKkB/DkxKu77NQF0F10Wp2YhXm0Ab+vU
+    00XOtd0ZCk6125PcVYsnit1/2tg2s0c5cuf7InBi0v/xBsUwlrv1VgoCyEkrbEG+
+    PVW4QNCrOWo4Y4X6P9njIZKJgi85mPL3j78OQqR+YvSWBYLogOL8YneTpS8fyTZU
+    2GpaCefeSTk1YOKD/+OV+VoxRgEANSKI+U5j0mD8KKlGt9J+gWttl9KY3afsMhoQ
+         [SNIP]
+    VdMtvyk/bHJfj+IycSdBRtnB4F8Fu/be4/lkQ+1xw0uyqhvVpP/8DW2dfYxkJXt8
+    4lY57zXPWB1hohfF8I/sJIzx5+Q6b1UUu7dXfdtR9QKBgQDO7jR7tHtVFgSGSoSV
+    yZZ+e6kNGoxv8pjse0XkebEt/hl69SJsp3bLJqD1Yz5PEc1b1Ic1XwFLtd4MGJEW
+    MNGNVKezZtdWaEkkBVK39HA5vsC/Pcmvzx6xpDOhWnzKWr+mimfpgCB+dvKDRMcU
+    quFl3jKbT+B69VPsCh5WTxxiBQ==
+    -----END PRIVATE KEY-----
 
 LTI 1.3 Tool Keyset Url (Extension - may not be needed/used by LMS)
 
