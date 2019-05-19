@@ -1,4 +1,4 @@
-Connecting Tsugi and Sakai with LTI Advantage 
+Connecting Tsugi and Sakai with LTI Advantage
 =============================================
 
 This is a suppliment to the Tsugi LTI Advantage documentation available at
@@ -14,12 +14,15 @@ admin UI of both tools at the same time.  This can either happen if both systems
 are administered by the same person or they can work together exchanging values
 over Slack or email.
 
+Tsugi has a self-service mechanism to request and approve LTI 1.1 keys but does not yet
+have a self service mechanism to request LTI Advantage keys so you need to create an Issuer.
+
 How to Connect Tsugi into Sakai
 -------------------------------
 
 You can either connect a single tool endpoint in Tsugi like https://www.tsugicloud.org/mod/cats
-or you can add Tsugi as a Learning App (Content Item or Deep Linking) with a url like 
-https://www.tsugicloud.org/tsugi/lti/store/.   
+or you can add Tsugi as a Learning App (Content Item or Deep Linking) with a url like
+https://www.tsugicloud.org/tsugi/lti/store/.
 
 The process is the same except for a few checkboxes at the bottom of the add LTI tool screen.
 For a single tool, simply check
@@ -32,17 +35,18 @@ When intalling Tsugi as an App Store under Learning Apps, check
 
 * Allow the tool to be used from the rich content editor to select content
 
-Adding Tsugi to Sakai
----------------------
+Adding Tsugi to Sakai Using LTI Advantage
+-----------------------------------------
 
-First go into Tsugi.   Add an Issuer.   On the issuer screen you can see the `OIDC Connect`
+First go into the Tsugi Administrator UI and select 'Manage Keys'.
+Add an Issuer.   On the issuer screen you can see the `OIDC Connect`
 and `OIDC Redirect` endpoints.
 
-In Sakai go to Adminstration Workspace, External Tools.  If you already have an 
-LTI 1.1 key/secret, edit it and turn on LTI 1.3 and enter the `OIDC Connect` 
+In Sakai go to Adminstration Workspace, External Tools.  If you already have an
+LTI 1.1 key/secret, edit it and turn on LTI 1.3 and enter the `OIDC Connect`
 and `OIDC Redirect` endpoints and save the tool.  Then go into the
-tool viewer on Sakai and you will see all the values including the 
-public and private key for the tool that can be pasted into the Tsugi 
+tool viewer on Sakai and you will see all the values including the
+public and private key for the tool that can be pasted into the Tsugi
 Add Issuer screen.
 
 If you want Tsugi to generate its own keys, leave them blank on the Tsugi Add Issuer screen and
