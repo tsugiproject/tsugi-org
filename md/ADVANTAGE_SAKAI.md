@@ -20,20 +20,25 @@ have a self service mechanism to request LTI Advantage keys so you need to creat
 How to Connect Tsugi into Sakai
 -------------------------------
 
-You can either connect a single tool endpoint in Tsugi like https://www.tsugicloud.org/mod/cats
-or you can add Tsugi as a Learning App (Content Item or Deep Linking) with a url like
-https://www.tsugicloud.org/tsugi/lti/store/.
+You can either connect a single tool endpoint in Tsugi or you can add Tsugi as a 
+Learning App (Content Item or Deep Linking).  The process is the same except for 
+a different URL and few checkboxes at the bottom of the add LTI tool screen.
 
-The process is the same except for a few checkboxes at the bottom of the add LTI tool screen.
 For a single tool, simply check
 
-* Allow the tool to be launched as a link
+* Direct tool url like https://www.tsugicloud.org/mod/cats
+
+* Allow the tool to be launched as a link (only check this)
 
 When intalling Tsugi as an App Store under Learning Apps, check
+
+* App Store endpoint like https://www.tsugicloud.org/tsugi/lti/store/
 
 * Allow external tool to configure itself
 
 * Allow the tool to be used from the rich content editor to select content
+
+* Do not check "Allow the tool to be launched as a link"
 
 Adding Tsugi to Sakai Using LTI Advantage
 -----------------------------------------
