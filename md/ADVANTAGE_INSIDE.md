@@ -35,7 +35,7 @@ with an `id_token` field and then..
 the `state`, and if the state matches what the tool expects, redirects to the original "deep link"/"launch url".
 
 5. At the launch url, the JWT is parsed. Within the JWT header there is a key id field (`kid`).  The Tool
-retrieves the `Platform OAuth2 Keyset URL` which is an array of keys, and loks up the Platform Public Key
+retrieves the `Platform OAuth2 Keyset URL` which is an array of keys, and looks up the Platform Public Key
 in the array using the `kid` as key in the array.  Then that public is used to check the signature in the JWT.
 If all is well, the user session is created and the user is logged into the deep link.
 
