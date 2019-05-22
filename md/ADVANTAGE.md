@@ -41,6 +41,22 @@ created in Tsugi.  If the LMS wants all the values before it starts its process,
 you will need to create the Issuer in Tsugi with some dummy values and then edit
 the Issuer in Tsugi later and put in the real values.
 
+Once the issuer has been created in the LMS they will also need the `target_link_uri`.
+This is most similar to the LTI 1.1 `launch_url`.   It is the actual launch destination
+after the OIDC Connect flow has been completed.
+
+For Tsugi if you are intending to send `Deep Linking Requests` (formerly known
+as `Content Item Launches` to select tools and/or content use the endpoint like:
+
+* https://www.tsugicloud.org/tsugi/lti/store/
+
+If you want to send normal launch requests, you need to choose an actual installed
+tool end point like:
+
+* https://www.tsugicloud.org/mod/cats
+
+* https://www.tsugicloud.org/mod/lmstest
+
 For more detail on how these parameters are used in LTI Advantage, see
 <a href="ADVANTAGE_INSIDE.md">Inside Advantage Launches and Services</a>.
 
