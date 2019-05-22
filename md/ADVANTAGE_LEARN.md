@@ -20,3 +20,10 @@ deployment-id that is part of the key / tenant.
 
 Tusgi will not properly handle launches unless there is an issuer/client-is combination and it
 is associated with a tenant/key with the proper deployment-id.
+
+Notes
+-----
+
+BB does not give a public key - Enter any string
+
+
