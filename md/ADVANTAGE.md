@@ -36,10 +36,10 @@ These are the data fields that Tsugi will provide to the LMS:
 
 Some LMS's will give the tool its public key, and other LMS's will accept a public
 key from the tool.  Other LMS's will expect a keyset URL in lieu of a public key.
-The public key and/or the keyset url is only available after the Issuer is
-created in Tsugi.  If the LMS wants all the values befor it starts its process,
+The public key and/or the keyset url is available after the Issuer is
+created in Tsugi.  If the LMS wants all the values before it starts its process,
 you will need to create the Issuer in Tsugi with some dummy values and then edit
-the Issuer later and put in the real values.
+the Issuer in Tsugi later and put in the real values.
 
 For more detail on how these parameters are used in LTI Advantage, see
 <a href="ADVANTAGE_INSIDE.md">Inside Advantage Launches and Services</a>.
