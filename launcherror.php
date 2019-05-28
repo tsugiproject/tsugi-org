@@ -41,7 +41,7 @@ or launch your tool from <a href="https://www.tsugi.org/lti-test/lms.php" target
 ?>
 <p><b>Detail:</b>
 The tool has received a broken LTI 1.3 launch.  This typically happens when you have defined an Issuer in
-Tsugi but not create a Key/Tenant for the issuer/clientid/deployment_id combination.
+Tsugi but have not created and/or updated a Key/Tenant and associated it with the issuer/clientid/deployment_id combination.
 (<a href="md/ADVANTAGE.md" target="_blank">LTI Advantage Documentation</a>)
 </p>
 <?php
