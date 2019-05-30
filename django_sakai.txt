@@ -1,0 +1,140 @@
+
+Building Tsugi Applications in Django
+-------------------------------------
+
+This handout can be downloaded from https://www.tsugi.org/django_sakai.txt
+
+Make an account on 
+
+www.pythonanywhere.com
+
+Start a shell on PythonAnywhere
+
+cd
+mkvirtualenv django2 --python=/usr/bin/python3.6
+workon django2
+pip install django
+
+python3 -m django --version
+
+git clone https://github.com/tsugiproject/djtest
+
+cd djtest
+pip install -r requirements.txt
+
+Then create the needed database file:
+
+python3 manage.py migrate
+
+In the PYAW web interface navigate to the Web tab to create a new 
+web application. If you have not already done so, add a new web 
+application. Select manual configuration and Python 3.6. Once the 
+webapp is created, you need to make a few changes to the settings 
+for the web app and your application.
+
+Create a duplicate tab in the current web browser with shell open. 
+In the duplicate tab in top right corner click on the three line 
+drop down and select Web. Click on Add a new web app. Click next 
+until you get to Select a Python Web Framework. Select Manual 
+Configuration. Select the Python version to be Python 3.6. 
+Click Next to finish Manual Configuration for Web App. 
+
+
+source code: /home/--your-account---/djtest
+working directory: /home/--your-account---/djtest
+virtualenv: /home/--your-account---/.virtualenvs/django2
+
+Then edit the WGSI Configuration File and replace the contents of the file
+with the following code:
+
+import os
+import sys
+
+path = os.path.expanduser('~/djtest')
+if path not in sys.path:
+    sys.path.insert(0, path)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'djtest.settings'
+from django.core.wsgi import get_wsgi_application
+from django.contrib.staticfiles.handlers import StaticFilesHandler
+application = StaticFilesHandler(get_wsgi_application())
+
+
+Then restart your web application and attempt to go 
+
+https://--your-account--.pythonanywhere.com/grade/
+
+You literally should get a "403 Forbidden" error because it is 
+not an LTI launch - just like what you get when you go to:
+
+https://djtools.tsugicloud.org/grade/
+
+Adding to to an instance of Tsugi.  
+
+https://dev1.tsugicloud.org/tsugi/admin
+
+Enter the password "sakaiger" and select "Manage External Tools" and "Add Tool".
+
+The "Launch Endpoint" must be unique across the whole system.  The simplest thing
+is to just use your account name on pythonanywhere.  The name of the tool is a title
+and can have several words.
+
+The URL for receiving launches needs to be
+
+https://--your-account--.pythonanywhere.com/grade/launch
+
+
+Here are my sample settings:
+
+Launch endpoint: drchuck
+Name of the tool: Dr. Chuck's Test
+Launch URL: https://drchuck.pythonanywhere.com/grade/launch
+Icon: fa-random
+
+Set the Additional Settings to the JSON shown below the field.  Yes the field is 
+only one line - the JSON will all fit and it will look better in the edit view.
+
+Ignore the pubic key for now - it is already hard-coded into djtest for this tutorial.
+
+Test launch the tool from the TsugiCloud store:
+
+https://dev1.tsugicloud.org/tsugi/store/
+
+Find your tool, click on "Details" and then "Test".  This
+will test launch the tool from within Tsugi.  It should work
+and show a button "Open in New Window" - press it and your tool
+should appear in a new tab.
+
+Launching from an LMS
+---------------------
+
+Next we will launch your tool from Sakai.
+
+Make an account on 
+
+https://dev1.sakaicloud.com
+
+Make a site, add the Lessons and Gradebook tools.
+
+Then in Lessons, "Add Content" -> "Add Learning App" and
+select "Dev1" from the list.  If "Dev1" is not in the
+"Add Learning App" list have Chuck add it.
+
+Once you are in the "Add Learning App" dialog, scroll down and 
+find your app and install it in Lessons.
+
+If you want to test grade flow, make sure to make a second student
+account to join your site and launch your tool to send back a
+grade that actually makes it to the gradebook.  Instructors
+can't receive grades.
+
+Then, go back to your PythonAnywhere account, and edit the file
+
+~/djtest/grade/templates/grade/main.html
+
+Add your name to the <h1> tag, then go into the PythonAnywhere account Web Tab
+and "Reload" your application and then re-launch it from Sakai.
+
+Congratulations - you just built, installed, and modified a Django-based
+Tsugi tool.
+
+
