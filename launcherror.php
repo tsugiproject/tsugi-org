@@ -45,6 +45,20 @@ Tsugi but have not created and/or updated a Key/Tenant and associated it with th
 (<a href="md/ADVANTAGE.md" target="_blank">LTI Advantage Documentation</a>)
 </p>
 <?php
+} else if ( strpos($error,"Session expired - please re-launch") === 0 || 
+            strpos($error,"Session has expired") === 0 ) 
+{
+?>
+<p><b>Detail:</b>
+This error can mean one of several things happenned.  You might have simply stopped using this page for a long while
+and your session expired.  Alternatively, something about your Internet connection changed or you switched to a different
+browser.  Perhaps your computer went to sleep and woke back up with a different network address.  Or perhaps you tried
+to bookmark a direct link into this tool - which does not work.
+</p>
+<p>
+To solve this go back to the learning system where you originally launched the tool and relaunch the tool.
+</p>
+<?php
 } else if ( strpos($error,"Invalid Key Id (header.kid), could not find public key") === 0 ) {
 ?>
 <p><b>Detail:</b>
