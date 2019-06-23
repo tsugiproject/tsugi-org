@@ -17,11 +17,6 @@ Sakai ContentItem:
 https://trunk-mysql.nightly.sakaiproject.org/imsblti/provider/content.item
 key: 12345 / secret
 
-Sakai/LTI 2.0:
-
-https://lti-tools.dr-chuck.com/tsugi/lti/register.php
-Must sign up for an account and apply for a key
-
 Canvas/ContentItem + Config Extensions
 
 https://trunk-mysql.nightly.sakaiproject.org/imsblti/provider/canvas-config.xml
