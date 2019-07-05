@@ -70,7 +70,7 @@ Adding to to an instance of Tsugi.
 
 https://dev1.tsugicloud.org/tsugi/admin
 
-Enter the password "sakaiger" and select "Manage External Tools" and "Add Tool".
+Enter the password "tsugi" and select "Manage External Tools" and "Add Tool".
 
 The "Launch Endpoint" must be unique across the whole system.  The simplest thing
 is to just use your account name on pythonanywhere.  The name of the tool is a title
