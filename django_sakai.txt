@@ -2,18 +2,20 @@
 Building Tsugi Applications in Django
 -------------------------------------
 
-This handout can be downloaded from https://www.tsugi.org/django_sakai.txt
-
 Make an account on 
 
 www.pythonanywhere.com
 
-Start a shell on PythonAnywhere
+Start a shell on PythonAnywhere and run these commands:
 
 cd
 mkvirtualenv django2 --python=/usr/bin/python3.6
 workon django2
-pip install django
+pip install django==2.1.7 
+
+We install an earlier version of Django to make sure
+that the vesion of SQLite works with your Django.
+Verify things worked by checing the Django version:
 
 python3 -m django --version
 
@@ -39,7 +41,6 @@ until you get to Select a Python Web Framework. Select Manual
 Configuration. Select the Python version to be Python 3.6. 
 Click Next to finish Manual Configuration for Web App. 
 
-
 source code: /home/--your-account---/djtest
 working directory: /home/--your-account---/djtest
 virtualenv: /home/--your-account---/.virtualenvs/django2
@@ -61,12 +62,12 @@ application = StaticFilesHandler(get_wsgi_application())
 
 Then restart your web application and attempt to go 
 
-https://--your-account--.pythonanywhere.com/grade/
+https://--your-account--.pythonanywhere.com/grade/launch/
 
-You literally should get a "403 Forbidden" error because it is 
-not an LTI launch - just like what you get when you go to:
+You should get redirected to an error detail page on
+www.tsugi.org since this is the launch URL.
 
-https://djtools.tsugicloud.org/grade/
+https://djtools.tsugicloud.org/grade/launch/
 
 Adding to to an instance of Tsugi.  
 
