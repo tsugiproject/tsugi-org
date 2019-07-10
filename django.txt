@@ -94,9 +94,9 @@ Icon: fa-random
 Set the Additional Settings to the JSON shown below the field.  Yes the field is 
 only one line - the JSON will all fit and it will look better in the edit view.
 
-Ignore the pubic key for now - it is already hard-coded into djtest for this tutorial.
+Don't fill in the keys - they are created automatically.
 
-Test launch the tool from the TsugiCloud store:
+After you save yout tool, test launch it from the TsugiCloud store:
 
 https://dev1.tsugicloud.org/tsugi/store/
 
