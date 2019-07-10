@@ -29,9 +29,15 @@ Then create the needed database file:
 python3 manage.py migrate
 
 Edit the file djtest/settings.py and make sure that the the 
-keyset url is pointing to the right server:
+keyset url is pointing to the right server and the TSUGI_PROXY
+is set as shown below:
 
-TSUGI_KEYSET = "https://dev1.tsugicloud.org/tsugi/lti/keyset-ext";
+TSUGI_KEYSET = "https://dev1.tsugicloud.org/tsugi/lti/keyset-ext"
+TSUGI_PROXY = 'proxy.server:3128'
+
+The TSUGI_PROXY value is only needed for PythonAnywhere for free
+accounts.  If you set this up on your own hosting environment
+or pay for your PythonAnywhere account, this is not necessary.
 
 In the PYAW web interface navigate to the Web tab to create a new 
 web application. If you have not already done so, add a new web 
