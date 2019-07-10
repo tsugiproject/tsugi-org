@@ -10,8 +10,8 @@ require_once "nav.php";
 $error = U::get($_REQUEST, 'detail');
 ?>
 <div id="container">
-<h1>Django Launch Errors</h1>
-<p>This page provides detail when there is an error with Tsugi launching a DJango application.
+<h1>Django Tsugi Launch Errors</h1>
+<p>This page provides detail when there is an error with Tsugi launching a Django application.
 </p>
 <?php if ( $error ) { ?>
 <div class="alert alert-danger">
@@ -19,86 +19,47 @@ $error = U::get($_REQUEST, 'detail');
 </div>
 <?php } ?>
 <?php
-// This is a Launch URL, expecting a POST with a JWT to initiate a launch
-// This URL is expecting a POST with a JWT to initiate a launch
-// Could not load header from JWT
-// The JWT is missing a key ID (kid)
-// Could not load keyset from
-// Could not parse keyset from
-// Could not extract kid
-// Could not validate JSON Web Token signature
-if ( strpos($error,'OAuth validation fail key') === 0 ) {
-?>
-<p><b>Detail:</b>
-The most typical cause of this error is a mis-match between the OAuth Consumer Key and Secret between
-the LMS and tool.   If you are testing a new tool for the first time, there might be a mis-match between 
-the URL that the LMS thinking it is launching to and the URL that tool things of itself as serving from.
-Sometimes the LMS is launching to an 'https://' url and the tool thinks that it is serving on 'http://'.
-The only way to know for sure is to check the base strings on the LMS and tool.  You might want to make a
-test launch from your LMS to:
-<pre>
-URL: https://www.tsugi.org/lti-test/tool.php
-Key: 12345
-Secret: secret
-</pre>
-or launch your tool from <a href="https://www.tsugi.org/lti-test/lms.php" target="_blank">https://www.tsugi.org/lti-test/lms.php</a>.
-</p>
-<?php
-} else if ( strpos($error,"Could not find tenant/key ") === 0 ) {
-?>
-<p><b>Detail:</b>
-The tool has received a broken LTI 1.3 launch.  This typically happens when you have defined an Issuer in
-Tsugi but have not created and/or updated a Key/Tenant and associated it with the issuer/clientid/deployment_id combination.
-(<a href="md/ADVANTAGE.md" target="_blank">LTI Advantage Documentation</a>)
-</p>
-<?php
-} else if ( strpos($error,"Session expired - please re-launch") === 0 || 
-            strpos($error,"Session has expired") === 0 ) 
-{
-?>
-<p><b>Detail:</b>
-This error can mean one of several things happenned.  You might have simply stopped using this page for a long while
-and your session expired.  Alternatively, something about your Internet connection changed or you switched to a different
-browser.  Perhaps your computer went to sleep and woke back up with a different network address.  Or perhaps you tried
-to bookmark a direct link into this tool - which does not work.
-</p>
-<p>
-To solve this go back to the learning system where you originally launched the tool and relaunch the tool.
-</p>
-<?php
-} else if ( strpos($error,"Invalid Key Id (header.kid), could not find public key") === 0 ) {
-?>
-<p><b>Detail:</b>
-The tool has received a broken LTI 1.3 launch.  A common cause of this is when you are using the
-IMS certification suite where they are sending broken launches on purpose to insure the tool has
-a suitable error message (like this).
-</p>
-<?php
-} else if ( strpos($error,"Bad LTI version") === 0 ) {
-?>
-<p><b>Detail:</b> The tool has received a launch that looks like LTI 1.3 but is missing or has the incorrect version.
-A common cause of this is when you are using the
-IMS certification suite where they are sending broken launches on purpose to insure the tool has
-a suitable error message (like this).
-<p>
-If you are receiving this message from a launch from an acutal LMS it is lilely mis-configured or generating
-bad launches.
-</p>
-<?php
-} else if ( strpos($error,"This tool should be launched from a learning system using LTI") === 0 ) {
-?>
-<p><b>Detail:</b> This tool did not receive a proper launch and there either was no tool session
-from a prior launch.   If this is the initial lauch, the LMS probably sent broken data.  If you have been 
-using the tool for a while, it may have lost its session due to a bug in the tool.  If is the firt time
-your are testing the tool you may have omitted the trailing slash on the launch URL.
-</p>
-<?php
-} else if ( strpos($error,"Missing") === 0 ) {
-?>
-<p><b>Detail:</b> This tool did not receive a required item for this launch.   Your LMS or testing system
-is probably sending a launch improperly.
-</p>
-<?php
+$error_detail = array(
+"This is a Launch URL, expecting a POST with a JWT to initiate a launch" =>
+"You have used a GET request to a URL that is internal and used to receive a launch
+with a signed JSON Web Token (JWT) from Tsugi to initiate a session in the Django application. ",
+
+"This URL is expecting a POST with a JWT to initiate a launch" =>
+"The proper way to communicate a JWT to this tool is with a form parameter of JWT.",
+
+"Could not load header from JWT" =>
+"This is an improperly formed JSON Web Token as it does not have a header area.",
+"The JWT is missing a key ID (kid)" =>
+"This launch is missing a 'kid' value in its header to look up a public key in a JWK Keyset.",
+
+"Could not load keyset from" =>
+"This launch retrienves a JWK key set from this URL and expects to find JSON data
+so it can retrieve the appropriate public key to validate the launch.  You can try to
+retrieve the keyset URL by hand to see if it contains the properly formatted JSON.
+The Django Tsugi may be improperly configured and looking for its keyset at the wrong URL.",
+
+"Could not parse keyset from" =>
+"Django Tsugi was able to retrieve its keyset URL but the data was in the wrong format.
+You can try to
+retrieve the keyset URL by hand to see if it contains the properly formatted JSON.
+The Django Tsugi may be improperly configured and looking for its keyset at the wrong URL.",
+
+"Could not extract kid" =>
+"Tsugi Django retrieved and parsed the keyset but could not find an entry that matched
+the incoming kid from the JSON Web Token. You can try to
+retrieve the keyset URL by hand to see if it contains the properly formatted JSON.
+The Django Tsugi may be improperly configured and looking for its keyset at the wrong URL.",
+
+"Could not validate JSON Web Token signature" =>
+"This indicates that the public key that was provided could not validate the incoming
+JSON Web Token.",
+);
+
+foreach($error_detail as $message => $text ) {
+    if ( strpos($error,$message) === false ) continue;
+    echo("<p><b>Detail:</b>\n");
+    echo($text);
+    echo("\n</p>\n");
 }
 ?>
 <p>
