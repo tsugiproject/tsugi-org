@@ -71,6 +71,6 @@ You can work through this example using the Sakai and Tsugi nightly servers.  Th
 experiment with because they reset every night :)
 
 https://trunk-mysql.nightly.sakaiproject.org/portal/  ( admin / admin )
-https://dev1.tsugicloud.org/tsugi/admin/ (sakaiger)
+https://dev1.tsugicloud.org/tsugi/admin/ (tsugi)
 
 
