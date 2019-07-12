@@ -22,8 +22,9 @@ $OUTPUT->header();
 ?>
 <style>
 a[target="_blank"]:after {
-    font-family: "FontAwesome";
-    content: " \f08e";
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 600;
+    content: " \f35d";
 }
 .goog-te-banner-frame.skiptranslate {
     display: none !important;
