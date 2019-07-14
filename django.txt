@@ -119,5 +119,7 @@ Launching from an LMS
 
 Once this is done, you can use LTI 1.1 or LTI Advantage to launch your tool.  In the 
 Tsugi store you will get the launch url to use in the LMS.  You might be able to 
-use 12345/secret if the Tsugi server still had the default key for testing.
+use 12345/secret if the Tsugi server still had the default key for testing.  The URL
+will be something like (depending on your tool registration).
 
+https://dev1.tsugicloud.org/ext/drchuck
