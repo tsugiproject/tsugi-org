@@ -16,6 +16,9 @@ This is a secret page that points to some pretty awesome things.
 </p>
 <ul>
 <li>
+<a href="talks/2016-07-D2L-Brightspace.pptx">Brightspace Presentation Slides</a>
+</li>
+<li>
 <a href="https://www.tsugicloud.org/" target="_blank">Free Tsugi App Store</a>
 </li>
 <li>
