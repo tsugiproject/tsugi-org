@@ -102,12 +102,10 @@ Name of the tool: Dr. Chuck's Test
 Launch URL: https://drchuck.pythonanywhere.com/grade/launch
 Icon: fa-random
 
-Set the Additional Settings to the JSON shown below the field.  Yes the field is 
-only one line - the JSON will all fit and it will look better in the edit view.
+The default for the additional settings is OK for this test.  These fields inform the
+App Store and Deep Linking.  Don't fill in the keys - they are created automatically.
 
-Don't fill in the keys - they are created automatically.
-
-After you save yout tool, test launch it from the TsugiCloud store:
+After you save your tool, test launch it from the TsugiCloud store:
 
 https://dev1.tsugicloud.org/tsugi/store/
 
