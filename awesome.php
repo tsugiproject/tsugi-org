@@ -30,6 +30,9 @@ https://learningapps-dev.udayton.edu/tsugi/store/
 Recent Tsugi Presentations
 <ul>
 <li>
+<a href="talks/2019-07-LAMP-Sakai.pptx">LAMP Camp 2019 (Sakai)</a>
+</li>
+<li>
 <a href="talks/2019-07-Bb-DevCon.pptx">Blackboard Devcon 2019 </a>
 </li>
 <li>
