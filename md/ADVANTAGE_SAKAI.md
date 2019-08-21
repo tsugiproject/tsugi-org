@@ -39,7 +39,7 @@ a different URL and few checkboxes at the bottom of the add LTI tool screen.
 
 For a single tool, simply check
 
-* Direct tool url like https://dev1.tsugicloud.org/mod/cats
+* Direct tool url like https://dev1.tsugicloud.org/mod/youtube
 
 * Check all the services and send PII to the tool
 

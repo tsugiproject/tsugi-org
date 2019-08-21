@@ -53,7 +53,7 @@ as `Content Item Launches` to select tools and/or content use the endpoint like:
 If you want to send normal launch requests, you need to choose an actual installed
 tool end point like:
 
-* https://www.tsugicloud.org/mod/cats
+* https://www.tsugicloud.org/mod/youtube
 
 * https://www.tsugicloud.org/mod/lmstest
 
