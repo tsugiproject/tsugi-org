@@ -46,7 +46,9 @@ a new location and get a new IP address and refresh the page.   To be safe and, 
 of your browser changes, Tsugi wants you to re-launch the tool.
 </p>
 <p>
-The simple solution is usually to go back into your Learning System and re-launch the tool.
+The simple solution is usually to go back into your Learning System and re-launch the tool.  Or you can close
+your browser and re-open it.   Tsugi does not use cookies so there is no reason to clear cookies.  Just
+close your browser (all the tabs) and reopen it and go back to the tool.
 </p>
 <?php
 } else if ( strpos($error,"Could not find tenant/key ") === 0 ) {
