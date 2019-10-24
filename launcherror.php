@@ -37,6 +37,18 @@ Secret: secret
 or launch your tool from <a href="https://www.tsugi.org/lti-test/lms.php" target="_blank">https://www.tsugi.org/lti-test/lms.php</a>.
 </p>
 <?php
+} else if ( strpos($error,"Session address has expired") === 0 ) {
+?>
+<p><b>Detail:</b>
+Some how in the middle of a login session, there was a disconnect between the session data in your browser
+and the session data in the Tsugi server.  A common cause of this is to close your computer and move to
+a new location and get a new IP address and refresh the page.   To be safe and, when the IP address
+of your browser changes, Tsugi wants you to re-launch the tool.
+</p>
+<p>
+The simple solution is usually to go back into your Learning System and re-launch the tool.
+</p>
+<?php
 } else if ( strpos($error,"Could not find tenant/key ") === 0 ) {
 ?>
 <p><b>Detail:</b>
