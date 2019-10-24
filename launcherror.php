@@ -42,12 +42,13 @@ or launch your tool from <a href="https://www.tsugi.org/lti-test/lms.php" target
 <p><b>Detail:</b>
 Some how in the middle of a login session, there was a disconnect between the session data in your browser
 and the session data in the Tsugi server.  A common cause of this is to close your computer and move to
-a new location and get a new IP address and refresh the page.   To be safe and, when the IP address
-of your browser changes, Tsugi wants you to re-launch the tool.
+a new location and get a new IP address and refresh the page.   To be safe and secure, when Tsugi notices
+that the IP address of your browser changes, it wants you to re-launch the tool.
 </p>
 <p>
 The simple solution is usually to go back into your Learning System and re-launch the tool.  Or you can close
-your browser and re-open it.   Tsugi does not use cookies so there is no reason to clear cookies.  Just
+your browser and re-open it and navigate back to the tool.
+Tsugi does not use cookies so there is no reason to clear cookies.  Just
 close your browser (all the tabs) and reopen it and go back to the tool.
 </p>
 <?php
