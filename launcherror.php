@@ -97,7 +97,7 @@ bad launches.
 ?>
 <p><b>Detail:</b> This tool did not receive a proper launch and there either was no tool session
 from a prior launch.   If this is the initial lauch, the LMS probably sent broken data.  If you have been 
-using the tool for a while, it may have lost its session due to a bug in the tool.  If is the firt time
+using the tool for a while, it may have lost its session due to a bug in the tool.  If is the first time
 your are testing the tool you may have omitted the trailing slash on the launch URL.
 </p>
 <?php
