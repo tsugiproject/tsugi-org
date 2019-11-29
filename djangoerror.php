@@ -33,7 +33,7 @@ with a signed JSON Web Token (JWT) from Tsugi to initiate a session in the Djang
 "This launch is missing a 'kid' value in its header to look up a public key in a JWK Keyset.",
 
 "Could not load keyset from" =>
-"This launch retrienves a JWK key set from this URL and expects to find JSON data
+"This launch retrieves a JWK key set from this URL and expects to find JSON data
 so it can retrieve the appropriate public key to validate the launch.  You can try to
 retrieve the keyset URL by hand to see if it contains the properly formatted JSON.
 The Django Tsugi may be improperly configured and looking for its keyset at the wrong URL.",
