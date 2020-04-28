@@ -52,6 +52,20 @@ Tsugi does not use cookies so there is no reason to clear cookies.  Just
 close your browser (all the tabs) and reopen it and go back to the tool.
 </p>
 <?php
+} else if ( strpos($error,"Missing required user_id") === 0 ) {
+?>
+<p><b>Detail:</b>
+This is often caused by one of two reasons. Sometimes the LMS is doing an "anonymous launch"
+and is simply not including the "user_id" which is required by the tool.  The solution in
+this case is to reconfigure the LMS to include the required information on the launch.
+</p>
+<p>
+Another less common situation is when the LMS is sending a "Content Item" / "App Store" / 
+"Deep Link" request (which is not supposed to include a "user_id" value but sending the request
+to a tool end point and not an app store endpoint.  Usually in Tsugi, these kinds of
+provisioning requests need to be sent to a URL of the form "/tsugi/lti/store/".
+</p>
+<?php
 } else if ( strpos($error,"Could not find tenant/key ") === 0 ) {
 ?>
 <p><b>Detail:</b>
