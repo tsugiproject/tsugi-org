@@ -17,32 +17,27 @@ $CFG-&gt;google_map_api_key = 'Ve8eH49498....43cIA9IGl8';</code></pre>
 in your Google credentials configuration.</p>
 <p>As a sample, 
 here are some of my JavaScript origins:</p>
-<pre><code>https://online.dr-chuck.com
-http://localhost
-https://online.dr-chuck.com
-https://pr4e.dr-chuck.com
-https://lti-tools.dr-chuck.com
-https://www.php-intro.com
-https://pylearn.sites.uofmhosting.net
+<pre><code>http://localhost
 https://www.py4e.com
 https://www.wa4e.com</code></pre>
 <p>You don't need a port number for the JavaScript origin.</p>
 <p>Here are my sample redirect URIs:</p>
-<pre><code>http://localhost/GoogleLogin/index.php
-http://localhost/tsugi/login.php
-https://lti-tools.dr-chuck.com/tsugi/login.php
-https://online.dr-chuck.com/login.php
-https://pr4e.dr-chuck.com/tsugi/login.php
-https://pr4e.dr-chuck.com/GoogleLogin/index.php
-https://www.php-intro.com/tsugi/login.php
-http://localhost/pythonlearn/tsugi/login.php
-https://www.py4e.com/tsugi/login.php
-https://www.wa4e.com/tsugi/login.php
-http://localhost/wa4e/tsugi/login.php</code></pre>
-<p>Again, the port seems not to matter.</p>
-<p>
+<pre><code>
+http://localhost/tsugi/login
+https://www.py4e.com/tsugi/login
+http://localhost/py4e/tsugi/login
+https://www.wa4e.com/tsugi/login
+http://localhost/wa4e/tsugi/login</code></pre>
+<p>Again, the port seems not to matter.
 This works both for localhost instances as well as instances on the
 web which is nice for testing.
+</p>
+<p>
+Also, in the beginning, the redirect URI for Tsugi ended in <b>/tsugi/login.php</b> - 
+for more recent Tsugi installs, you can drop the php at the end
+unless you set:
+<pre><code>$CFG-&gt;google_login_new = false;</code></pre>
+in your <b>config.php</b>.
 </p>
 
 </div>
