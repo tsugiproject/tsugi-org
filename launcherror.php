@@ -52,6 +52,28 @@ Tsugi does not use cookies so there is no reason to clear cookies.  Just
 close your browser (all the tabs) and reopen it and go back to the tool.
 </p>
 <?php
+} else if ( strpos($error,"OAuth nonce error") === 0 ) {
+?>
+<p><b>Detail:</b>
+The <a href="https://oauth.net/core/1.0/#nonce" target="_blank">OAuth 1.0</a> requires that eqch launch contain a
+timestamp and a single-use token called a 
+<a href="https://en.wikipedia.org/wiki/Cryptographic_nonce" target="_blank">Cryptographic nonce</a>.  In order
+to void replay attacks, LTI and OAuth insist that once a nonce launch has been received, it cannot be reused.
+So the second time that Tsugi receives the same <b>oauth_nonce</b> value on the launch, it rejects the launch.
+The mistake is in the LMS that allowed you to send the same launch twice.  Usually you can go back to the LMS,
+refresh the launch page and get a new <b>oauth_nonce</b> and do a successful launch.
+</p>
+<p>
+The people who wrote the LMS you are using need to fix their bug.  Nearly all LTI tools <i>ignore</i> the 
+<b>oauth_nonce</b> and so LMS vendors never realize their bug in normal testing.  Those LTI tools
+are vulnerable to a reply attack.  But Tsugi <i>does</i> process the <b>oauth_nonce</b> value exactly per the
+OAuth spec - so (a) Tsugi tools are not vulnerable to a simple replay attack and (b) you see this message.
+</p>
+<p>
+If you go to the LMS page, and launch twice and get this error and then do a third launch after a refresh
+and a launch and it works - please file a bug report with your LMS vendor :).
+</p>
+<?php
 } else if ( strpos($error,"Missing required user_id") === 0 ) {
 ?>
 <p><b>Detail:</b>
