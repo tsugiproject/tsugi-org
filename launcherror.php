@@ -55,12 +55,12 @@ close your browser (all the tabs) and reopen it and go back to the tool.
 } else if ( strpos($error,"OAuth nonce error") === 0 ) {
 ?>
 <p><b>Detail:</b>
-The <a href="https://oauth.net/core/1.0/#nonce" target="_blank">OAuth 1.0</a> requires that eqch launch contain a
+The <a href="https://oauth.net/core/1.0/#nonce" target="_blank">OAuth 1.0</a> requires that each launch contain a
 timestamp and a single-use token called a 
 <a href="https://en.wikipedia.org/wiki/Cryptographic_nonce" target="_blank">Cryptographic nonce</a>.  In order
 to void replay attacks, LTI and OAuth insist that once a nonce launch has been received, it cannot be reused.
 So the second time that Tsugi receives the same <b>oauth_nonce</b> value on the launch, it rejects the launch.
-The mistake is in the LMS that allowed you to send the same launch twice.  Usually you can go back to the LMS,
+The mistake is in the LMS that allowed you to send the same launch data twice.  Usually you can go back to the LMS,
 refresh the launch page and get a new <b>oauth_nonce</b> and do a successful launch.
 </p>
 <p>
