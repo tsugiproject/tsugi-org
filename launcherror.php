@@ -5,12 +5,58 @@ use \Tsugi\UI\Output;
 use \Tsugi\Util\U;
 
 require_once "top.php";
-require_once "nav.php";
+//require_once "nav.php";
+?>
+<style>
+.overlay{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  display: block;
+  background-color: rgba(0,0,0,0.5); /*dim the background*/
+}
+
+.modal {
+       width: 90%;
+       height: 100px;
+       margin:0 auto;
+       display:table;
+       position: absolute;
+       background-color: white;
+       border: 5px black solid;
+       padding: 10px;
+       left: 0;
+       right:0;
+       top: 10%;
+}
+
+</style>
+<script>
+function clicked() {
+    if (! inIframe() ) {
+        alert("This LTI launch has finished with an error.  You can close this window/tab in your browser or perhaps press 'Back' to go back to your learning system");
+    }
+}
+</script>
+<?php
 
 $error = U::get($_REQUEST, 'detail');
 ?>
-<div id="container">
-<h1>Tsugi Launch Errors</h1>
+<body>
+<div id="overlay" class="overlay">
+<div id="container" class="modal" onclick="clicked();return false;">
+<div style="float: right;">
+<i id="close_button" class="fas fa-2x fa-window-close" style="display:none;"></i></div>
+<script>
+if ( ! inIframe() ) {
+  document.getElementById("close_button").style.display = "block";
+}
+</script>
+
+<h1>LTI  Launch Errors</h1>
 <p>You get a launch error when there is missing or incorrect data in the launch that
 is sent from the Learning Management System / Platform.
 </p>
@@ -27,14 +73,22 @@ The most typical cause of this error is a mis-match between the OAuth Consumer K
 the LMS and tool.   If you are testing a new tool for the first time, there might be a mis-match between 
 the URL that the LMS thinking it is launching to and the URL that tool things of itself as serving from.
 Sometimes the LMS is launching to an 'https://' url and the tool thinks that it is serving on 'http://'.
-The only way to know for sure is to check the base strings on the LMS and tool.  You might want to make a
+The only way to know for sure is to check the base strings on the LMS and tool.  
+</p>
+<hr/>
+<p>
+If you are the instructor or administrator of the LMS system, you might want to make a
 test launch from your LMS to:
 <pre>
 URL: https://www.tsugi.org/lti-test/tool.php
 Key: 12345
 Secret: secret
 </pre>
-or launch your tool from <a href="https://www.tsugi.org/lti-test/lms.php" target="_blank">https://www.tsugi.org/lti-test/lms.php</a>.
+to verify that you know how to properly configure your LMS.  
+</p>
+<p>
+Or you can test to see if you have the correct, URL, key, and secret by launching
+the tool from <a href="https://www.tsugi.org/lti-test/lms.php" target="_blank">https://www.tsugi.org/lti-test/lms.php</a>.
 </p>
 <?php
 } else if ( strpos($error,"Session address has expired") === 0 ) {
@@ -151,6 +205,8 @@ are officially certified at
 <a href="https://www.imsglobal.org/cc/statuschart.cfm" target="_blank">https://www.imsglobal.org/cc/statuschart.cfm</a>
 </p>
 </div>
+</div>
+</body>
 <?php 
-require_once "foot.php";
+// require_once "foot.php";
 
