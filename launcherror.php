@@ -71,7 +71,8 @@ $out = array();
 $delta = preg_match('/.*delta=(\d+).*/', $error, $out) ? $out[1] : false;
 ?>
 <p><b>Detail:</b>
-The <a href="https://oauth.net/core/1.0/#nonce" target="_blank">OAuth 1.0</a> requires that each launch contain a
+The <a href="https://oauth.net/core/1.0/#nonce" target="_blank">OAuth 1.0</a> protocol used to launch this tool
+requires that each launch contain a
 timestamp to avoid replay attacks.   Launch data that is prepared by the LMS and sent to the tool generally "expires"
 after five minutes (600 seconds) and is rejected by the tool as per the LTI and OAuth protocols.
 </p>
@@ -136,7 +137,8 @@ close your browser (all the tabs) and reopen it and go back to the tool.
 } else if ( strpos($error,"OAuth nonce error") === 0 ) {
 ?>
 <p><b>Detail:</b>
-The <a href="https://oauth.net/core/1.0/#nonce" target="_blank">OAuth 1.0</a> requires that each launch contain a
+The <a href="https://oauth.net/core/1.0/#nonce" target="_blank">OAuth 1.0</a> protocol used to launch this tool
+requires that each launch contain a
 timestamp and a single-use token called a 
 <a href="https://en.wikipedia.org/wiki/Cryptographic_nonce" target="_blank">Cryptographic nonce</a>.  In order
 to avoid replay attacks, LTI and OAuth insist that once a nonce launch has been received, it cannot be reused.
