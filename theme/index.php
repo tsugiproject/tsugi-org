@@ -125,6 +125,9 @@ if ( ! inIframe() ) {
 <div id="tsugi-theme">
 <h2>Tsugi</h2>
 <br/>
+<script>
+    var tsuginames = ['primary', 'primary-border', 'primary-darker', 'primary-darkest', 'secondary', 'text', 'text-light'];
+</script>
 <?php 
 $tsuginames = array( 
     "primary" => "#0D47A1", 
@@ -136,12 +139,18 @@ $tsuginames = array(
     "text-light" => "#5E5E5E",
 );
 
+echo("<script>\n var tsuginames = [\n");
+foreach($tsuginames as $name => $default) {
+    echo("'$name', ");
+}
+echo("];\n</script>\n");
+
 foreach($tsuginames as $name => $default) {
     $template = <<< EOT
 <span style="color: var(--$name);">
 $name
 </span>
-<input type="color" id="$name" value="$default" onchange="updateTsugiColors();"><br/>
+<input type="color" id="$name" value="$default" onchange="updateColors(tsuginames);"><br/>
 EOT;
     echo($template);
 }
@@ -157,66 +166,49 @@ echo("&nbsp;</br/>\n");
 </div>
 <div id="ims-theme" style="display:none;">
 <h2>IMS</h2><br/>
-<span style="color: var(--ims-lti-dark);">
-ims-lti-dark
+<?php 
+$imsnames = array( 
+    "ims-lti-dark" => "#0D47A1", 
+    "ims-lti-dark-lighter" => "#0d4295", 
+    "ims-lti-dark-darker" => "#0c4091",
+    "ims-lti-dark-accent" => "#0c4091",
+    "ims-lti-dark-mode-background" => "#0c4091",
+    "ims-lti-light" => "#0D47A1", 
+    "ims-lti-light-lighter" => "#0d4295", 
+    "ims-lti-light-darker" => "#0c4091",
+    "ims-lti-light-accent" => "#0c4091",
+);
+
+echo("<script>\n var imsnames = [\n");
+foreach($imsnames as $name => $default) {
+    echo("'$name', ");
+}
+echo("];\n</script>\n");
+
+foreach($imsnames as $name => $default) {
+    $template = <<< EOT
+<span style="color: var(--$name);">
+$name
 </span>
-<input type="color" id="ims-lti-dark" value="#0D47A1" onchange="updateIMSColors();">
+<input type="color" id="$name" value="$default" onchange="updateColors(imsnames);">
+<input type="checkbox" name="$name-compute" checked> Compute
 <br/>
 
-<span style="color: var(--ims-lti-dark-lighter);">
-ims-lti-dark-lighter
-</span>
-<input type="color" id="ims-lti-dark-lighter" value="#0D47A1" onchange="updateIMSColors();">
-<input type="checkbox" name="ims-lti-dark-compute" checked> Compute
-<br/>
-
-<span style="color: var(--ims-lti-dark-darker);">
-ims-lti-dark-darker
-</span>
-<input type="color" id="ims-lti-dark-darker" value="#0D47A1" onchange="updateIMSColors();">
-<input type="checkbox" name="ims-lti-dark-compute" checked> Compute
-<br/>
-
-<span style="color: var(--ims-lti-dark-accent);">
-ims-lti-dark-accent
-</span>
-<input type="color" id="ims-lti-dark-accent" value="#0D47A1" onchange="updateIMSColors();">
-<input type="checkbox" name="ims-lti-dark-compute" checked> Compute
-<br/>
-
-<span style="color: var(--ims-lti-light);">
-ims-lti-light
-</span>
-<input type="color" id="ims-lti-light" value="#0D47A1" onchange="updateIMSColors();">
-<input type="checkbox" name="ims-lti-light-compute" checked> Compute
-<br/>
-
-<span style="color: var(--ims-lti-light-lighter);">
-ims-lti-light-lighter
-</span>
-<input type="color" id="ims-lti-light-lighter" value="#0D47A1" onchange="updateIMSColors();">
-<input type="checkbox" name="ims-lti-light-lighter-compute" checked> Compute
-<br/>
-
-<span style="color: var(--ims-lti-light-darker);">
-ims-lti-light-darker
-</span>
-<input type="color" id="ims-lti-light-darker" value="#0D47A1" onchange="updateIMSColors();">
-<input type="checkbox" name="ims-lti-light-darker-compute" checked> Compute
-<br/>
-
-<span style="color: var(--ims-lti-light-accent);">
-ims-lti-light-accent
-</span>
-<input type="color" id="ims-lti-light-accent" value="#0D47A1" onchange="updateIMSColors();">
-<input type="checkbox" name="ims-lti-light-accent-compute" checked> Compute
-<br/>
-<div id="ims-gradient" style="border: black 2px solid; height: 40px; width: 100%; background-image: linear-gradient(to right, white , black);">&nbsp;</div>
+EOT;
+    echo($template);
+}
+?>
+<div id="ims-values" style="position: relative; border: black 2px solid; width: 100%; background-image: linear-gradient(to right, white , black);">
+<?php
+foreach($imsnames as $name => $default) {
+    echo('<span id="'.$name.'-ratio" style="color: var(--'.$name.'); position: absolute; padding: 10px 0;"></span><br/>'."\n");
+}
+echo("&nbsp;</br/>\n");
+?>
 </div>
 <br clear="all"/>
 <script>
-function updateTsugiColors() {
-    var cssnames = ['primary', 'primary-border', 'primary-darker', 'primary-darkest', 'secondary', 'text', 'text-light'];
+function updateColors(cssnames) {
     for(var i=0; i < cssnames.length; i++) {
         cssname = cssnames[i];
         var value = $("#"+cssname).val();
@@ -224,10 +216,9 @@ function updateTsugiColors() {
         var percent = Math.round(lum*100);
         var label = getShortLabel(cssname);
         label = cssname;
-        console.log(cssname, label, value, lum, percent);
+        // console.log(cssname, label, value, lum, percent);
         $("#"+cssname+'-ratio').html(label+' '+percent);
         if ( percent < 50 ) {
-            console.log(percent+'%');
             $("#"+cssname+'-ratio').css('left', percent+'%');
             $("#"+cssname+'-ratio').css('right', 'initial');
         } else {
@@ -288,17 +279,23 @@ function updateIMSColors() {
 <script src="https://static.tsugi.org/js/handlebars-v4.0.2.js"></script>
 <script src="https://static.tsugi.org/tmpljs-3.8.0/tmpl.min.js"></script>
 <script src="https://static.tsugi.org/js/tsugiscripts.js"></script>
-<script src="github_tmcw_relative-luminance.js"></script>
+<script src="relative-luminance.js"></script>
 <script src="tsugi_theme_library.js"></script>
+<script src="color-conversion-algorithms.js"></script>
 
 <script>
 $(document).ready(function () {
     console.log(relativeLuminance(breakHEX('#000000')),relativeLuminance(breakHEX('#0d47a1')), relativeLuminance(breakHEX('#FFFFFF')));
     var yellow = contrast([255, 255, 255], [255, 255, 0]); // 1.074 for yellow
     var blue = contrast([255, 255, 255], [0, 0, 255]); // 8.592 for blue
+    var hslgreen = rgbToHsl(breakHEX('#00FF00'));
+    console.log('hslgreen', hslgreen);
+    var hsvgreen = rgbToHsv(breakHEX('#00FF00'));
+    console.log('hsvgreen', hsvgreen);
     // console.log('contrast white to yellow 1.074', yellow);
     // console.log('contrast white to blue 8.592', blue); 
-    updateTsugiColors();
+    updateColors(imsnames);
+    updateColors(tsuginames);
 
 });
 </script>
