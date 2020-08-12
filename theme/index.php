@@ -123,41 +123,37 @@ if ( ! inIframe() ) {
 <a href="#" onclick="$('#tsugi-theme').toggle();$('#ims-theme').toggle();return false" class="btn btn-warning">Switch Theme Approach<a>
 </h1>
 <div id="tsugi-theme">
-<h2>Tsugi</h2><br/>
-<span style="color: var(--primary);">
-primary
-</span>
- <input type="color" id="primary" value="#0D47A1" onchange="updateTsugiColors();"><br/>
+<h2>Tsugi</h2>
+<br/>
+<?php 
+$tsuginames = array( 
+    "primary" => "#0D47A1", 
+    "primary-border" => "#0d4295", 
+    "primary-darker" => "#0c4091",
+    "primary-darkest" => "#00b3b85",
+    "secondary" => "#EEEEEE",
+    "text" => "#111111",
+    "text-light" => "#5E5E5E",
+);
 
-<span style="color: var(--primary-border);">
-primary-border
+foreach($tsuginames as $name => $default) {
+    $template = <<< EOT
+<span style="color: var(--$name);">
+$name
 </span>
- <input type="color" id="primary-border" value="#0d4295" onchange="updateTsugiColors();"><br/>
-
-<span style="color: var(--primary-darker);">
-primary-darker
-</span>
- <input type="color" id="primary-darker" value="#0c4091" onchange="updateTsugiColors();"><br/>
-
-<span style="color: var(--primary-darkest);">
-primary-darkest
-</span>
- <input type="color" id="primary-darkest" value="#0b3b85" onchange="updateTsugiColors();"><br/>
-
-<span style="color: var(--secondary);">
-secondary
-</span>
- <input type="color" id="secondary" value="#EEEEEE" onchange="updateTsugiColors();"><br/>
-
-<span style="color: var(--text);">
-text
-</span>
- <input type="color" id="text" value="#111111" onchange="updateTsugiColors();"><br/>
-
-<span style="color: var(--text-light);">
-text-light
-</span>
- <input type="color" id="text-light" value="#5E5E5E" onchange="updateTsugiColors();"><br/>
+<input type="color" id="$name" value="$default" onchange="updateTsugiColors();"><br/>
+EOT;
+    echo($template);
+}
+?>
+<div id="tsugi-values" style="position: relative; border: black 2px solid; width: 100%; background-image: linear-gradient(to right, white , black);">
+<?php
+foreach($tsuginames as $name => $default) {
+    echo('<span id="'.$name.'-ratio" style="color: var(--'.$name.'); position: absolute; padding: 10px 0;"></span><br/>'."\n");
+}
+echo("&nbsp;</br/>\n");
+?>
+</div>
 </div>
 <div id="ims-theme" style="display:none;">
 <h2>IMS</h2><br/>
@@ -215,7 +211,7 @@ ims-lti-light-accent
 <input type="color" id="ims-lti-light-accent" value="#0D47A1" onchange="updateIMSColors();">
 <input type="checkbox" name="ims-lti-light-accent-compute" checked> Compute
 <br/>
-
+<div id="ims-gradient" style="border: black 2px solid; height: 40px; width: 100%; background-image: linear-gradient(to right, white , black);">&nbsp;</div>
 </div>
 <br clear="all"/>
 <script>
@@ -223,8 +219,21 @@ function updateTsugiColors() {
     var cssnames = ['primary', 'primary-border', 'primary-darker', 'primary-darkest', 'secondary', 'text', 'text-light'];
     for(var i=0; i < cssnames.length; i++) {
         cssname = cssnames[i];
-        console.log(cssname);
         var value = $("#"+cssname).val();
+        var lum = relativeLuminance(breakHEX(value));
+        var percent = Math.round(lum*100);
+        var label = getShortLabel(cssname);
+        label = cssname;
+        console.log(cssname, label, value, lum, percent);
+        $("#"+cssname+'-ratio').html(label+' '+percent);
+        if ( percent < 50 ) {
+            console.log(percent+'%');
+            $("#"+cssname+'-ratio').css('left', percent+'%');
+            $("#"+cssname+'-ratio').css('right', 'initial');
+        } else {
+            $("#"+cssname+'-ratio').css('right', (100-percent)+'%');
+            $("#"+cssname+'-ratio').css('left', 'initial');
+        }
         document.documentElement.style.setProperty('--'+cssname, value);
     }
 }
@@ -279,10 +288,18 @@ function updateIMSColors() {
 <script src="https://static.tsugi.org/js/handlebars-v4.0.2.js"></script>
 <script src="https://static.tsugi.org/tmpljs-3.8.0/tmpl.min.js"></script>
 <script src="https://static.tsugi.org/js/tsugiscripts.js"></script>
+<script src="github_tmcw_relative-luminance.js"></script>
+<script src="tsugi_theme_library.js"></script>
 
 <script>
 $(document).ready(function () {
+    console.log(relativeLuminance(breakHEX('#000000')),relativeLuminance(breakHEX('#0d47a1')), relativeLuminance(breakHEX('#FFFFFF')));
+    var yellow = contrast([255, 255, 255], [255, 255, 0]); // 1.074 for yellow
+    var blue = contrast([255, 255, 255], [0, 0, 255]); // 8.592 for blue
+    // console.log('contrast white to yellow 1.074', yellow);
+    // console.log('contrast white to blue 8.592', blue); 
     updateTsugiColors();
+
 });
 </script>
 
