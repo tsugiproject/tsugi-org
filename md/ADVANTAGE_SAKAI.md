@@ -41,7 +41,7 @@ For a single tool, simply check
 
 * Direct tool url like https://dev1.tsugicloud.org/mod/youtube
 
-* Check all the services and send PII to the tool
+* Check all the services and send name and email to the tool
 
 * Allow the tool to be launched as a link (only check this)
 
@@ -49,7 +49,7 @@ When intalling Tsugi as an App Store under Learning Apps, check
 
 * App Store endpoint like https://dev1.tsugicloud.org/tsugi/lti/store/
 
-* Check all the services and send PII to the tool
+* Check all the services and send name and email to the tool
 
 * Allow external tool to configure itself
 
