@@ -168,16 +168,16 @@ echo("&nbsp;</br/>\n");
 <h2>IMS</h2><br/>
 <?php 
 $imsnames = array( 
-    "ims-lti-dark-background" => "#0c4091",
-    "ims-lti-dark-darker" => "#0c4091",
-    "ims-lti-dark" => "#0D47A1", 
-    "ims-lti-dark-lighter" => "#0d4295", 
-    "ims-lti-dark-accent" => "#0c4091",
-    "ims-lti-light-accent" => "#0c4091",
-    "ims-lti-light-darker" => "#0c4091",
-    "ims-lti-light" => "#0D47A1", 
-    "ims-lti-light-lighter" => "#0d4295", 
-    "ims-lti-light-background" => "#0c4091",
+    "ims-lti-dark-background" => "#000000",
+    "ims-lti-dark-darker" => "#000000",
+    "ims-lti-dark" => "#111111", 
+    "ims-lti-dark-lighter" => "#111111", 
+    "ims-lti-dark-accent" => "#111111",
+    "ims-lti-light-accent" => "#eeeeee",
+    "ims-lti-light-darker" => "#eeeeee",
+    "ims-lti-light" => "#eeeeee", 
+    "ims-lti-light-lighter" => "#ffffff", 
+    "ims-lti-light-background" => "#ffffff",
 );
 
 echo("<script>\n var imsnames = [\n");
