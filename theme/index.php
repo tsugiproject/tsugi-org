@@ -233,7 +233,6 @@ foreach($imsnames as $name => $default) {
 $name
 </span>
 <input type="color" id="$name" value="$default" onchange="updateColors(imsnames);">
-<input type="checkbox" name="$name-compute" checked> Compute
 <br/>
 
 EOT;
