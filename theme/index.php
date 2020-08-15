@@ -271,12 +271,15 @@ function updateColors(cssnames) {
         }
         document.documentElement.style.setProperty('--'+cssname, value);
         var tsugi = imstotsugi[cssname];
+        if ( ! tsugi ) continue;
+        console.log('tsugi', tsugi);
         if ( Array.isArray(tsugi) ) {
-            for(var i=0; i< tsugi.length; i++) {
-                var tsug = tsugi[i];
-                document.documentElement.style.setProperty('--'+tsugi, value);
+            for(var j=0; j<tsugi.length; j++) {
+                var tsug = tsugi[j];
+                console.log(tsug);
+                document.documentElement.style.setProperty('--'+tsug, value);
             }
-        } else {
+        } else if ( tsugi ) {
             document.documentElement.style.setProperty('--'+tsugi, value);
         }
     }
