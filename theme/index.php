@@ -183,9 +183,10 @@ $ddelta = $dlhsl[2] - $dbghsl[2];
 $ldelta = $lbghsl[2] - $ldhsl[2];
 
 $h = $dbghsl[0];
-$s = $dbghsl[1];
-$dl = $dbghsl[2];
-$ll = $lbghsl[2];
+$sat_high = $dbghsl[1];
+$sat_low = $lbghsl[1];
+$lite_high = $dbghsl[2];
+$lite_low = $lbghsl[2];
 // print_r($dbghsl);
 // print_r($lbghsl);
 
@@ -194,15 +195,15 @@ $ll = $lbghsl[2];
 $imsnames = array( 
     "ims-lti-base" => $color,
     "ims-lti-dark-background" => $farpair[0],
-    "ims-lti-dark-darker" => Color::hex(hslToRgb($h, $s, $dl + ($ddelta * 0.3))),
-    "ims-lti-dark" =>  Color::hex(hslToRgb($h, $s, $dl + ($ddelta * 0.6))),
-    "ims-lti-dark-lighter" => $nearpair[0],
-    "ims-lti-dark-accent" => Color::hex(hslToRgb($h, $s, $dl + ($ddelta * 1.2))),
+    "ims-lti-dark-text" =>  Color::hex(hslToRgb($h, $sat_high*0.5, $lite_high + ($ddelta * 0.3))),
+    "ims-lti-dark-darker" => Color::hex(hslToRgb($h, $sat_high, $lite_high + ($ddelta * 0.3))),
+    "ims-lti-dark" =>  Color::hex(hslToRgb($h, $sat_high, $lite_high + ($ddelta * 0.6))),
+    "ims-lti-dark-acccent" => $nearpair[0],
     "ims-lti-midpoint" => $mid,
-    "ims-lti-light-accent" => Color::hex(hslToRgb($h, $s, $ll - ($ldelta * 1.2))),
-    "ims-lti-light-darker" => $nearpair[1],
-    "ims-lti-light" => Color::hex(hslToRgb($h, $s, $ll - ($ldelta * 0.6))),
-    "ims-lti-light-lighter" => Color::hex(hslToRgb($h, $s, $ll - ($ldelta * 0.3))),
+    "ims-lti-light-accent" => $nearpair[1],
+    "ims-lti-light" => Color::hex(hslToRgb($h, $sat_low, $lite_low - ($ldelta * 0.6))),
+    "ims-lti-light-lighter" => Color::hex(hslToRgb($h, $sat_low, $lite_low - ($ldelta * 0.3))),
+    "ims-lti-light-text" => Color::hex(hslToRgb($h, $sat_low*0.5, $lite_low - ($ldelta * 0.3))),
     "ims-lti-light-background" => $farpair[1],
 );
 
@@ -238,7 +239,9 @@ $name
 EOT;
     echo($template);
 }
-echo('<span style="padding: 5px; color: '.$imsnames['ims-lti-light'].'; background-color: '.$imsnames['ims-lti-dark'].';">ims-lti-light on ims-lti-dark</span> ');
+echo('<span style="padding: 5px; color: '.$imsnames['ims-lti-light-text'].'; background-color: '.$imsnames['ims-lti-dark'].';">ims-lti-light-text on ims-lti-dark</span> ');
+echo('<span style="padding: 5px; color: '.$imsnames['ims-lti-dark-text'].'; background-color: '.$imsnames['ims-lti-light-background'].';">ims-lti-dark-text on ims-lti-light-background</span> ');
+echo('<span style="padding: 5px; color: '.$imsnames['ims-lti-light-text'].'; background-color: '.$imsnames['ims-lti-dark-background'].';">ims-lti-light-text on ims-lti-dark-background (dark mode)</span> ');
 ?>
 
 <div id="ims-values" style="position: relative; border: black 2px solid; width: 100%; background-image: linear-gradient(to right, white , black);">
