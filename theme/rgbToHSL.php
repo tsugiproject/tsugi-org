@@ -84,6 +84,11 @@ function hslToRgb( $h, $s, $l ){
 	$g = ( $g + $m ) * 255;
 	$b = ( $b + $m  ) * 255;
 
+    // Added by Chuck
+    if ( $r < 0 ) $r = 0;
+    if ( $g < 0 ) $g = 0;
+    if ( $b < 0 ) $b = 0;
+
     return array( floor( $r ), floor( $g ), floor( $b ) );
 }
 ?>

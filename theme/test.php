@@ -2,6 +2,8 @@
 
 require_once("Color.php");
 require_once("rgbToHSL.php");
+require_once("HSLuv.php");
+require_once("tsugi_color_util.php");
 
 $rel = Color::relativeLuminance("#000000", "#FFFFFF");
 echo("$rel \n");
@@ -19,3 +21,29 @@ for($h=0;$h<360;$h=$h+30) {
     echo("$h, $s, $l, $hex, $lum, $lasthex, $rel\n");
     $lasthex = $hex;
 }
+
+$white = "#FFFFF";
+for($b=0; $b<=255; $b=$b+16) {
+    $r=0;
+    $g = 0;
+    $rgb = [ $r, $g, $b];
+    $hex = Color::hex($rgb);
+    $lum = Color::luminance ($rgb);
+    $rel = Color::relativeLuminance($hex, $white);
+    echo("$hex, $lum, $white, $rel\n");
+}
+
+$rgb = \HSLuv\HSLuv::fromHex("#000000");
+$luv = \HSLuv\HSLuv::rgbToHpluv($rgb);
+print_r($luv);
+$rgb = \HSLuv\HSLuv::fromHex("#FFFFFF");
+$luv = \HSLuv\HSLuv::rgbToHpluv($rgb);
+print_r($luv);
+$rgb = \HSLuv\HSLuv::fromHex("#0000FF");
+$luv = \HSLuv\HSLuv::rgbToHpluv($rgb);
+print_r($luv);
+
+$mid = findLMidPoint("#0000FF");
+
+$pair = luminosityPair(7.0, $mid);
+print_r($pair);
