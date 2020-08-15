@@ -35,7 +35,7 @@ document.getElementById("body_container").className = "container";
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Tsugi Theme Test</a>
+      <a class="navbar-brand" href="#">IMS Theme Test</a>
     </div>
     <div class="navbar-collapse collapse">
     </div> <!--/.nav-collapse -->
@@ -53,7 +53,7 @@ document.getElementById("body_container").className = "container";
     </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
-        <li class="active"><a href="#" ><span class="fas fa-edit" aria-hidden="true"></span> Build</a></li>
+        <li class="active"><a href="tsugi.php" ><span class="fas fa-edit" aria-hidden="true"></span> Tsugi Theme</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fas fa-poll-h" aria-hidden="true"></span> Results <span class="fa fa-caret-down" aria-hidden="true"></span></a>
           <ul class="dropdown-menu">
@@ -206,11 +206,26 @@ $imsnames = array(
     "ims-lti-light-background" => $farpair[1],
 );
 
+
 echo("<script>\n var imsnames = [\n");
 foreach($imsnames as $name => $default) {
     echo("'$name', ");
 }
 echo("];\n</script>\n");
+
+$imstotsugi = array(
+   'ims-lti-dark-lighter' => ['primary', 'text-light'],
+   'ims-lti-dark' => ['primary-darker', 'text'],
+   'ims-lti-dark-darker' => 'primary-darkest',
+   'ims-lti-dark-accent' => 'primary-border', 
+   'ims-lti-light-darker' => 'secondary',
+);
+
+echo("<script>\n var imstotsugi = \n");
+echo(json_encode($imstotsugi));
+echo(";\n");
+echo("console.log(imstotsugi);\n");
+echo("</script>\n");
 
 foreach($imsnames as $name => $default) {
     $template = <<< EOT
@@ -255,6 +270,15 @@ function updateColors(cssnames) {
             $("#"+cssname+'-ratio').css('left', 'initial');
         }
         document.documentElement.style.setProperty('--'+cssname, value);
+        var tsugi = imstotsugi[cssname];
+        if ( Array.isArray(tsugi) ) {
+            for(var i=0; i< tsugi.length; i++) {
+                var tsug = tsugi[i];
+                document.documentElement.style.setProperty('--'+tsugi, value);
+            }
+        } else {
+            document.documentElement.style.setProperty('--'+tsugi, value);
+        }
     }
 }
 function updateIMSColors() {
@@ -324,7 +348,6 @@ $(document).ready(function () {
     // console.log('contrast white to yellow 1.074', yellow);
     // console.log('contrast white to blue 8.592', blue); 
     updateColors(imsnames);
-    updateColors(tsuginames);
 
 });
 </script>
