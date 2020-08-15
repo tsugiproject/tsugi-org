@@ -9,7 +9,7 @@ function fixRgb($r, $g, $b) {
     if ( is_string($r) ) return Color::rgb($r);
     return [$r, $g, $b];
 }
-function findLMidPoint($r, $g=false, $b=false) {
+function findLMidPointForHue($r, $g=false, $b=false) {
     echo("findLMidPoint $r $g $b\n");
     $rgb = fixRgb($r, $g, $b);
     // print_r($rgb);

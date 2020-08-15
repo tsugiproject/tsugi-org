@@ -9,7 +9,7 @@ $color = '';
 if ( isset($_REQUEST['color']) ) {
     echo("<pre>\n");
     $color = $_REQUEST['color'];
-    $mid = findLMidPoint($_REQUEST['color']);
+    $mid = findLMidPointForHue($_REQUEST['color']);
 
     $pair = luminosityPair(10.0, $mid);
     echo("</pre>\n");

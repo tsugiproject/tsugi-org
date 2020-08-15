@@ -43,7 +43,7 @@ $rgb = \HSLuv\HSLuv::fromHex("#0000FF");
 $luv = \HSLuv\HSLuv::rgbToHpluv($rgb);
 print_r($luv);
 
-$mid = findLMidPoint("#0000FF");
+$mid = findLMidPointForHue("#0000FF");
 
 $pair = luminosityPair(7.0, $mid);
 print_r($pair);
