@@ -1,7 +1,12 @@
 <?php
 // https://gist.github.com/brandonheyer/5254516
 
-function rgbToHsl( $r, $g, $b ) {
+function rgbToHsl( $r, $g=false, $b=false ) {
+    $rgb = fixRgb($r, $g, $b);
+    $r = $rgb[0];
+    $g = $rgb[1];
+    $b = $rgb[2];
+
 	$oldR = $r;
 	$oldG = $g;
 	$oldB = $b;
@@ -45,7 +50,12 @@ function rgbToHsl( $r, $g, $b ) {
 }
 
 // h: 0-360 s: 0-1 l: 0-1
-function hslToRgb( $h, $s, $l ){
+function hslToRgb( $h, $s=false, $l=false ){
+    if ( is_array($h) ) {
+        $s = $h[1];
+        $l = $h[2];
+        $h = $h[0];
+    }
     $r; 
     $g; 
     $b;

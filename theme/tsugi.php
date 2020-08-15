@@ -1,15 +1,9 @@
-<?php
-require_once("Color.php");
-require_once("rgbToHSL.php");
-require_once("HSLuv.php");
-require_once("tsugi_color_util.php");
-?>
 <!DOCTYPE html>
     <html lang="en">
       <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>IMS Theme Test</title>
+        <title>Tsugi Theme Test</title>
         <!-- Tiny bit of JS -->
         <script src="https://static.tsugi.org/js/tsugiscripts_head.js"></script>
         <!-- Le styles -->
@@ -125,6 +119,12 @@ if ( ! inIframe() ) {
         </div>
 </section>
 <section>
+<div id="tsugi-theme">
+<h2>Tsugi</h2>
+<br/>
+<script>
+    var tsuginames = ['primary', 'primary-border', 'primary-darker', 'primary-darkest', 'secondary', 'text', 'text-light'];
+</script>
 <?php 
     /**
     * From https://stackoverflow.com/questions/3512311/how-to-generate-lighter-darker-color-with-php
@@ -154,88 +154,42 @@ if ( ! inIframe() ) {
 
         return '#' . implode($hexCode);
     }
-$color = '#000000';
-if ( isset($_REQUEST['color']) ) {
-    $color = $_REQUEST['color'];
-}
-?>
-</div>
-<div id="ims-theme" style="display:block;">
-<h2>IMS</h2><br/>
-<form>
-Choose IMS LTI Base color for a hue: <input type="color" name="color" value="<?= $color ?>"><br/>
-<input type="submit" value="Populate Colors">
-</form>
-<hr/>
-<?php 
-// echo("<pre>\n");
-$mid = findLMidPointForHue($color);
-$farpair = luminosityPair(20.0, $mid);
-$nearpair = luminosityPair(7.0, $mid);
 
-$darkest = $farpair[0];
-$lightest = $farpair[1];
-$dbghsl = rgbToHsl($farpair[0]);
-$dlhsl = rgbToHsl($nearpair[0]);
-$ldhsl = rgbToHsl($nearpair[1]);
-$lbghsl = rgbToHsl($farpair[1]);
-$ddelta = $dlhsl[2] - $dbghsl[2];
-$ldelta = $lbghsl[2] - $ldhsl[2];
-
-$h = $dbghsl[0];
-$s = $dbghsl[1];
-$dl = $dbghsl[2];
-$ll = $lbghsl[2];
-// print_r($dbghsl);
-// print_r($lbghsl);
-
-// echo("</pre>\n");
-
-$imsnames = array( 
-    "ims-lti-base" => $color,
-    "ims-lti-dark-background" => $farpair[0],
-    "ims-lti-dark-darker" => Color::hex(hslToRgb($h, $s, $dl + ($ddelta * 0.3))),
-    "ims-lti-dark" =>  Color::hex(hslToRgb($h, $s, $dl + ($ddelta * 0.6))),
-    "ims-lti-dark-lighter" => $nearpair[0],
-    "ims-lti-dark-accent" => Color::hex(hslToRgb($h, $s, $dl + ($ddelta * 1.2))),
-    "ims-lti-midpoint" => $mid,
-    "ims-lti-light-accent" => Color::hex(hslToRgb($h, $s, $ll - ($ldelta * 1.2))),
-    "ims-lti-light-darker" => $nearpair[1],
-    "ims-lti-light" => Color::hex(hslToRgb($h, $s, $ll - ($ldelta * 0.6))),
-    "ims-lti-light-lighter" => Color::hex(hslToRgb($h, $s, $ll - ($ldelta * 0.3))),
-    "ims-lti-light-background" => $farpair[1],
+$tsuginames = array( 
+    "primary" => "#0D47A1", 
+    "primary-border" => "#0d4295", 
+    "primary-darker" => "#0c4091",
+    "primary-darkest" => "#00b3b85",
+    "secondary" => "#EEEEEE",
+    "text" => "#111111",
+    "text-light" => "#5E5E5E",
 );
 
-echo("<script>\n var imsnames = [\n");
-foreach($imsnames as $name => $default) {
+echo("<script>\n var tsuginames = [\n");
+foreach($tsuginames as $name => $default) {
     echo("'$name', ");
 }
 echo("];\n</script>\n");
 
-foreach($imsnames as $name => $default) {
+foreach($tsuginames as $name => $default) {
     $template = <<< EOT
 <span style="color: var(--$name);">
 $name
 </span>
-<input type="color" id="$name" value="$default" onchange="updateColors(imsnames);">
-<input type="checkbox" name="$name-compute" checked> Compute
-<br/>
-
+<input type="color" id="$name" value="$default" onchange="updateColors(tsuginames);"><br/>
 EOT;
     echo($template);
 }
-echo('<span style="padding: 5px; color: '.$imsnames['ims-lti-light'].'; background-color: '.$imsnames['ims-lti-dark'].';">ims-lti-light on ims-lti-dark</span> ');
 ?>
-
-<div id="ims-values" style="position: relative; border: black 2px solid; width: 100%; background-image: linear-gradient(to right, white , black);">
+<div id="tsugi-values" style="position: relative; border: black 2px solid; width: 100%; background-image: linear-gradient(to right, white , black);">
 <?php
-foreach($imsnames as $name => $default) {
+foreach($tsuginames as $name => $default) {
     echo('<span id="'.$name.'-ratio" style="color: var(--'.$name.'); position: absolute; padding: 10px 0;"></span><br/>'."\n");
 }
 echo("&nbsp;</br/>\n");
 ?>
 </div>
-<br clear="all"/>
+</div>
 <script>
 function updateColors(cssnames) {
     for(var i=0; i < cssnames.length; i++) {
@@ -323,7 +277,6 @@ $(document).ready(function () {
     console.log('hsvgreen', hsvgreen);
     // console.log('contrast white to yellow 1.074', yellow);
     // console.log('contrast white to blue 8.592', blue); 
-    updateColors(imsnames);
     updateColors(tsuginames);
 
 });

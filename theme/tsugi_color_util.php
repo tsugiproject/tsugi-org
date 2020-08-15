@@ -10,7 +10,7 @@ function fixRgb($r, $g, $b) {
     return [$r, $g, $b];
 }
 function findLMidPointForHue($r, $g=false, $b=false) {
-    echo("findLMidPoint $r $g $b\n");
+    // echo("findLMidPoint $r $g $b\n");
     $rgb = fixRgb($r, $g, $b);
     // print_r($rgb);
     $hsl = rgbToHsl($rgb[0], $rgb[1], $rgb[2] );
@@ -37,7 +37,7 @@ function findLMidPointForHue($r, $g=false, $b=false) {
 }
 
 function luminosityPair($difference, $r, $g=false, $b=false) {
-    echo("luminosityPair $difference $r $g $b\n");
+    // echo("luminosityPair $difference $r $g $b\n");
     $rgb = fixRgb($r, $g, $b);
     // print_r($rgb);
     $hex = Color::hex($rgb);
