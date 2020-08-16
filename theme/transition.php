@@ -102,6 +102,10 @@ if ( ! inIframe() ) {
     </form>
     <p class="lead">This is the new theme values, mapped to the old theme / old markup.  
 You can interactively change any color or autogenerate a color set from a single color.
+If you pick a color that has at least 8.0 contrast from white, it will be used as the
+tsugi-dark theme color.  If the color you choose has less than 8.0 contrast from white,
+then it will be nudged within the same hue to to the point where tsugi-dark is 8.0 contrast from 
+white.
 You can see how the new values are mapped to the old values for old markup.
 The old markup won't support dark mode.</p>
     <section id="theQuestions">
@@ -209,7 +213,7 @@ echo("];\n</script>\n");
 $tusgitolegacy = array(
    'tsugi-dark-lighter' => ['primary', 'text-light'],
    'tsugi-dark-text' => ['text', 'primary-darkest'],
-   'tsugi-dark' => 'primary',
+   'tsugi-dark' => ['primary', 'text-light'],
    'tsugi-dark-darker' => 'primary-darker', 
    'tsugi-dark-accent' => 'primary-border', 
    'tsugi-light-darker' => 'secondary',
