@@ -49,7 +49,7 @@ document.getElementById("body_container").className = "container";
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Pre/Post</a>
+      <a class="navbar-brand" href="#">Transition</a>
     </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
@@ -130,85 +130,73 @@ The old markup won't support dark mode.</p>
 </section>
 <section>
 <?php 
-    /**
-    * From https://stackoverflow.com/questions/3512311/how-to-generate-lighter-darker-color-with-php
-    *
-    * Increases or decreases the brightness of a color by a percentage of the current brightness.
-    *
-    * @param   string  $hexCode        Supported formats: `#FFF`, `#FFFFFF`, `FFF`, `FFFFFF`
-    * @param   float   $adjustPercent  A number between -1 and 1. E.g. 0.3 = 30% lighter; -0.4 = 40% darker.
-    *
-    * @return  string
-    */
-    function adjustBrightness($hexCode, $adjustPercent) {
-        $hexCode = ltrim($hexCode, '#');
-
-        if (strlen($hexCode) == 3) {
-            $hexCode = $hexCode[0] . $hexCode[0] . $hexCode[1] . $hexCode[1] . $hexCode[2] . $hexCode[2];
-        }
-
-        $hexCode = array_map('hexdec', str_split($hexCode, 2));
-
-        foreach ($hexCode as & $color) {
-            $adjustableLimit = $adjustPercent < 0 ? $color : 255 - $color;
-            $adjustAmount = ceil($adjustableLimit * $adjustPercent);
-
-            $color = str_pad(dechex($color + $adjustAmount), 2, '0', STR_PAD_LEFT);
-        }
-
-        return '#' . implode($hexCode);
-    }
-$color = '#000000';
+$tsugi_dark = '#000000';
 if ( isset($_REQUEST['color']) ) {
-    $color = $_REQUEST['color'];
+    $tsugi_dark = $_REQUEST['color'];
 }
+$fromwhite = Color::relativeLuminance("#FFFFFF", $tsugi_dark);
+if ( $fromwhite < 8.0 ) {
+    $mid = findLMidPointForHue($tsugi_dark);
+} else {
+    $rgb = fixRgb($tsugi_dark);
+    $mid = findLMidPointForHue($rgb[0], $rgb[1], $rgb[2], $tsugi_dark);
+}
+
+$outerpair = luminosityPair(20.0, $mid);
+$innerpair = luminosityPair(7.0, $mid);
+
 ?>
 </div>
 <div id="tsugi-theme" style="display:block;">
-<h2>Tsugi Transition</h2><br/>
 <form>
-Choose Base color for a hue: <input type="color" name="color" value="<?= $color ?>"><br/>
-<input type="submit" value="Populate Colors">
+Choose dark color: <input type="color" name="color" value="<?= $tsugi_dark ?>">
+Contrast from white: <?= $fromwhite ?> 
+<br/>
+<input type="submit" value="Populate Colors"></br>
+Outer dark: <input type="color" value="<?= $outerpair[0] ?>" readonly>
+Inner dark: <input type="color" value="<?= $innerpair[0] ?>" readonly>
+Hue midpoint: <input type="color" value="<?= $mid ?>" readonly>
+Inner light: <input type="color" value="<?= $innerpair[1] ?>" readonly>
+Outer light: <input type="color" value="<?= $outerpair[1] ?>" readonly>
 </form>
 <hr/>
 <?php 
-// echo("<pre>\n");
-$mid = findLMidPointForHue($color);
-$farpair = luminosityPair(20.0, $mid);
-$nearpair = luminosityPair(7.0, $mid);
+$dark_outer_hsl = rgbToHsl($outerpair[0]);
+$dark_inner_hsl = rgbToHsl($innerpair[0]);
 
-$darkest = $farpair[0];
-$lightest = $farpair[1];
-$dbghsl = rgbToHsl($farpair[0]);
-$dlhsl = rgbToHsl($nearpair[0]);
-$ldhsl = rgbToHsl($nearpair[1]);
-$lbghsl = rgbToHsl($farpair[1]);
-$ddelta = $dlhsl[2] - $dbghsl[2];
-$ldelta = $lbghsl[2] - $ldhsl[2];
+$light_inner_hsl = rgbToHsl($innerpair[1]);
+$light_outer_hsl = rgbToHsl($outerpair[1]);
 
-$h = $dbghsl[0];
-$sat_high = $dbghsl[1];
-$sat_low = $lbghsl[1];
-$lite_high = $dbghsl[2];
-$lite_low = $lbghsl[2];
-// print_r($dbghsl);
-// print_r($lbghsl);
+$tsugi_dark_hsl = rgbToHsl($tsugi_dark);
 
-// echo("</pre>\n");
+$ddelta = $dark_inner_hsl[2] - $dark_outer_hsl[2];
+$ldelta = $light_outer_hsl[2] - $light_inner_hsl[2];
+
+$hue = $dark_outer_hsl[0];
+$sat_dark = $dark_outer_hsl[1];
+$sat_light = $light_outer_hsl[1];
+$lightness_dark = $dark_outer_hsl[2];
+$lightness_light = $light_outer_hsl[2];
+
+if ( $fromwhite < 8.0 ) {
+    $tsugi_dark = Color::hex(hslToRgb($hue, $sat_dark, $lightness_dark + ($ddelta * 0.6)));
+    $tsugi_dark_hsl = rgbToHsl($tsugi_dark);
+}
+
+$lightness_darker = ($tsugi_dark_hsl[2] + $dark_outer_hsl[2]) / 2.0;
+$lightness_dark_accent = ($tsugi_dark_hsl[2] + $dark_inner_hsl[2]) / 2.0;
 
 $tsuginames = array( 
-    "tsugi-lti-base" => $color,
-    "tsugi-lti-dark-background" => $farpair[0],
-    "tsugi-lti-dark-text" =>  Color::hex(hslToRgb($h, $sat_high*0.5, $lite_high + ($ddelta * 0.3))),
-    "tsugi-lti-dark-darker" => Color::hex(hslToRgb($h, $sat_high, $lite_high + ($ddelta * 0.3))),
-    "tsugi-lti-dark" =>  Color::hex(hslToRgb($h, $sat_high, $lite_high + ($ddelta * 0.6))),
-    "tsugi-lti-dark-accent" => $nearpair[0],
-    "tsugi-lti-midpoint" => $mid,
-    "tsugi-lti-light-accent" => $nearpair[1],
-    "tsugi-lti-light" => Color::hex(hslToRgb($h, $sat_low, $lite_low - ($ldelta * 0.6))),
-    "tsugi-lti-light-lighter" => Color::hex(hslToRgb($h, $sat_low, $lite_low - ($ldelta * 0.3))),
-    "tsugi-lti-light-text" => Color::hex(hslToRgb($h, $sat_low*0.5, $lite_low - ($ldelta * 0.3))),
-    "tsugi-lti-light-background" => $farpair[1],
+    "tsugi-dark-background" => $outerpair[0],
+    "tsugi-dark-text" =>  Color::hex(hslToRgb($hue, $sat_dark*0.5, $lightness_darker)),
+    "tsugi-dark-darker" => Color::hex(hslToRgb($hue, $sat_dark, $lightness_darker)),
+    "tsugi-dark" =>  $tsugi_dark,
+    "tsugi-dark-accent" => Color::hex(hslToRgb($hue, $sat_dark, $lightness_dark_accent)),
+    "tsugi-light-accent" => $innerpair[1],
+    "tsugi-light" => Color::hex(hslToRgb($hue, $sat_light, $lightness_light - ($ldelta * 0.6))),
+    "tsugi-light-lighter" => Color::hex(hslToRgb($hue, $sat_light, $lightness_light - ($ldelta * 0.3))),
+    "tsugi-light-text" => Color::hex(hslToRgb($hue, $sat_light*0.5, $lightness_light - ($ldelta * 0.3))),
+    "tsugi-light-background" => $outerpair[1],
 );
 
 
@@ -219,13 +207,13 @@ foreach($tsuginames as $name => $default) {
 echo("];\n</script>\n");
 
 $tusgitolegacy = array(
-   'tsugi-lti-dark-lighter' => ['primary', 'text-light'],
-   'tsugi-lti-dark-text' => 'text',
-   'tsugi-lti-dark' => 'primary',
-   'tsugi-lti-dark-darker' => ['primary-darker', 'primary-darkest'], 
-   'tsugi-lti-dark-accent' => 'primary-border', 
-   'tsugi-lti-light-darker' => 'secondary',
-   'tsugi-lti-light-background' => 'background-color',
+   'tsugi-dark-lighter' => ['primary', 'text-light'],
+   'tsugi-dark-text' => ['text', 'primary-darkest'],
+   'tsugi-dark' => 'primary',
+   'tsugi-dark-darker' => 'primary-darker', 
+   'tsugi-dark-accent' => 'primary-border', 
+   'tsugi-light-darker' => 'secondary',
+   'tsugi-light-background' => 'background-color',
 );
 
 echo("<script>\n var tusgitolegacy = \n");
@@ -256,9 +244,9 @@ EOT;
     }
     echo("<br/>\n");
 }
-echo('<span style="padding: 5px; color: '.$tsuginames['tsugi-lti-light-text'].'; background-color: '.$tsuginames['tsugi-lti-dark'].';">tsugi-lti-light-text on tsugi-lti-dark</span> ');
-echo('<span style="padding: 5px; color: '.$tsuginames['tsugi-lti-dark-text'].'; background-color: '.$tsuginames['tsugi-lti-light-background'].';">tsugi-lti-dark-text on tsugi-lti-light-background</span> ');
-echo('<span style="padding: 5px; color: '.$tsuginames['tsugi-lti-light-text'].'; background-color: '.$tsuginames['tsugi-lti-dark-background'].';">tsugi-lti-light-text on tsugi-lti-dark-background (dark mode)</span> ');
+echo('<span style="padding: 5px; color: '.$tsuginames['tsugi-light-text'].'; background-color: '.$tsuginames['tsugi-dark'].';">tsugi-light-text on tsugi-dark</span> ');
+echo('<span style="padding: 5px; color: '.$tsuginames['tsugi-dark-text'].'; background-color: '.$tsuginames['tsugi-light-background'].';">tsugi-dark-text on tsugi-light-background</span> ');
+echo('<span style="padding: 5px; color: '.$tsuginames['tsugi-light-text'].'; background-color: '.$tsuginames['tsugi-dark-background'].';">tsugi-light-text on tsugi-dark-background (dark mode)</span> ');
 ?>
 
 <div id="tsugi-values" style="position: relative; border: black 2px solid; width: 100%; background-image: linear-gradient(to right, white , black);">
@@ -305,14 +293,14 @@ function updateColors(cssnames) {
 }
 function updateIMSColors() {
     var cssnames = [
-        'tsugi-lti-dark',
-        'tsugi-lti-dark-lighter',
-        'tsugi-lti-dark-darker',
-        'tsugi-lti-dark-accent',
-        'tsugi-lti-light',
-        'tsugi-lti-light-lighter',
-        'tsugi-lti-light-darker',
-        'tsugi-lti-light-accent'
+        'tsugi-dark',
+        'tsugi-dark-lighter',
+        'tsugi-dark-darker',
+        'tsugi-dark-accent',
+        'tsugi-light',
+        'tsugi-light-lighter',
+        'tsugi-light-darker',
+        'tsugi-light-accent'
     ];
     for(var i=0; i < cssnames.length; i++) {
         cssname = cssnames[i];
@@ -329,7 +317,7 @@ function updateIMSColors() {
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span class="fa fa-times" aria-hidden="true"></span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title">Pre/Post Reflection Help</h4>
+                <h4 class="modal-title">Tsugi Transition</h4>
             </div>
             <div class="modal-body">
                                         <h4>General Help</h4>

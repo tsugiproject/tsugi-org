@@ -4,13 +4,15 @@
 require_once("Color.php");
 require_once("rgbToHSL.php");
 
-function fixRgb($r, $g, $b) {
+function fixRgb($r, $g=0, $b=0) {
     if ( is_array($r) ) return $r;
     if ( is_string($r) ) return Color::rgb($r);
     return [$r, $g, $b];
 }
-function findLMidPointForHue($r, $g=false, $b=false) {
+
+function findLMidPointForHue($r, $g=false, $b=false, $dark=false) {
     // echo("findLMidPoint $r $g $b\n");
+    if ( ! $dark ) $dark = "#000000";
     $rgb = fixRgb($r, $g, $b);
     // print_r($rgb);
     $hsl = rgbToHsl($rgb[0], $rgb[1], $rgb[2] );
@@ -24,7 +26,7 @@ function findLMidPointForHue($r, $g=false, $b=false) {
         // print_r($rgb);
         $hex = Color::hex($rgb);
         // Come down from white
-        $relblack = Color::relativeLuminance("#000000", $hex);
+        $relblack = Color::relativeLuminance($dark, $hex);
         $relwhite = Color::relativeLuminance("#FFFFFF", $hex);
         $reltot = $relblack + $relwhite;
         // echo("#000000 $h $s $l $hex $relblack $relwhite $reltot\n");
