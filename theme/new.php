@@ -100,8 +100,8 @@ if ( ! inIframe() ) {
             </a>
         </div>
     </form>
-    <p class="lead">This will the new theme values, mapped to new markup, hopefully with a functionioning dark mode.
- This is currently incomplete and just a copy of the transition theme.
+    <p class="lead">This will the new theme values, mapped to new markup, hopefully with a functioning dark mode.
+ <span style="color: red;">This is currently incomplete and just a copy of the transition theme.</span>
 </p>
     <section id="theQuestions">
         <h2 class="hdr-nobot-mrgn"><small>Pre-Question</small></h2>
