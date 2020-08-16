@@ -9,7 +9,7 @@ require_once("tsugi_color_util.php");
       <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tsugi Transision Theme Test</title>
+        <title>Tsugi Transition Theme Test</title>
         <!-- Tiny bit of JS -->
         <script src="https://static.tsugi.org/js/tsugiscripts_head.js"></script>
         <!-- Le styles -->
@@ -35,7 +35,7 @@ document.getElementById("body_container").className = "container";
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Tsugi Transision Theme Test</a>
+      <a class="navbar-brand" href="#">Tsugi Transition Theme Test</a>
     </div>
     <div class="navbar-collapse collapse">
     </div> <!--/.nav-collapse -->
@@ -161,9 +161,9 @@ if ( isset($_REQUEST['color']) ) {
 ?>
 </div>
 <div id="tsugi-theme" style="display:block;">
-<h2>Tsugi Transistion</h2><br/>
+<h2>Tsugi Transition</h2><br/>
 <form>
-Choose IMS LTI Base color for a hue: <input type="color" name="color" value="<?= $color ?>"><br/>
+Choose Base color for a hue: <input type="color" name="color" value="<?= $color ?>"><br/>
 <input type="submit" value="Populate Colors">
 </form>
 <hr/>
@@ -217,8 +217,8 @@ echo("];\n</script>\n");
 $tusgitolegacy = array(
    'tsugi-lti-dark-lighter' => ['primary', 'text-light'],
    'tsugi-lti-dark-text' => 'text',
-   'tsugi-lti-dark' => 'primary-darker',
-   'tsugi-lti-dark-darker' => 'primary-darkest',
+   'tsugi-lti-dark' => 'primary',
+   'tsugi-lti-dark-darker' => ['primary-darker', 'primary-darkest'], 
    'tsugi-lti-dark-accent' => 'primary-border', 
    'tsugi-lti-light-darker' => 'secondary',
    'tsugi-lti-light-background' => 'background-color',
@@ -236,10 +236,21 @@ foreach($tsuginames as $name => $default) {
 $name
 </span>
 <input type="color" id="$name" value="$default" onchange="updateColors(tsuginames);">
-<br/>
 
 EOT;
     echo($template);
+    $legacy = isset($tusgitolegacy[$name]) ? $tusgitolegacy[$name] : false;
+    if ( $legacy ) {
+        if ( is_string($legacy) ) {
+            echo(" ".$legacy);
+        } else {
+            $legacies = $legacy;
+            foreach($legacies as $legacy) {
+                echo(" ".$legacy);
+            }
+        }
+    }
+    echo("<br/>\n");
 }
 echo('<span style="padding: 5px; color: '.$tsuginames['tsugi-lti-light-text'].'; background-color: '.$tsuginames['tsugi-lti-dark'].';">tsugi-lti-light-text on tsugi-lti-dark</span> ');
 echo('<span style="padding: 5px; color: '.$tsuginames['tsugi-lti-dark-text'].'; background-color: '.$tsuginames['tsugi-lti-light-background'].';">tsugi-lti-dark-text on tsugi-lti-light-background</span> ');
