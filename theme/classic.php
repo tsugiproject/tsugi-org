@@ -47,15 +47,16 @@ document.getElementById("body_container").className = "container";
     </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
-        <li class="active"><a href="index.php"><span class="fas fa-edit" aria-hidden="true"></span> Transition Theme</a></li>
+<li class="active"><a href="contrast.php" target="_blank"><span class="fas fa-edit" aria-hidden="true"></span> Contrast Checker</a></li>
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fas fa-poll-h" aria-hidden="true"></span> Results <span class="fa fa-caret-down" aria-hidden="true"></span></a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fas fa-poll-h" aria-hidden="true"></span> Themes <span class="fa fa-caret-down" aria-hidden="true"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="#" >By Student</a></li>
-            <li><a href="#" >By Question</a></li>
+            <li><a href="classic.php" >Classic</a></li>
+            <li><a href="transition.php" >Transition</a></li>
+            <li><a href="index.php" >New</a></li>
           </ul>
         </li>
-        <li><a href="index.php" ><span class="fas fa-user-graduate" aria-hidden="true"></span> New Theme</a></li>
+        <li><a href="#"><span class="fas fa-user-graduate" aria-hidden="true"></span> TBD</a></li>
       </ul>
     </div> <!--/.nav-collapse -->
   </div> <!--container -->
