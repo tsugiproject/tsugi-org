@@ -99,7 +99,7 @@ if ( ! inIframe() ) {
             </a>
         </div>
     </form>
-    <p class="lead">Create a question that students can respond to before and after an activity.</p>
+    <p class="lead">This is the new theme and new markup (under construction).  Eventually it will support dark mode.</p>
     <section id="theQuestions">
         <h2 class="hdr-nobot-mrgn"><small>Pre-Question</small></h2>
         <div id="preQuestionRow" class="h3 inline hdr-notop-mrgn flx-cntnr flx-row flx-nowrap flx-start question-row">

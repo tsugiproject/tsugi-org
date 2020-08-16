@@ -99,7 +99,10 @@ if ( ! inIframe() ) {
             </a>
         </div>
     </form>
-    <p class="lead">Create a question that students can respond to before and after an activity.</p>
+    <p class="lead">This is the new theme values, mapped to the old theme / old markup.  
+You can interactively change any color or autogenerate a color set from a single color.
+You can see how the new values are mapped to the old values for old markup.
+The old markup won't support dark mode.</p>
     <section id="theQuestions">
         <h2 class="hdr-nobot-mrgn"><small>Pre-Question</small></h2>
         <div id="preQuestionRow" class="h3 inline hdr-notop-mrgn flx-cntnr flx-row flx-nowrap flx-start question-row">
