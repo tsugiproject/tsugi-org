@@ -161,7 +161,7 @@ if ( isset($_REQUEST['color']) ) {
 ?>
 </div>
 <div id="tsugi-theme" style="display:block;">
-<h2>Tsugi Transistion</h2><br/>
+<h2>New Theme / New Markup</h2><br/>
 <form>
 Choose IMS LTI Base color for a hue: <input type="color" name="color" value="<?= $color ?>"><br/>
 <input type="submit" value="Populate Colors">

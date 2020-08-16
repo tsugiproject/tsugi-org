@@ -61,7 +61,7 @@ document.getElementById("body_container").className = "container";
             <li><a href="#" >By Question</a></li>
           </ul>
         </li>
-        <li><a href="#" ><span class="fas fa-user-graduate" aria-hidden="true"></span> Student View</a></li>
+        <li><a href="index.php" ><span class="fas fa-user-graduate" aria-hidden="true"></span> New Theme</a></li>
       </ul>
     </div> <!--/.nav-collapse -->
   </div> <!--container -->
