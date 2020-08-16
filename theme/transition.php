@@ -9,7 +9,7 @@ require_once("tsugi_color_util.php");
       <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tsugi New Theme Test</title>
+        <title>Tsugi Transision Theme Test</title>
         <!-- Tiny bit of JS -->
         <script src="https://static.tsugi.org/js/tsugiscripts_head.js"></script>
         <!-- Le styles -->
@@ -35,7 +35,7 @@ document.getElementById("body_container").className = "container";
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Tsugi New Theme Test</a>
+      <a class="navbar-brand" href="#">Tsugi Transision Theme Test</a>
     </div>
     <div class="navbar-collapse collapse">
     </div> <!--/.nav-collapse -->
@@ -61,7 +61,7 @@ document.getElementById("body_container").className = "container";
             <li><a href="#" >By Question</a></li>
           </ul>
         </li>
-        <li><a href="transition.php"><span class="fas fa-user-graduate" aria-hidden="true"></span> Transition Theme</a></li>
+        <li><a href="#" ><span class="fas fa-user-graduate" aria-hidden="true"></span> Student View</a></li>
       </ul>
     </div> <!--/.nav-collapse -->
   </div> <!--container -->

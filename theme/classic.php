@@ -3,7 +3,7 @@
       <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tsugi Theme Test</title>
+        <title>Classic Theme</title>
         <!-- Tiny bit of JS -->
         <script src="https://static.tsugi.org/js/tsugiscripts_head.js"></script>
         <!-- Le styles -->
@@ -29,7 +29,7 @@ document.getElementById("body_container").className = "container";
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Tsugi Theme Test</a>
+      <a class="navbar-brand" href="#">Classic Theme</a>
     </div>
     <div class="navbar-collapse collapse">
     </div> <!--/.nav-collapse -->
@@ -47,7 +47,7 @@ document.getElementById("body_container").className = "container";
     </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
-        <li class="active"><a href="index.php"><span class="fas fa-edit" aria-hidden="true"></span> IMS Theme</a></li>
+        <li class="active"><a href="index.php"><span class="fas fa-edit" aria-hidden="true"></span> Transition Theme</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fas fa-poll-h" aria-hidden="true"></span> Results <span class="fa fa-caret-down" aria-hidden="true"></span></a>
           <ul class="dropdown-menu">
@@ -120,7 +120,7 @@ if ( ! inIframe() ) {
 </section>
 <section>
 <div id="tsugi-theme">
-<h2>Tsugi</h2>
+<h2>Classic Theme</h2>
 <br/>
 <script>
     var tsuginames = ['primary', 'primary-border', 'primary-darker', 'primary-darkest', 'secondary', 'text', 'text-light'];
