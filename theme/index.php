@@ -103,8 +103,8 @@ if ( ! inIframe() ) {
 These are theme values from the LMS plus a dark mode indicator.
 You can interactively change any color or autogenerate a color set from a single color.
 If you pick a color that has at least 8.0 contrast from white, it will be used as the
-tsugi-dark theme color.  If the color you choose has less than 8.0 contrast from white,
-then it will be nudged within the same hue to to the point where tsugi-dark is 8.0 contrast from
+tsugi-theme-dark theme color.  If the color you choose has less than 8.0 contrast from white,
+then it will be nudged within the same hue to to the point where tsugi-theme-dark is 8.0 contrast from
 white.
 The LMS theme values are mapped onto the Tsugi CSS variables depending on the dark mode setting.
 </p>
@@ -144,7 +144,7 @@ $fromwhite = Color::relativeLuminance("#FFFFFF", $tsugi_dark);
 $tsuginames = deriveTsugiColors($tsugi_dark);
 ?>
 </div>
-<div id="tsugi-theme" style="display:block;">
+<div id="tsugi-theme-theme" style="display:block;">
 <form>
 Choose dark color: <input type="color" name="color" value="<?= $tsugi_dark ?>">
 Contrast from white: <?= $fromwhite ?>
@@ -159,15 +159,15 @@ Dark Mode
 <th style="text-align:center;">Dark Range</th><th style="text-align:center;">Midpoint</th><th style="text-align:center;">Light Range</th></thead>
 <tr>
 <td>
-<input type="color" value="<?= $tsuginames['tsugi-dark-background'] ?>" readonly>
+<input type="color" value="<?= $tsuginames['tsugi-theme-dark-background'] ?>" readonly>
 ...
-<input type="color" value="<?=  $tsuginames['tsugi-dark-accent'] ?>" readonly>
+<input type="color" value="<?=  $tsuginames['tsugi-theme-dark-accent'] ?>" readonly>
 </td><td>
- <input type="color" value="<?= $tsuginames['tsugi-mid'] ?>" readonly>
+ <input type="color" value="<?= $tsuginames['tsugi-theme-mid'] ?>" readonly>
 </td><td>
-<input type="color" value="<?= $tsuginames['tsugi-light-accent'] ?>" readonly>
+<input type="color" value="<?= $tsuginames['tsugi-theme-light-accent'] ?>" readonly>
 ...
-<input type="color" value="<?= $tsuginames['tsugi-light-background']?>" readonly>
+<input type="color" value="<?= $tsuginames['tsugi-theme-light-background']?>" readonly>
 </td></tr>
 </table>
 </p>
@@ -184,22 +184,22 @@ echo("];\n</script>\n");
 
 if ( $dark_mode ) {
     $tusgitolegacy = array(
-        'tsugi-light-text' => ['text', 'primary-darkest'],
-        'tsugi-light' => ['text-light'],
-        'tsugi-light-darker' => 'primary-darker', 
-        'tsugi-light-accent' => 'primary-border', 
-        'tsugi-dark' => 'primary',
-        'tsugi-light' => 'secondary',
-        'tsugi-dark-background' => 'background-color',
+        'tsugi-theme-light-text' => ['text', 'primary-darkest'],
+        'tsugi-theme-light' => ['text-light'],
+        'tsugi-theme-light-darker' => 'primary-darker', 
+        'tsugi-theme-light-accent' => 'primary-border', 
+        'tsugi-theme-dark' => 'primary',
+        'tsugi-theme-light' => 'secondary',
+        'tsugi-theme-dark-background' => 'background-color',
     );
 } else {
     $tusgitolegacy = array(
-        'tsugi-dark-text' => ['text', 'primary-darkest'],
-        'tsugi-dark' => ['primary', 'text-light'],
-        'tsugi-dark-darker' => 'primary-darker', 
-        'tsugi-dark-accent' => 'primary-border', 
-        'tsugi-light' => 'secondary',
-        'tsugi-light-background' => 'background-color',
+        'tsugi-theme-dark-text' => ['text', 'primary-darkest'],
+        'tsugi-theme-dark' => ['primary', 'text-light'],
+        'tsugi-theme-dark-darker' => 'primary-darker', 
+        'tsugi-theme-dark-accent' => 'primary-border', 
+        'tsugi-theme-light' => 'secondary',
+        'tsugi-theme-light-background' => 'background-color',
     );
 }
 
@@ -235,12 +235,12 @@ EOT;
     }
     echo("<br/>\n");
 }
-echo('<span style="padding: 5px; color: '.$tsuginames['tsugi-light-text'].'; background-color: '.$tsuginames['tsugi-dark'].';">tsugi-light-text on tsugi-dark</span> ');
-echo('<span style="padding: 5px; color: '.$tsuginames['tsugi-dark-text'].'; background-color: '.$tsuginames['tsugi-light-background'].';">tsugi-dark-text on tsugi-light-background</span> ');
-echo('<span style="padding: 5px; color: '.$tsuginames['tsugi-light-text'].'; background-color: '.$tsuginames['tsugi-dark-background'].';">tsugi-light-text on tsugi-dark-background (dark mode)</span> ');
+echo('<span style="padding: 5px; color: '.$tsuginames['tsugi-theme-light-text'].'; background-color: '.$tsuginames['tsugi-theme-dark'].';">tsugi-theme-light-text on tsugi-theme-dark</span> ');
+echo('<span style="padding: 5px; color: '.$tsuginames['tsugi-theme-dark-text'].'; background-color: '.$tsuginames['tsugi-theme-light-background'].';">tsugi-theme-dark-text on tsugi-theme-light-background</span> ');
+echo('<span style="padding: 5px; color: '.$tsuginames['tsugi-theme-light-text'].'; background-color: '.$tsuginames['tsugi-theme-dark-background'].';">tsugi-theme-light-text on tsugi-theme-dark-background (dark mode)</span> ');
 ?>
 
-<div id="tsugi-values" style="position: relative; border: black 2px solid; width: 100%; background-image: linear-gradient(to right, white , black);">
+<div id="tsugi-theme-values" style="position: relative; border: black 2px solid; width: 100%; background-image: linear-gradient(to right, white , black);">
 <?php
 foreach($tsuginames as $name => $default) {
     echo('<span id="'.$name.'-ratio" style="color: var(--'.$name.'); position: absolute; padding: 10px 0;"></span><br/>'."\n");
@@ -284,14 +284,14 @@ function updateColors(cssnames) {
 }
 function updateIMSColors() {
     var cssnames = [
-        'tsugi-dark',
-        'tsugi-dark-lighter',
-        'tsugi-dark-darker',
-        'tsugi-dark-accent',
-        'tsugi-light',
-        'tsugi-light-lighter',
-        'tsugi-light-darker',
-        'tsugi-light-accent'
+        'tsugi-theme-dark',
+        'tsugi-theme-dark-lighter',
+        'tsugi-theme-dark-darker',
+        'tsugi-theme-dark-accent',
+        'tsugi-theme-light',
+        'tsugi-theme-light-lighter',
+        'tsugi-theme-light-darker',
+        'tsugi-theme-light-accent'
     ];
     for(var i=0; i < cssnames.length; i++) {
         cssname = cssnames[i];

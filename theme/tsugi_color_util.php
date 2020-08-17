@@ -107,17 +107,17 @@ function deriveTsugiColors($tsugi_dark) {
     $lightness_dark_accent = ($tsugi_dark_hsl[2] + $dark_inner_hsl[2]) / 2.0;
 
     $tsuginames = array(
-        "tsugi-dark-background" => $outerpair[0],
-        "tsugi-dark-text" =>  Color::hex(hslToRgb($hue, $sat_dark*0.5, $lightness_darker)),
-        "tsugi-dark-darker" => Color::hex(hslToRgb($hue, $sat_dark, $lightness_darker)),
-        "tsugi-dark" =>  $tsugi_dark,
-        "tsugi-dark-accent" => $innerpair[0],
-        "tsugi-mid" => $mid,
-        "tsugi-light-accent" => $innerpair[1],
-        "tsugi-light" => Color::hex(hslToRgb($hue, $sat_light, $lightness_light - ($ldelta * 0.6))),
-        "tsugi-light-lighter" => Color::hex(hslToRgb($hue, $sat_light, $lightness_light - ($ldelta * 0.3))),
-        "tsugi-light-text" => Color::hex(hslToRgb($hue, $sat_light*0.5, $lightness_light - ($ldelta * 0.3))),
-        "tsugi-light-background" => $outerpair[1],
+        "tsugi-theme-dark-background" => $outerpair[0],
+        "tsugi-theme-dark-text" =>  Color::hex(hslToRgb($hue, $sat_dark*0.5, $lightness_darker)),
+        "tsugi-theme-dark-darker" => Color::hex(hslToRgb($hue, $sat_dark, $lightness_darker)),
+        "tsugi-theme-dark" =>  $tsugi_dark,
+        "tsugi-theme-dark-accent" => $innerpair[0],
+        "tsugi-theme-mid" => $mid,
+        "tsugi-theme-light-accent" => $innerpair[1],
+        "tsugi-theme-light" => Color::hex(hslToRgb($hue, $sat_light, $lightness_light - ($ldelta * 0.6))),
+        "tsugi-theme-light-lighter" => Color::hex(hslToRgb($hue, $sat_light, $lightness_light - ($ldelta * 0.3))),
+        "tsugi-theme-light-text" => Color::hex(hslToRgb($hue, $sat_light*0.5, $lightness_light - ($ldelta * 0.3))),
+        "tsugi-theme-light-background" => $outerpair[1],
     );
 
     return $tsuginames;
