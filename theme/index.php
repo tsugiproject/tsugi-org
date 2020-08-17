@@ -9,7 +9,7 @@ require_once("tsugi_color_util.php");
       <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tsugi Transition Theme Test</title>
+        <title>LMS Controlled Theme</title>
         <!-- Tiny bit of JS -->
         <script src="https://static.tsugi.org/js/tsugiscripts_head.js"></script>
         <!-- Le styles -->
@@ -21,9 +21,9 @@ require_once("tsugi_color_util.php");
           <link href="https://static.tsugi.org/css/tsugi.css" rel="stylesheet">
 
 <script>var CSRF_TOKEN = "42"; var _TSUGI = {staticroot: "https://static.tsugi.org"}; </script>
-</head
-<body prefix="oer: http://oerschema.org" style="color: var(--text); background-color: var(--background-color);">
-<div id="body_container">
+</head>
+<body style="color: var(--text); background-color: var(--background-color);">
+<div id="body_container" style="color: var(--text); background-color: var(--background-color);">
 <script>
 document.getElementById("body_container").className = "container";
 </script>
@@ -35,7 +35,7 @@ document.getElementById("body_container").className = "container";
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Tsugi Transition Theme Test</a>
+      <a class="navbar-brand" href="#">LMS Controlled Theme</a>
     </div>
     <div class="navbar-collapse collapse">
     </div> <!--/.nav-collapse -->
@@ -49,7 +49,7 @@ document.getElementById("body_container").className = "container";
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Transition</a>
+      <a class="navbar-brand" href="#">Theme from the LMS</a>
     </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
@@ -57,9 +57,8 @@ document.getElementById("body_container").className = "container";
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fas fa-poll-h" aria-hidden="true"></span> Themes <span class="fa fa-caret-down" aria-hidden="true"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="classic.php" >Classic</a></li>
-            <li><a href="index.php" >Transition</a></li>
-            <li><a href="new.php" >New</a></li>
+            <li><a href="index.php" >LMS Theme</a></li>
+            <li><a href="classic.php" >Tsugi Classic</a></li>
           </ul>
         </li>
         <li><a href="#"><span class="fas fa-user-graduate" aria-hidden="true"></span> TBD</a></li>
@@ -100,14 +99,15 @@ if ( ! inIframe() ) {
             </a>
         </div>
     </form>
-    <p class="lead">This is the new theme values, mapped to the old theme / old markup.  
+    <p class="lead">
+These are theme values from the LMS plus a dark mode indicator.
 You can interactively change any color or autogenerate a color set from a single color.
 If you pick a color that has at least 8.0 contrast from white, it will be used as the
 tsugi-dark theme color.  If the color you choose has less than 8.0 contrast from white,
-then it will be nudged within the same hue to to the point where tsugi-dark is 8.0 contrast from 
+then it will be nudged within the same hue to to the point where tsugi-dark is 8.0 contrast from
 white.
-You can see how the new values are mapped to the old values for old markup.
-The old markup won't support dark mode.</p>
+The LMS theme values are mapped onto the Tsugi CSS variables depending on the dark mode setting.
+</p>
     <section id="theQuestions">
         <h2 class="hdr-nobot-mrgn"><small>Pre-Question</small></h2>
         <div id="preQuestionRow" class="h3 inline hdr-notop-mrgn flx-cntnr flx-row flx-nowrap flx-start question-row">
@@ -134,6 +134,7 @@ The old markup won't support dark mode.</p>
 </section>
 <section>
 <?php 
+$dark_mode = isset($_REQUEST['dark_mode']) && $_REQUEST['dark_mode'] == 'yes';
 $tsugi_dark = '#000000';
 if ( isset($_REQUEST['color']) ) {
     $tsugi_dark = $_REQUEST['color'];
@@ -146,8 +147,12 @@ $tsuginames = deriveTsugiColors($tsugi_dark);
 <div id="tsugi-theme" style="display:block;">
 <form>
 Choose dark color: <input type="color" name="color" value="<?= $tsugi_dark ?>">
-Contrast from white: <?= $fromwhite ?> 
+Contrast from white: <?= $fromwhite ?>
 <br/>
+<input type="checkbox" name="dark_mode" value="yes" <?php if ( $dark_mode ) echo('checked'); ?> >
+Dark Mode
+<br>
+<input type="submit" value="Populate Colors"></br>
 <p>
 <table border=2px;>
 <thead>
@@ -168,7 +173,8 @@ Contrast from white: <?= $fromwhite ?>
 </p>
 </form>
 <hr/>
-<?php 
+<?php
+
 
 echo("<script>\n var tsuginames = [\n");
 foreach($tsuginames as $name => $default) {
@@ -176,15 +182,27 @@ foreach($tsuginames as $name => $default) {
 }
 echo("];\n</script>\n");
 
-$tusgitolegacy = array(
-   'tsugi-dark-lighter' => ['primary', 'text-light'],
-   'tsugi-dark-text' => ['text', 'primary-darkest'],
-   'tsugi-dark' => ['primary', 'text-light'],
-   'tsugi-dark-darker' => 'primary-darker', 
-   'tsugi-dark-accent' => 'primary-border', 
-   'tsugi-light-darker' => 'secondary',
-   'tsugi-light-background' => 'background-color',
-);
+if ( $dark_mode ) {
+    $tusgitolegacy = array(
+        'tsugi-light-text' => ['text', 'primary-darkest'],
+        'tsugi-light' => ['text-light'],
+        'tsugi-light-darker' => 'primary-darker', 
+        'tsugi-light-accent' => 'primary-border', 
+        'tsugi-dark' => 'primary',
+        'tsugi-light' => 'secondary',
+        'tsugi-dark-background' => 'background-color',
+    );
+} else {
+    $tusgitolegacy = array(
+        'tsugi-dark-text' => ['text', 'primary-darkest'],
+        'tsugi-dark' => ['primary', 'text-light'],
+        'tsugi-dark-darker' => 'primary-darker', 
+        'tsugi-dark-accent' => 'primary-border', 
+        'tsugi-light' => 'secondary',
+        'tsugi-light-background' => 'background-color',
+    );
+}
+
 
 echo("<script>\n var tusgitolegacy = \n");
 echo(json_encode($tusgitolegacy));
@@ -290,7 +308,7 @@ function updateIMSColors() {
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span class="fa fa-times" aria-hidden="true"></span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title">Tsugi Transition</h4>
+                <h4 class="modal-title">LMS Controlled Theme</h4>
             </div>
             <div class="modal-body">
                                         <h4>General Help</h4>
