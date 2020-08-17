@@ -69,3 +69,57 @@ function luminosityPair($difference, $r, $g=false, $b=false) {
     }
 }
 
+function deriveTsugiColors($tsugi_dark) {
+    $fromwhite = Color::relativeLuminance("#FFFFFF", $tsugi_dark);
+    if ( $fromwhite < 8.0 ) {
+        $mid = findLMidPointForHue($tsugi_dark);
+    } else {
+        $rgb = fixRgb($tsugi_dark);
+        $mid = findLMidPointForHue($rgb[0], $rgb[1], $rgb[2], $tsugi_dark);
+    }
+
+    $outerpair = luminosityPair(20.0, $mid);
+    $innerpair = luminosityPair(7.0, $mid);
+
+    $dark_outer_hsl = rgbToHsl($outerpair[0]);
+    $dark_inner_hsl = rgbToHsl($innerpair[0]);
+
+    $light_inner_hsl = rgbToHsl($innerpair[1]);
+    $light_outer_hsl = rgbToHsl($outerpair[1]);
+
+    $tsugi_dark_hsl = rgbToHsl($tsugi_dark);
+
+    $ddelta = $dark_inner_hsl[2] - $dark_outer_hsl[2];
+    $ldelta = $light_outer_hsl[2] - $light_inner_hsl[2];
+
+    $hue = $dark_outer_hsl[0];
+    $sat_dark = $dark_outer_hsl[1];
+    $sat_light = $light_outer_hsl[1];
+    $lightness_dark = $dark_outer_hsl[2];
+    $lightness_light = $light_outer_hsl[2];
+
+    if ( $fromwhite < 8.0 ) {
+        $tsugi_dark = Color::hex(hslToRgb($hue, $sat_dark, $lightness_dark + ($ddelta * 0.6)));
+        $tsugi_dark_hsl = rgbToHsl($tsugi_dark);
+    }
+
+    $lightness_darker = ($tsugi_dark_hsl[2] + $dark_outer_hsl[2]) / 2.0;
+    $lightness_dark_accent = ($tsugi_dark_hsl[2] + $dark_inner_hsl[2]) / 2.0;
+
+    $tsuginames = array(
+        "tsugi-dark-background" => $outerpair[0],
+        "tsugi-dark-text" =>  Color::hex(hslToRgb($hue, $sat_dark*0.5, $lightness_darker)),
+        "tsugi-dark-darker" => Color::hex(hslToRgb($hue, $sat_dark, $lightness_darker)),
+        "tsugi-dark" =>  $tsugi_dark,
+        "tsugi-dark-accent" => $innerpair[0],
+        "tsugi-mid" => $mid,
+        "tsugi-light-accent" => $innerpair[1],
+        "tsugi-light" => Color::hex(hslToRgb($hue, $sat_light, $lightness_light - ($ldelta * 0.6))),
+        "tsugi-light-lighter" => Color::hex(hslToRgb($hue, $sat_light, $lightness_light - ($ldelta * 0.3))),
+        "tsugi-light-text" => Color::hex(hslToRgb($hue, $sat_light*0.5, $lightness_light - ($ldelta * 0.3))),
+        "tsugi-light-background" => $outerpair[1],
+    );
+
+    return $tsuginames;
+}
+
