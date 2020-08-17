@@ -148,12 +148,24 @@ $tsuginames = deriveTsugiColors($tsugi_dark);
 Choose dark color: <input type="color" name="color" value="<?= $tsugi_dark ?>">
 Contrast from white: <?= $fromwhite ?> 
 <br/>
-<input type="submit" value="Populate Colors"></br>
-Outer dark: <input type="color" value="<?= $tsuginames['tsugi-dark-background'] ?>" readonly>
-Inner dark: <input type="color" value="<?=  $tsuginames['tsugi-dark-accent'] ?>" readonly>
-Hue midpoint: <input type="color" value="<?= $tsuginames['tsugi-mid'] ?>" readonly>
-Inner light: <input type="color" value="<?= $tsuginames['tsugi-light-accent'] ?>" readonly>
-Outer light: <input type="color" value="<?= $tsuginames['tsugi-light-background']?>" readonly>
+<p>
+<table border=2px;>
+<thead>
+<th style="text-align:center;">Dark Range</th><th style="text-align:center;">Midpoint</th><th style="text-align:center;">Light Range</th></thead>
+<tr>
+<td>
+<input type="color" value="<?= $tsuginames['tsugi-dark-background'] ?>" readonly>
+...
+<input type="color" value="<?=  $tsuginames['tsugi-dark-accent'] ?>" readonly>
+</td><td>
+ <input type="color" value="<?= $tsuginames['tsugi-mid'] ?>" readonly>
+</td><td>
+<input type="color" value="<?= $tsuginames['tsugi-light-accent'] ?>" readonly>
+...
+<input type="color" value="<?= $tsuginames['tsugi-light-background']?>" readonly>
+</td></tr>
+</table>
+</p>
 </form>
 <hr/>
 <?php 

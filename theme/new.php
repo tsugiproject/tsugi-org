@@ -134,69 +134,37 @@ if ( isset($_REQUEST['color']) ) {
     $tsugi_dark = $_REQUEST['color'];
 }
 $fromwhite = Color::relativeLuminance("#FFFFFF", $tsugi_dark);
-if ( $fromwhite < 8.0 ) {
-    $mid = findLMidPointForHue($tsugi_dark);
-} else {
-    $rgb = fixRgb($tsugi_dark);
-    $mid = findLMidPointForHue($rgb[0], $rgb[1], $rgb[2], $tsugi_dark);
-}
 
-$outerpair = luminosityPair(20.0, $mid);
-$innerpair = luminosityPair(7.0, $mid);
-
+$tsuginames = deriveTsugiColors($tsugi_dark);
 ?>
 </div>
 <div id="tsugi-theme" style="display:block;">
 <form>
 Choose dark color: <input type="color" name="color" value="<?= $tsugi_dark ?>">
-Contrast from white: <?= $fromwhite ?> 
+Contrast from white: <?= $fromwhite ?>
 <br/>
 <input type="submit" value="Populate Colors"></br>
-Outer dark: <input type="color" value="<?= $outerpair[0] ?>" readonly>
-Inner dark: <input type="color" value="<?= $innerpair[0] ?>" readonly>
-Hue midpoint: <input type="color" value="<?= $mid ?>" readonly>
-Inner light: <input type="color" value="<?= $innerpair[1] ?>" readonly>
-Outer light: <input type="color" value="<?= $outerpair[1] ?>" readonly>
+<p>
+<table border=2px;>
+<thead>
+<th style="text-align:center;">Dark Range</th><th style="text-align:center;">Midpoint</th><th style="text-align:center;">Light Range</th></thead>
+<tr>
+<td>
+<input type="color" value="<?= $tsuginames['tsugi-dark-background'] ?>" readonly>
+...
+<input type="color" value="<?=  $tsuginames['tsugi-dark-accent'] ?>" readonly>
+</td><td>
+ <input type="color" value="<?= $tsuginames['tsugi-mid'] ?>" readonly>
+</td><td>
+<input type="color" value="<?= $tsuginames['tsugi-light-accent'] ?>" readonly>
+...
+<input type="color" value="<?= $tsuginames['tsugi-light-background']?>" readonly>
+</td></tr>
+</table>
+</p>
 </form>
 <hr/>
-<?php 
-$dark_outer_hsl = rgbToHsl($outerpair[0]);
-$dark_inner_hsl = rgbToHsl($innerpair[0]);
-
-$light_inner_hsl = rgbToHsl($innerpair[1]);
-$light_outer_hsl = rgbToHsl($outerpair[1]);
-
-$tsugi_dark_hsl = rgbToHsl($tsugi_dark);
-
-$ddelta = $dark_inner_hsl[2] - $dark_outer_hsl[2];
-$ldelta = $light_outer_hsl[2] - $light_inner_hsl[2];
-
-$hue = $dark_outer_hsl[0];
-$sat_dark = $dark_outer_hsl[1];
-$sat_light = $light_outer_hsl[1];
-$lightness_dark = $dark_outer_hsl[2];
-$lightness_light = $light_outer_hsl[2];
-
-if ( $fromwhite < 8.0 ) {
-    $tsugi_dark = Color::hex(hslToRgb($hue, $sat_dark, $lightness_dark + ($ddelta * 0.6)));
-    $tsugi_dark_hsl = rgbToHsl($tsugi_dark);
-}
-
-$lightness_darker = ($tsugi_dark_hsl[2] + $dark_outer_hsl[2]) / 2.0;
-$lightness_dark_accent = ($tsugi_dark_hsl[2] + $dark_inner_hsl[2]) / 2.0;
-
-$tsuginames = array( 
-    "tsugi-dark-background" => $outerpair[0],
-    "tsugi-dark-text" =>  Color::hex(hslToRgb($hue, $sat_dark*0.5, $lightness_darker)),
-    "tsugi-dark-darker" => Color::hex(hslToRgb($hue, $sat_dark, $lightness_darker)),
-    "tsugi-dark" =>  $tsugi_dark,
-    "tsugi-dark-accent" => Color::hex(hslToRgb($hue, $sat_dark, $lightness_dark_accent)),
-    "tsugi-light-accent" => $innerpair[1],
-    "tsugi-light" => Color::hex(hslToRgb($hue, $sat_light, $lightness_light - ($ldelta * 0.6))),
-    "tsugi-light-lighter" => Color::hex(hslToRgb($hue, $sat_light, $lightness_light - ($ldelta * 0.3))),
-    "tsugi-light-text" => Color::hex(hslToRgb($hue, $sat_light*0.5, $lightness_light - ($ldelta * 0.3))),
-    "tsugi-light-background" => $outerpair[1],
-);
+<?php
 
 
 echo("<script>\n var tsuginames = [\n");
