@@ -152,7 +152,7 @@ Contrast from white: <?= $fromwhite ?>
 <input type="checkbox" name="dark_mode" value="yes" <?php if ( $dark_mode ) echo('checked'); ?> >
 Dark Mode
 <br>
-<input type="submit" value="Populate Colors"></br>
+<input type="submit" class="btn btn-primary" value="Populate Colors"></br>
 <p>
 <table border=2px;>
 <thead>
