@@ -17,7 +17,7 @@ require_once("tsugi_color_util.php");
         <link href="https://static.tsugi.org/js/jquery-ui-1.11.4/jquery-ui.min.css" rel="stylesheet">
                 <link href="https://static.tsugi.org/fontawesome-free-5.8.2-web/css/all.css" rel="stylesheet">
         <link href="https://static.tsugi.org/fontawesome-free-5.8.2-web/css/v4-shims.css" rel="stylesheet">
-        <style>:root {--background-color: #FFFFFF; --primary:#0D47A1;--primary-border:#0d4295;--primary-darker:#0c4091;--primary-darkest:#0b3b85;--secondary:#EEEEEE;--text:#111111;--text-light:#5E5E5E;--font-family:sans-serif;--font-size:14px;}</style>
+        <style>:root {--background-color: #FFFFFF; --primary:#0D47A1;--primary-menu:#0D47A1; --primary-border:#0d4295;--primary-darker:#0c4091;--primary-darkest:#0b3b85;--secondary:#EEEEEE;--secondary-menu:#EEEEEE;--background-color:#FFFFFF;--text:#111111;--text-light:#5E5E5E;--font-family:sans-serif;--font-size:14px;}</style>
           <link href="https://static.tsugi.org/css/tsugi.css" rel="stylesheet">
 
 <script>var CSRF_TOKEN = "42"; var _TSUGI = {staticroot: "https://static.tsugi.org"}; </script>
@@ -27,41 +27,42 @@ require_once("tsugi_color_util.php");
 <script>
 document.getElementById("body_container").className = "container";
 </script>
-<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="tsugi_main_nav_bar" style="display:none">  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="tsugi_main_nav_bar" style="display:none; background-color: var(--primary-menu);">  <div class="container-fluid" style="background-color: var(--primary-menu);">
+    <div class="navbar-header" style="background-color: var(--primary-menu);">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse" style="background-color: var(--primary-menu);">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">LMS Controlled Theme</a>
+      <a class="navbar-brand" href="#" style="background-color: var(--primary-menu);">LMS Controlled Theme</a>
     </div>
-    <div class="navbar-collapse collapse">
+    <div class="navbar-collapse collapse" style="background-color: var(--primary-menu);">
     </div> <!--/.nav-collapse -->
   </div> <!--container -->
 </nav>
-<nav class="navbar navbar-default" role="navigation" id="tsugi_tool_nav_bar">  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+<nav class="navbar navbar-default" role="navigation" id="tsugi_tool_nav_bar" style="color: var(--primary-menu); background-color: var(--secondary-menu);">
+  <div class="container-fluid" style="color: var(--primary-menu); background-color: var(--secondary-menu);">
+    <div class="navbar-header" style="color: var(--primary-menu); background-color: var(--secondary-menu);">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"  style="color: var(--primary-menu); background-color: var(--secondary-menu);">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Theme from the LMS</a>
+      <a class="navbar-brand" href="#"  style="color: var(--primary-menu); background-color: var(--secondary-menu);">Theme from the LMS</a>
     </div>
-    <div class="navbar-collapse collapse">
+    <div class="navbar-collapse collapse" style="color: var(--primary-menu); background-color: var(--secondary-menu);">
       <ul class="nav navbar-nav navbar-right">
-        <li class="active"><a href="contrast.php" target="_blank"><span class="fas fa-edit" aria-hidden="true"></span> Contrast Checker</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fas fa-poll-h" aria-hidden="true"></span> Themes <span class="fa fa-caret-down" aria-hidden="true"></span></a>
+        <li class="active"><a href="contrast.php" target="_blank" style="color: var(--primary-menu); background-color: var(--secondary-menu);"><span class="fas fa-edit" aria-hidden="true"></span> Contrast Checker</a></li>
+        <li class="dropdown"  style="color: var(--primary-menu); background-color: var(--secondary-menu);">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="color: var(--primary-menu); background-color: var(--secondary-menu);"><span class="fas fa-poll-h" aria-hidden="true"></span> Themes <span class="fa fa-caret-down" aria-hidden="true"></span></a>
           <ul class="dropdown-menu">
             <li><a href="index.php" >LMS Theme</a></li>
             <li><a href="classic.php" >Tsugi Classic</a></li>
           </ul>
         </li>
-        <li><a href="#"><span class="fas fa-user-graduate" aria-hidden="true"></span> TBD</a></li>
+        <li  style="color: var(--primary-menu); background-color: var(--secondary-menu);"><a href="#" style="color: var(--primary-menu); background-color: var(--secondary-menu);"><span class="fas fa-user-graduate" aria-hidden="true"></span> TBD</a></li>
       </ul>
     </div> <!--/.nav-collapse -->
   </div> <!--container -->
@@ -185,17 +186,16 @@ echo("];\n</script>\n");
 if ( $dark_mode ) {
     $tusgitolegacy = array(
         'tsugi-theme-light-text' => ['text', 'primary-darkest'],
-        'tsugi-theme-light' => ['text-light'],
+        'tsugi-theme-light' => ['text-light', 'primary', 'secondary-menu'],
         'tsugi-theme-light-darker' => 'primary-darker', 
         'tsugi-theme-light-accent' => 'primary-border', 
-        'tsugi-theme-dark' => 'primary',
-        'tsugi-theme-light' => 'secondary',
+        'tsugi-theme-dark' => 'primary-menu',
         'tsugi-theme-dark-background' => 'background-color',
     );
 } else {
     $tusgitolegacy = array(
-        'tsugi-theme-dark-text' => ['text', 'primary-darkest'],
-        'tsugi-theme-dark' => ['primary', 'text-light'],
+        'tsugi-theme-dark-text' => ['text', 'text-menu', 'primary-darkest'],
+        'tsugi-theme-dark' => ['primary', 'primary-menu', 'text-light'],
         'tsugi-theme-dark-darker' => 'primary-darker', 
         'tsugi-theme-dark-accent' => 'primary-border', 
         'tsugi-theme-light' => 'secondary',
@@ -256,10 +256,7 @@ function updateColors(cssnames) {
         var value = $("#"+cssname).val();
         var lum = relativeLuminance(breakHEX(value));
         var percent = Math.round(lum*100);
-        var label = getShortLabel(cssname);
-        label = cssname;
-        // console.log(cssname, label, value, lum, percent);
-        $("#"+cssname+'-ratio').html(label+' '+percent);
+        $("#"+cssname+'-ratio').html(cssname+' '+percent);
         if ( percent < 50 ) {
             $("#"+cssname+'-ratio').css('left', percent+'%');
             $("#"+cssname+'-ratio').css('right', 'initial');
@@ -269,35 +266,19 @@ function updateColors(cssnames) {
         }
         document.documentElement.style.setProperty('--'+cssname, value);
         var tsugi = tusgitolegacy[cssname];
+        console.log(cssname, value, lum, percent, tsugi);
         if ( ! tsugi ) continue;
-        console.log('tsugi', tsugi);
         if ( Array.isArray(tsugi) ) {
+            console.log("length=",tsugi.length);
             for(var j=0; j<tsugi.length; j++) {
                 var tsug = tsugi[j];
-                console.log(tsug);
+                console.log(tsug, value, 'array');
                 document.documentElement.style.setProperty('--'+tsug, value);
             }
         } else if ( tsugi ) {
+            console.log(tsugi, value, 'single');
             document.documentElement.style.setProperty('--'+tsugi, value);
         }
-    }
-}
-function updateIMSColors() {
-    var cssnames = [
-        'tsugi-theme-dark',
-        'tsugi-theme-dark-lighter',
-        'tsugi-theme-dark-darker',
-        'tsugi-theme-dark-accent',
-        'tsugi-theme-light',
-        'tsugi-theme-light-lighter',
-        'tsugi-theme-light-darker',
-        'tsugi-theme-light-accent'
-    ];
-    for(var i=0; i < cssnames.length; i++) {
-        cssname = cssnames[i];
-        console.log(cssname);
-        var value = $("#"+cssname).val();
-        document.documentElement.style.setProperty('--'+cssname, value);
     }
 }
 </script>
