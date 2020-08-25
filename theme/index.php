@@ -18,8 +18,7 @@ require_once("tsugi_color_util.php");
                 <link href="https://static.tsugi.org/fontawesome-free-5.8.2-web/css/all.css" rel="stylesheet">
         <link href="https://static.tsugi.org/fontawesome-free-5.8.2-web/css/v4-shims.css" rel="stylesheet">
         <style>:root {--background-color: #FFFFFF; --primary:#0D47A1;--primary-menu:#0D47A1; --primary-border:#0d4295;--primary-darker:#0c4091;--primary-darkest:#0b3b85;--secondary:#EEEEEE;--secondary-menu:#EEEEEE;--background-color:#FFFFFF;--text:#111111;--text-light:#5E5E5E;--font-family:sans-serif;--font-size:14px;}</style>
-          <!-- <link href="https://static.tsugi.org/css/tsugi.css" rel="stylesheet"> -->
-          <link href="http://localhost:8888/tsugi-static/css/tsugi2.css" rel="stylesheet">
+          <link href="https://static.tsugi.org/css/tsugi2.css" rel="stylesheet">
 
 <script>var CSRF_TOKEN = "42"; var _TSUGI = {staticroot: "https://static.tsugi.org"}; </script>
 </head>
