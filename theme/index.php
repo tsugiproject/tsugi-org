@@ -18,51 +18,52 @@ require_once("tsugi_color_util.php");
                 <link href="https://static.tsugi.org/fontawesome-free-5.8.2-web/css/all.css" rel="stylesheet">
         <link href="https://static.tsugi.org/fontawesome-free-5.8.2-web/css/v4-shims.css" rel="stylesheet">
         <style>:root {--background-color: #FFFFFF; --primary:#0D47A1;--primary-menu:#0D47A1; --primary-border:#0d4295;--primary-darker:#0c4091;--primary-darkest:#0b3b85;--secondary:#EEEEEE;--secondary-menu:#EEEEEE;--background-color:#FFFFFF;--text:#111111;--text-light:#5E5E5E;--font-family:sans-serif;--font-size:14px;}</style>
-          <link href="https://static.tsugi.org/css/tsugi.css" rel="stylesheet">
+          <!-- <link href="https://static.tsugi.org/css/tsugi.css" rel="stylesheet"> -->
+          <link href="http://localhost:8888/tsugi-static/css/tsugi2.css" rel="stylesheet">
 
 <script>var CSRF_TOKEN = "42"; var _TSUGI = {staticroot: "https://static.tsugi.org"}; </script>
 </head>
-<body style="color: var(--text); background-color: var(--background-color);">
-<div id="body_container" style="color: var(--text); background-color: var(--background-color);">
+<body>
+<div id="body_container">
 <script>
 document.getElementById("body_container").className = "container";
 </script>
-<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="tsugi_main_nav_bar" style="display:none; background-color: var(--primary-menu);">  <div class="container-fluid" style="background-color: var(--primary-menu);">
-    <div class="navbar-header" style="background-color: var(--primary-menu);">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse" style="background-color: var(--primary-menu);">
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="tsugi_main_nav_bar" style="display:none;">  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#" style="background-color: var(--primary-menu);">LMS Controlled Theme</a>
+      <a class="navbar-brand" href="#">LMS Controlled Theme</a>
     </div>
-    <div class="navbar-collapse collapse" style="background-color: var(--primary-menu);">
+    <div class="navbar-collapse collapse">
     </div> <!--/.nav-collapse -->
   </div> <!--container -->
 </nav>
-<nav class="navbar navbar-default" role="navigation" id="tsugi_tool_nav_bar" style="color: var(--primary-menu); background-color: var(--secondary-menu);">
-  <div class="container-fluid" style="color: var(--primary-menu); background-color: var(--secondary-menu);">
-    <div class="navbar-header" style="color: var(--primary-menu); background-color: var(--secondary-menu);">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"  style="color: var(--primary-menu); background-color: var(--secondary-menu);">
+<nav class="navbar navbar-default" role="navigation" id="tsugi_tool_nav_bar">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#"  style="color: var(--primary-menu); background-color: var(--secondary-menu);">Theme from the LMS</a>
+      <a class="navbar-brand" href="#">Theme from the LMS</a>
     </div>
-    <div class="navbar-collapse collapse" style="color: var(--primary-menu); background-color: var(--secondary-menu);">
+    <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
-        <li class="active"><a href="contrast.php" target="_blank" style="color: var(--primary-menu); background-color: var(--secondary-menu);"><span class="fas fa-edit" aria-hidden="true"></span> Contrast Checker</a></li>
-        <li class="dropdown"  style="color: var(--primary-menu); background-color: var(--secondary-menu);">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="color: var(--primary-menu); background-color: var(--secondary-menu);"><span class="fas fa-poll-h" aria-hidden="true"></span> Themes <span class="fa fa-caret-down" aria-hidden="true"></span></a>
+        <li class="active"><a href="contrast.php" target="_blank"><span class="fas fa-edit" aria-hidden="true"></span> Contrast Checker</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fas fa-poll-h" aria-hidden="true"></span> Themes <span class="fa fa-caret-down" aria-hidden="true"></span></a>
           <ul class="dropdown-menu">
             <li><a href="index.php" >LMS Theme</a></li>
             <li><a href="classic.php" >Tsugi Classic</a></li>
           </ul>
         </li>
-        <li  style="color: var(--primary-menu); background-color: var(--secondary-menu);"><a href="#" style="color: var(--primary-menu); background-color: var(--secondary-menu);"><span class="fas fa-user-graduate" aria-hidden="true"></span> TBD</a></li>
+        <li ><a href="#"><span class="fas fa-user-graduate" aria-hidden="true"></span> TBD</a></li>
       </ul>
     </div> <!--/.nav-collapse -->
   </div> <!--container -->
