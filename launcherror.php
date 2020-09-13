@@ -134,10 +134,10 @@ Tsugi does not use cookies so there is no reason to clear cookies.  Just
 close your browser (all the tabs) and reopen it and go back to the tool.
 </p>
 <?php
-} else if ( strpos($error,"Could not find issuer") === 0 ) {
+} else if ( strpos($error,"could not find issuer") > 0 ) {
 ?>
 <p><b>Detail:</b>
-The launch included an <b>issuer</b> value that was not registered with this server.
+The launch included an <b>issuer</b> value that was not registered with this Tsugi server.
 </p>
 <?php
 } else if ( strpos($error,"Found issuer, but did not find corresponding deployment") === 0 ) {
@@ -145,6 +145,11 @@ The launch included an <b>issuer</b> value that was not registered with this ser
 <p><b>Detail:</b>
 The launch included an issuer value that is registered with this server, but the launch
 included a <b>deployment_id</b> that is not registered on this server.
+</p>
+<p>
+If you are the Tsugi administrator, to do LTI Advantage launches, it is a two-step
+process.  First you must add an Issuer and then add a key that referencees the issuer
+and defines the deployment_id.
 </p>
 <?php
 } else if ( strpos($error,"OAuth nonce error") === 0 ) {
