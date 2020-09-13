@@ -134,6 +134,19 @@ Tsugi does not use cookies so there is no reason to clear cookies.  Just
 close your browser (all the tabs) and reopen it and go back to the tool.
 </p>
 <?php
+} else if ( strpos($error,"Could not find issuer") === 0 ) {
+?>
+<p><b>Detail:</b>
+The launch included an <b>issuer</b> value that was not registered with this server.
+</p>
+<?php
+} else if ( strpos($error,"Found issuer, but did not find corresponding deployment") === 0 ) {
+?>
+<p><b>Detail:</b>
+The launch included an issuer value that is registered with this server, but the launch
+included a <b>deployment_id</b> that is not registered on this server.
+</p>
+<?php
 } else if ( strpos($error,"OAuth nonce error") === 0 ) {
 ?>
 <p><b>Detail:</b>
