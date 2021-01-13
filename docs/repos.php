@@ -76,12 +76,9 @@ and can be added to your <b>composer.json</b> as follows:
 </li>
 <li><a href="https://github.com/tsugiproject/koseu-php" 
 target="_blank">Koseu LMS/MOOC Platform</a><br>
-The code to support adding a Tsugi-powerd LMS to a web site will be re-factored into 
-into own project named "Koseu (코스)".  This will include the lessons, badges, 
-and gradebook functionality currently in Tsugi.
-Some of these tools are written using the (deprecated as of 2018)
-<a href="http://silex.sensiolabs.org/" target="_blank">Silex</a> PHP framework.
-These tools will be rewritten over time not to depend on Silex.
+The code to support adding a Tsugi-powered LMS to a web site will be re-factored into 
+into own project named "Koseu (코스)".  This will include the lessons, badges, discussion,
+topics, and gradebook functionality.
 </p>
 </li>
 <li><p><a href="https://github.com/tsugiproject/tsugi-php-module" target="_blank">Tsugi Module (Sample)</a><br/>
