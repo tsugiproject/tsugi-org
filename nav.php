@@ -31,7 +31,7 @@ if ( isset($_SESSION['id']) ) {
     }
     $submenu->addLink('Logout', $R.'logout');
     if ( isset($_SESSION['avatar']) ) {
-        $set->addRight('<img src="'.$_SESSION['avatar'].'" style="height: 2em;"/>', $submenu);
+        $set->addRight('<img src="'.$_SESSION['avatar'].'" title="'.htmlentities(__('User Profile Menu - Includes logout')).'" style="height: 2em;"/>', $submenu);
     } else {
         $set->addRight(htmlentities($_SESSION['displayname']), $submenu);
     }
