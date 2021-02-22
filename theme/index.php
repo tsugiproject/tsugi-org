@@ -1,8 +1,11 @@
 <?php
 require_once("Color.php");
-require_once("rgbToHSL.php");
 require_once("HSLuv.php");
-require_once("tsugi_color_util.php");
+require_once("Theme.php");
+
+use \Tsugi\Util\Color;
+use \Tsugi\UI\Theme;
+
 ?>
 <!DOCTYPE html>
     <html lang="en">
@@ -142,7 +145,7 @@ if ( isset($_REQUEST['color']) ) {
 }
 $fromwhite = Color::relativeLuminance("#FFFFFF", $tsugi_dark);
 
-$tsuginames = deriveTsugiColors($tsugi_dark);
+$tsuginames = Theme::deriveTsugiColors($tsugi_dark);
 ?>
 </div>
 <div id="tsugi-theme-theme" style="display:block;">
@@ -175,7 +178,6 @@ Dark Mode
 </form>
 <hr/>
 <?php
-
 
 echo("<script>\n var tsuginames = [\n");
 foreach($tsuginames as $name => $default) {
@@ -307,6 +309,11 @@ function updateColors(cssnames) {
 
     </div>
 </div>
+<?php 
+$legacy_theme = Theme::getLegacyTheme($tsugi_dark, $dark_mode);
+echo("\n<pre>\nLegacy Theme:\n");print_r($legacy_theme);echo("\n</pre>\n");
+?>
+
 <script src="https://static.tsugi.org/js/jquery-1.11.3.js"></script>
 <script src="https://static.tsugi.org/bootstrap-3.4.1/js/bootstrap.min.js"></script>
 <script src="https://static.tsugi.org/js/jquery-ui-1.11.4/jquery-ui.min.js"></script>

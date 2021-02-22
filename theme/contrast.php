@@ -1,8 +1,9 @@
 <?php
+
 require_once("Color.php");
-require_once("rgbToHSL.php");
-require_once("HSLuv.php");
 require_once("tsugi_color_util.php");
+
+use \Tsugi\Util\Color;
 
 $color = '#000000';
 if ( isset($_REQUEST['color']) ) {

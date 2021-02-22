@@ -1,5 +1,7 @@
 <?php
 
+namespace Tsugi\Util;
+
 // https://gist.github.com/sebdesign/a65cc39e3bcd81201609e6a8087a83b3
 
 class Color

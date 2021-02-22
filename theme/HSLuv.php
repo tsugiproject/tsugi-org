@@ -1,6 +1,6 @@
 <?php
 
-namespace HSLuv;
+namespace Tsugi\Util;
 
 /**
   Port of HSLuv Color library to PHP by Carlos Cabo. V.2.0.0
