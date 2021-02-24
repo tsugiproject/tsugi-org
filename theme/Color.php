@@ -7,6 +7,15 @@ namespace Tsugi\Util;
 class Color
 {
     /**
+     * Allow array pr parameter form for RGB
+     */
+    public static function fixRgb($r, $g=0, $b=0) {
+        if ( is_array($r) ) return $r;
+        if ( is_string($r) ) return Color::rgb($r);
+        return [$r, $g, $b];
+    }
+
+    /**
      * Convert a hex color to RGB.
      * 
      * @param  string $hex  #BADA55

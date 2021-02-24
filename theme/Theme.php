@@ -1,30 +1,27 @@
 <?php
     
 namespace Tsugi\UI;
-    
+
 require_once("Color.php");
     
 use \Tsugi\Util\Color;
     
 class Theme {
     
-    public static function fixRgb($r, $g=0, $b=0) {
-        if ( is_array($r) ) return $r;
-        if ( is_string($r) ) return Color::rgb($r);
-        return [$r, $g, $b];
-    }
-    
+    /**
+     * Take a color and move it along its luminance until it is halfway between
+     * a given dark color and white 
+     */
     public static function findLMidPointForHue($r, $g=false, $b=false, $dark=false) {
         // echo("findLMidPoint $r $g $b\n");
         if ( ! $dark ) $dark = "#000000";
-        $rgb = self::fixRgb($r, $g, $b);
-        // print_r($rgb);
+        $rgb = Color::fixRgb($r, $g, $b);
         $hsl = self::rgbToHsl($rgb[0], $rgb[1], $rgb[2] );
-        // print_r($hsl);
         $h = $hsl[0];
         $s = $hsl[1];
         $l = $hsl[2];
         $lasttot = 100;  // > 21
+        // TODO: Find closed form way to solve this problem
         for($l = 0.0; $l <= 1.0; $l += 0.01 ) {
             $rgb = self::hslToRgb( $h, $s, $l );
             // print_r($rgb);
@@ -42,9 +39,13 @@ class Theme {
     
     }
     
+    /**
+     * Take a color, move a pair of colors outwards towards white and black
+     * until the colors are at least as far apart as $difference
+     */
     public static function luminosityPair($difference, $r, $g=false, $b=false) {
         // echo("luminosityPair $difference $r $g $b\n");
-        $rgb = self::fixRgb($r, $g, $b);
+        $rgb = Color::fixRgb($r, $g, $b);
         // print_r($rgb);
         $hex = Color::hex($rgb);
         $relblack = Color::relativeLuminance("#000000", $hex);
@@ -58,6 +59,7 @@ class Theme {
         $updist = 1.0 - $l;
         $downdist = $l;
         $increment = 0.01;
+        // TODO: Find closed form way to solve this problem
         for($d = 0.0; $d <= 1.0; $d += 0.01 ) {
             $downl =  $l - ($d * $downdist);
             $upl =  $l + ($d * $updist);
@@ -124,7 +126,7 @@ class Theme {
         if ( $fromwhite < 8.0 ) {
             $mid = self::findLMidPointForHue($tsugi_dark);
         } else {
-            $rgb = self::fixRgb($tsugi_dark);
+            $rgb = Color::fixRgb($tsugi_dark);
             $mid = self::findLMidPointForHue($rgb[0], $rgb[1], $rgb[2], $tsugi_dark);
         }
     
@@ -177,7 +179,7 @@ class Theme {
     // https://gist.github.com/brandonheyer/5254516
     
     public static function rgbToHsl( $r, $g=false, $b=false ) {
-        $rgb = self::fixRgb($r, $g, $b);
+        $rgb = Color::fixRgb($r, $g, $b);
         $r = $rgb[0];
         $g = $rgb[1];
         $b = $rgb[2];
