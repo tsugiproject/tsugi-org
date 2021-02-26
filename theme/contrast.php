@@ -1,7 +1,6 @@
 <?php
 
-require_once("Color.php");
-require_once("tsugi_color_util.php");
+require_once("../tsugi/vendor/tsugi/lib/src/Util/Color.php");
 
 use \Tsugi\Util\Color;
 
@@ -11,7 +10,7 @@ if ( isset($_REQUEST['color']) ) {
 }
 ?>
 <h1>Tsugi Contrast Checker</h1>
-<p>Why do we need a contrast checker when 100's already exist?  This once uses the input type "color" 
+<p>Why do we need a contrast checker when 100's already exist?  This one uses the input type "color" 
 so you can use an eye dropper.
 </p>
 <form>

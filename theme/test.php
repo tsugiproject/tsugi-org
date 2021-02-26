@@ -1,8 +1,8 @@
 <?php
 
-require_once("Color.php");
-require_once("HSLuv.php");
-require_once("Theme.php");
+require_once("../tsugi/vendor/tsugi/lib/src/Util/Color.php");
+require_once("../tsugi/vendor/tsugi/lib/src/Util/HSLuv.php");
+require_once("../tsugi/vendor/tsugi/lib/src/UI/Theme.php");
 
 use \Tsugi\Util\Color;
 use \Tsugi\UI\Theme;
