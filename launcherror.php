@@ -238,6 +238,12 @@ using the tool for a while, it may have lost its session due to a bug in the too
 your are testing the tool you may have omitted the trailing slash on the launch URL.
 </p>
 <?php
+} else if ( stripos($error,"Client not authorized in requested context") === 0 ) {
+?>
+<p><b>Detail:</b> This is a Canvas-specific error message - there is something mis-configured between
+yout <b>Client ID</b> and <b>Deployment ID</b>.
+</p>
+<?php
 } else if ( strpos($error,"Missing") === 0 ) {
 ?>
 <p><b>Detail:</b> This tool did not receive a required item for this launch.   Your LMS or testing system
