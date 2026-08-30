@@ -16,6 +16,8 @@
 
 <IfModule mod_rewrite.c>
     RewriteEngine on
+    # Include-only fragments (need Tsugi $OUTPUT / $CFG; not standalone pages)
+    RewriteRule ^(nav|top|foot|tsugi_settings)\.php$ - [R=404,L,NS]
     RewriteRule ^ - [E=protossl]
     RewriteCond %{HTTPS} on
     RewriteRule ^ - [E=protossl:s]
