@@ -28,6 +28,7 @@ if ( isset($_SESSION['id']) ) {
     }
     if ( isset($_COOKIE['adminmenu']) && $_COOKIE['adminmenu'] == "true" ) {
         $submenu->addLink('Administer', $T . 'admin/');
+        $submenu->addLink('Upgrade reports', $R . 'beacon');
     }
     $submenu->addLink('Logout', $R.'logout');
     if ( isset($_SESSION['avatar']) ) {

@@ -27,6 +27,9 @@
 
 <IfModule mod_rewrite.c>
     RewriteEngine on
+    # Unauthenticated upgrade beacon. A real script, not the front controller,
+    # so the report is stored even when Tsugi's database is down.
+    RewriteRule ^api/beacon/upgrade/?$ api/beacon/upgrade.php [L]
     # Include-only fragments (need Tsugi $OUTPUT / $CFG; not standalone pages)
     RewriteRule ^(nav|top|foot|tsugi_settings)\.php$ - [R=404,L,NS]
     RewriteRule ^ - [E=protossl]
