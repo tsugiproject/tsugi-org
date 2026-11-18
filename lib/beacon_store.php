@@ -10,7 +10,8 @@
  */
 
 const BEACON_SCHEMA_VERSION = 2;
-const BEACON_MAX_BODY = 262144;
+const BEACON_MAX_BODY = 5120;
+const BEACON_MAX_INSTALLS = 5000;
 const BEACON_MAX_SCHEMAS = 300;
 
 function beacon_sqlite_path() {
@@ -359,6 +360,7 @@ function beacon_save(PDO $pdo, array $snapshot, array $history, $httpStatus, $no
         )');
     $history['http_status'] = (int) $httpStatus;
     $hist->execute($history);
+    beacon_prune($pdo);
     $pdo->commit();
     } catch ( Throwable $e ) {
         if ( $pdo->inTransaction() ) $pdo->rollBack();
@@ -369,6 +371,32 @@ function beacon_save(PDO $pdo, array $snapshot, array $history, $httpStatus, $no
 /**
  * @return array{0:int,1:array}
  */
+function beacon_prune(PDO $pdo, $keep = BEACON_MAX_INSTALLS) {
+    $keep = (int) $keep;
+    if ( $keep < 1 ) $keep = BEACON_MAX_INSTALLS;
+    $count = (int) $pdo->query('SELECT COUNT(*) FROM beacon_install')->fetchColumn();
+    $extra = $count - $keep;
+    if ( $extra < 1 ) return;
+    $ids = $pdo->query('SELECT id FROM beacon_install ORDER BY updated_at ASC, created_at ASC, id ASC LIMIT ' . $extra)
+        ->fetchAll(PDO::FETCH_COLUMN);
+    if ( ! $ids ) return;
+    foreach ( array_chunk($ids, 400) as $chunk ) {
+        $marks = implode(',', array_fill(0, count($chunk), '?'));
+        $pdo->prepare('DELETE FROM beacon_history WHERE install_id IN (' . $marks . ')')->execute($chunk);
+        $pdo->prepare('DELETE FROM beacon_install WHERE id IN (' . $marks . ')')->execute($chunk);
+    }
+}
+
+function beacon_read_body() {
+    $declared = isset($_SERVER['CONTENT_LENGTH']) ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
+    if ( $declared > BEACON_MAX_BODY ) return false;
+    $stream = fopen('php://input', 'rb');
+    $raw = $stream ? stream_get_contents($stream, BEACON_MAX_BODY + 1) : '';
+    if ( is_resource($stream) ) fclose($stream);
+    if ( ! is_string($raw) || strlen($raw) > BEACON_MAX_BODY ) return false;
+    return $raw;
+}
+
 function beacon_handle($method, $raw, $pdo = null) {
     if ( $method !== 'POST' ) {
         return array(405, array('error' => 'method not allowed'));
@@ -383,7 +411,29 @@ function beacon_handle($method, $raw, $pdo = null) {
     return array($status, array('ok' => true));
 }
 
-function beacon_list(PDO $pdo, $showLocal, $sort = 'updated') {
+function beacon_list_columns() {
+    return array(
+        'wwwroot' => 'text',
+        'dirroot' => 'text',
+        'tsugi_version' => 'version',
+        'software_version' => 'number',
+        'recorded_overall' => 'number',
+        'upgrade_count' => 'number',
+        'reported_at' => 'text',
+        'updated_at' => 'text',
+        'created_at' => 'text',
+        'git' => 'text',
+        'owner' => 'text',
+        'schemas' => 'number',
+    );
+}
+
+function beacon_list(PDO $pdo, $showLocal, $sort = 'updated_at', $dir = 'desc', $search = '') {
+    $columns = beacon_list_columns();
+    if ( ! isset($columns[$sort]) ) $sort = 'updated_at';
+    if ( $dir !== 'asc' && $dir !== 'desc' ) $dir = 'desc';
+    $search = beacon_search_needle($search);
+
     $sql = 'SELECT id, wwwroot, apphome, dirroot, servicename, servicedesc, ownername, owneremail,
             developer, local, lessons, tsugi_version, minimum_php, minimum_mysql,
             software_version, highest_migration, highest_migration_path, recorded_overall,
@@ -393,12 +443,89 @@ function beacon_list(PDO $pdo, $showLocal, $sort = 'updated') {
             (SELECT COUNT(*) FROM beacon_history h WHERE h.install_id = beacon_install.id) AS upgrade_count
         FROM beacon_install';
     if ( ! $showLocal ) $sql .= ' WHERE local = 0';
-    if ( $sort === 'created' ) {
-        $sql .= ' ORDER BY created_at DESC, updated_at DESC, wwwroot ASC';
-    } else {
-        $sql .= ' ORDER BY updated_at DESC, created_at DESC, wwwroot ASC';
+    $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    if ( $search !== '' ) {
+        $rows = array_values(array_filter($rows, function ($row) use ($search) {
+            return beacon_row_matches($row, $search);
+        }));
     }
-    return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    usort($rows, function ($a, $b) use ($sort, $dir) {
+        return beacon_row_cmp($a, $b, $sort, $dir);
+    });
+    return $rows;
+}
+
+function beacon_search_needle($search) {
+    $search = trim((string) $search);
+    if ( strlen($search) > 200 ) $search = substr($search, 0, 200);
+    return $search;
+}
+
+function beacon_row_matches(array $row, $search) {
+    $needle = beacon_lower($search);
+    if ( $needle === '' ) return true;
+    $parts = array(
+        $row['wwwroot'], $row['dirroot'], $row['apphome'], $row['servicename'],
+        $row['servicedesc'], $row['ownername'], $row['owneremail'],
+        $row['tsugi_version'], $row['software_version'], $row['recorded_overall'],
+        $row['git_commit'], $row['git_branch'], $row['reported_at'],
+        $row['created_at'], $row['updated_at'], $row['comment'],
+        $row['hostname'], $row['schemas_json'], $row['highest_migration_path'],
+    );
+    $haystack = beacon_lower(implode("\n", array_map(function ($value) {
+        return (string) $value;
+    }, $parts)));
+    return strpos($haystack, $needle) !== false;
+}
+
+function beacon_lower($value) {
+    $value = (string) $value;
+    if ( function_exists('mb_strtolower') ) return mb_strtolower($value, 'UTF-8');
+    return strtolower($value);
+}
+
+function beacon_row_cmp(array $a, array $b, $sort, $dir) {
+    $va = beacon_sort_value($a, $sort);
+    $vb = beacon_sort_value($b, $sort);
+    $aMissing = beacon_sort_missing($va);
+    $bMissing = beacon_sort_missing($vb);
+    if ( $aMissing || $bMissing ) {
+        if ( ! ($aMissing && $bMissing) ) return $aMissing ? 1 : -1;
+    } else {
+        $kind = beacon_list_columns()[$sort];
+        if ( $kind === 'number' ) {
+            $cmp = ((int) $va) <=> ((int) $vb);
+        } else if ( $kind === 'version' ) {
+            $cmp = version_compare((string) $va, (string) $vb);
+        } else {
+            $cmp = strcasecmp((string) $va, (string) $vb);
+        }
+        if ( $dir === 'desc' ) $cmp = -$cmp;
+        if ( $cmp !== 0 ) return $cmp;
+    }
+    $created = strcmp((string) $b['created_at'], (string) $a['created_at']);
+    if ( $created !== 0 ) return $created;
+    return strcmp((string) $a['id'], (string) $b['id']);
+}
+
+function beacon_sort_value(array $row, $sort) {
+    if ( $sort === 'upgrade_count' ) return (int) $row['upgrade_count'];
+    if ( $sort === 'schemas' ) {
+        $decoded = json_decode((string) $row['schemas_json'], true);
+        return is_array($decoded) ? count($decoded) : 0;
+    }
+    if ( $sort === 'git' ) {
+        return trim((string) ($row['git_commit'] ?? '') . ' ' . (string) ($row['git_branch'] ?? ''));
+    }
+    if ( $sort === 'owner' ) {
+        return trim((string) ($row['ownername'] ?? '') . ' ' . (string) ($row['owneremail'] ?? ''));
+    }
+    if ( ! array_key_exists($sort, $row) ) return '';
+    return $row[$sort];
+}
+
+function beacon_sort_missing($value) {
+    return $value === null || $value === '';
 }
 
 function beacon_one(PDO $pdo, $id) {

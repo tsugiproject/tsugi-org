@@ -235,6 +235,12 @@ foreach ( $garbage as $item ) {
 }
 list($getStatus,) = beacon_handle('GET', $raw, $pdo);
 beacon_test($getStatus === 405, 'GET is not a stored report');
+$beforeBig = (int) $pdo->query('SELECT COUNT(*) FROM beacon_install')->fetchColumn();
+$oversized = str_repeat('x', BEACON_MAX_BODY + 1);
+list($bigStatus, $bigBody) = beacon_handle('POST', $oversized, $pdo);
+beacon_test($bigStatus === 400 && $bigBody === array('error' => 'bad request'), 'a body over 5KB is rejected');
+beacon_test(beacon_accept(str_repeat('x', BEACON_MAX_BODY))['ok'] === false, '5KB of junk is not stored');
+beacon_test($beforeBig === (int) $pdo->query('SELECT COUNT(*) FROM beacon_install')->fetchColumn(), 'rejected body does not add a row');
 
 $cli = beacon_test_payload();
 $cli['runtime']['server_software'] = null;
@@ -283,10 +289,31 @@ foreach ( beacon_list($pdo, false) as $stampItem ) {
 }
 beacon_test($stampList === array('/var/www/c', '/var/www/a', '/var/www/b'), 'list sorts by updated_at then created_at');
 $createdList = array();
-foreach ( beacon_list($pdo, false, 'created') as $stampItem ) {
+foreach ( beacon_list($pdo, false, 'created_at') as $stampItem ) {
     if ( $stampItem['wwwroot'] === 'https://stamps.example.edu' ) $createdList[] = $stampItem['dirroot'];
 }
 beacon_test($createdList === array('/var/www/c', '/var/www/b', '/var/www/a'), 'list can sort by created_at then updated_at');
+$createdAsc = array();
+foreach ( beacon_list($pdo, false, 'created_at', 'asc') as $stampItem ) {
+    if ( $stampItem['wwwroot'] === 'https://stamps.example.edu' ) $createdAsc[] = $stampItem['dirroot'];
+}
+beacon_test($createdAsc === array('/var/www/a', '/var/www/b', '/var/www/c'), 'created_at can sort ascending');
+$foundDirs = array();
+foreach ( beacon_list($pdo, false, 'updated_at', 'desc', '/var/www/b') as $stampItem ) {
+    if ( $stampItem['wwwroot'] === 'https://stamps.example.edu' ) $foundDirs[] = $stampItem['dirroot'];
+}
+beacon_test($foundDirs === array('/var/www/b'), 'search matches a dirroot');
+$caseHits = 0;
+foreach ( beacon_list($pdo, false, 'wwwroot', 'asc', 'StAmPs.ExAmPle') as $stampItem ) {
+    if ( $stampItem['wwwroot'] === 'https://stamps.example.edu' ) $caseHits++;
+}
+beacon_test($caseHits === 3, 'search is case insensitive');
+beacon_test(count(beacon_list($pdo, false, 'updated_at', 'desc', 'no-such-beacon-xyz')) === 0, 'a miss returns no rows');
+$fallback = array();
+foreach ( beacon_list($pdo, false, 'not-a-column', 'sideways') as $stampItem ) {
+    if ( $stampItem['wwwroot'] === 'https://stamps.example.edu' ) $fallback[] = $stampItem['dirroot'];
+}
+beacon_test($fallback === $stampList, 'an unknown sort falls back to updated_at descending');
 
 $oldPath = tempnam(sys_get_temp_dir(), 'beaconold');
 unlink($oldPath);
@@ -308,6 +335,32 @@ $oldRow = beacon_one($upgraded, '0123456789abcdef0123456789abcdef0123456789abcde
 beacon_test($oldRow['created_at'] === '2024-05-01T00:00:00Z' && $oldRow['updated_at'] === '2024-05-01T00:00:00Z', 'migration 2 backfills both timestamps from reported_at');
 unset($upgraded);
 unlink($oldPath);
+
+$pdo->exec('DELETE FROM beacon_history');
+$pdo->exec('DELETE FROM beacon_install');
+$insertOld = $pdo->prepare('INSERT INTO beacon_install (
+        id, wwwroot, developer, local, lessons, server_below_minimum, schemas_json,
+        reported_at, comment, created_at, updated_at
+    ) VALUES (?, ?, 0, 0, 0, 0, \'{}\', ?, \'\', ?, ?)');
+$insertHist = $pdo->prepare('INSERT INTO beacon_history (
+        install_id, reported_at, software_version, recorded_overall, http_status, created_at, updated_at
+    ) VALUES (?, ?, 1, 1, 200, ?, ?)');
+for ( $n = 1; $n <= 4; $n++ ) {
+    $oldId = str_repeat((string) $n, 64);
+    $stamp = '2020-0' . $n . '-01T00:00:00Z';
+    $insertOld->execute(array($oldId, 'https://old-' . $n . '.example.edu', $stamp, $stamp, $stamp));
+    $insertHist->execute(array($oldId, $stamp, $stamp, $stamp));
+}
+beacon_prune($pdo, 3);
+$kept = $pdo->query('SELECT wwwroot FROM beacon_install ORDER BY updated_at ASC')->fetchAll(PDO::FETCH_COLUMN);
+beacon_test($kept === array(
+    'https://old-2.example.edu',
+    'https://old-3.example.edu',
+    'https://old-4.example.edu',
+), 'prune keeps the 3 most recent installs');
+$goneHistory = (int) $pdo->query('SELECT COUNT(*) FROM beacon_history WHERE install_id = \'' . str_repeat('1', 64) . '\'')->fetchColumn();
+beacon_test($goneHistory === 0, 'prune deletes history for the earliest install');
+beacon_test((int) $pdo->query('SELECT COUNT(*) FROM beacon_install')->fetchColumn() === 3, 'prune stops at the cap');
 
 unset($pdo);
 $blob = file_get_contents($path);

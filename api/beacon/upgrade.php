@@ -10,10 +10,11 @@
 require_once dirname(__DIR__, 2) . '/lib/beacon_store.php';
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-$raw = file_get_contents('php://input');
-if ( $raw === false ) $raw = '';
-
-try {
+$raw = beacon_read_body();
+if ( $raw === false ) {
+    $status = 400;
+    $payload = array('error' => 'bad request');
+} else try {
     list($status, $payload) = beacon_handle($method, $raw);
 } catch ( Throwable $e ) {
     error_log('tsugi beacon store failed');
