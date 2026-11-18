@@ -371,6 +371,22 @@ function beacon_save(PDO $pdo, array $snapshot, array $history, $httpStatus, $no
 /**
  * @return array{0:int,1:array}
  */
+function beacon_delete(PDO $pdo, $id) {
+    if ( ! is_string($id) || ! preg_match('/^[0-9a-f]{64}$/', $id) ) return false;
+    $pdo->beginTransaction();
+    try {
+        $pdo->prepare('DELETE FROM beacon_history WHERE install_id = ?')->execute(array($id));
+        $stmt = $pdo->prepare('DELETE FROM beacon_install WHERE id = ?');
+        $stmt->execute(array($id));
+        $gone = $stmt->rowCount() > 0;
+        $pdo->commit();
+        return $gone;
+    } catch ( Throwable $e ) {
+        if ( $pdo->inTransaction() ) $pdo->rollBack();
+        throw $e;
+    }
+}
+
 function beacon_prune(PDO $pdo, $keep = BEACON_MAX_INSTALLS) {
     $keep = (int) $keep;
     if ( $keep < 1 ) $keep = BEACON_MAX_INSTALLS;

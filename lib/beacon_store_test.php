@@ -360,6 +360,18 @@ beacon_test($kept === array(
 ), 'prune keeps the 3 most recent installs');
 $goneHistory = (int) $pdo->query('SELECT COUNT(*) FROM beacon_history WHERE install_id = \'' . str_repeat('1', 64) . '\'')->fetchColumn();
 beacon_test($goneHistory === 0, 'prune deletes history for the earliest install');
+$deleteId = str_repeat('d', 64);
+$pdo->prepare('INSERT INTO beacon_install (
+        id, wwwroot, developer, local, lessons, server_below_minimum, schemas_json,
+        reported_at, comment, created_at, updated_at
+    ) VALUES (?, \'https://delete.example.edu\', 0, 0, 0, 0, \'{}\', \'2020-01-01T00:00:00Z\', \'\', \'2020-01-01T00:00:00Z\', \'2020-01-01T00:00:00Z\')')->execute(array($deleteId));
+$pdo->prepare('INSERT INTO beacon_history (
+        install_id, reported_at, software_version, recorded_overall, http_status, created_at, updated_at
+    ) VALUES (?, \'2020-01-01T00:00:00Z\', 1, 1, 200, \'2020-01-01T00:00:00Z\', \'2020-01-01T00:00:00Z\')')->execute(array($deleteId));
+beacon_test(beacon_delete($pdo, 'not-an-id') === false, 'delete rejects a bad id');
+beacon_test(beacon_delete($pdo, $deleteId) === true, 'delete removes an install');
+beacon_test(beacon_one($pdo, $deleteId) === null, 'deleted install is gone');
+beacon_test(count(beacon_history_for($pdo, $deleteId)) === 0, 'delete removes that install history');
 beacon_test((int) $pdo->query('SELECT COUNT(*) FROM beacon_install')->fetchColumn() === 3, 'prune stops at the cap');
 
 unset($pdo);

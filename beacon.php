@@ -19,11 +19,38 @@ header('X-Robots-Tag: noindex');
 $unlocked = AdminService::isAdmin();
 if ( ! $unlocked ) http_response_code(403);
 
+$view = (isset($_GET['view']) && $_GET['view'] === 'wwwroot') ? 'wwwroot' : 'installs';
+$showLocal = isset($_GET['show_local']) && $_GET['show_local'] === '1';
+$sortColumns = beacon_list_columns();
+$sort = (isset($_GET['sort']) && isset($sortColumns[$_GET['sort']])) ? $_GET['sort'] : 'updated_at';
+$dir = (isset($_GET['dir']) && $_GET['dir'] === 'asc') ? 'asc' : 'desc';
+$search = beacon_search_needle(isset($_GET['q']) ? $_GET['q'] : '');
+$wantId = isset($_GET['id']) ? (string) $_GET['id'] : '';
+$deleteError = '';
+
+if ( $unlocked && (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') && isset($_POST['delete_id']) ) {
+    try {
+        $deletePdo = beacon_open();
+        if ( ! \Tsugi\Controllers\Tool::csrfOk() ) {
+            $deleteError = 'The delete was rejected. Reload the page and try again.';
+        } else {
+            $deleteId = (string) $_POST['delete_id'];
+            if ( preg_match('/^[0-9a-f]{64}$/', $deleteId) ) beacon_delete($deletePdo, $deleteId);
+            header('Location: ' . beacon_page_qs($view, $showLocal, $sort, $dir, $search), true, 303);
+            exit;
+        }
+    } catch ( Throwable $e ) {
+        error_log('tsugi beacon delete failed');
+        $deleteError = 'The install could not be deleted.';
+    }
+}
+
 $OUTPUT->header();
 require_once __DIR__ . '/nav.php';
 
 echo '<div id="container" class="container">'."\n";
 echo '<h1>Upgrade reports</h1>'."\n";
+if ( $deleteError !== '' ) echo '<p>' . beacon_page_h($deleteError) . '</p>'."\n";
 
 if ( ! $unlocked ) {
     $adminUrl = htmlspecialchars(rtrim((string) $CFG->wwwroot, '/') . '/admin/', ENT_QUOTES, 'UTF-8');
@@ -33,14 +60,6 @@ if ( ! $unlocked ) {
     $OUTPUT->footer();
     return;
 }
-
-$view = (isset($_GET['view']) && $_GET['view'] === 'wwwroot') ? 'wwwroot' : 'installs';
-$showLocal = isset($_GET['show_local']) && $_GET['show_local'] === '1';
-$sortColumns = beacon_list_columns();
-$sort = (isset($_GET['sort']) && isset($sortColumns[$_GET['sort']])) ? $_GET['sort'] : 'updated_at';
-$dir = (isset($_GET['dir']) && $_GET['dir'] === 'asc') ? 'asc' : 'desc';
-$search = beacon_search_needle(isset($_GET['q']) ? $_GET['q'] : '');
-$wantId = isset($_GET['id']) ? (string) $_GET['id'] : '';
 
 echo '<p>';
 echo '<a href="' . beacon_page_qs('installs', $showLocal, $sort, $dir, $search) . '">By install</a>';
@@ -76,6 +95,7 @@ if ( $wantId !== '' ) {
             echo '<p>Unknown install.</p>'."\n";
         } else {
             beacon_page_detail($one, beacon_history_for($pdo, $wantId));
+            beacon_page_delete_form($wantId, $view, $showLocal, $sort, $dir, $search);
         }
     }
     echo '<p><a href="' . beacon_page_qs($view, $showLocal, $sort, $dir, $search) . '">Back to the list</a></p>'."\n";
@@ -183,6 +203,7 @@ function beacon_page_table(array $rows, $view, $showLocal, $sort, $dir, $search)
     foreach ( $headers as $column => $label ) {
         echo '<th>' . beacon_page_header_link($column, $label, $view, $showLocal, $sort, $dir, $search) . '</th>';
     }
+    echo "<th></th>";
     echo "</tr></thead>\n<tbody>\n";
     foreach ( $rows as $row ) {
         $href = beacon_page_qs($view, $showLocal, $sort, $dir, $search);
@@ -207,9 +228,21 @@ function beacon_page_table(array $rows, $view, $showLocal, $sort, $dir, $search)
         }
         echo '</td>';
         echo '<td>' . beacon_page_schemas($row['schemas_json']) . '</td>';
+        echo '<td>';
+        beacon_page_delete_form($row['id'], $view, $showLocal, $sort, $dir, $search);
+        echo '</td>';
         echo "</tr>\n";
     }
     echo "</tbody></table></div>\n";
+}
+
+function beacon_page_delete_form($id, $view, $showLocal, $sort, $dir, $search) {
+    $action = beacon_page_h(beacon_page_qs($view, $showLocal, $sort, $dir, $search));
+    echo '<form method="post" action="' . $action . '" onsubmit="return confirm(\'Delete this install and its upgrade history?\');">'."\n";
+    echo \Tsugi\Controllers\Tool::csrfField();
+    echo '<input type="hidden" name="delete_id" value="' . beacon_page_h($id) . '">'."\n";
+    echo '<button type="submit">Delete</button>'."\n";
+    echo "</form>\n";
 }
 
 function beacon_page_git(array $row) {
