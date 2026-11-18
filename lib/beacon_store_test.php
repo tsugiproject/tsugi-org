@@ -282,6 +282,11 @@ foreach ( beacon_list($pdo, false) as $stampItem ) {
     if ( $stampItem['wwwroot'] === 'https://stamps.example.edu' ) $stampList[] = $stampItem['dirroot'];
 }
 beacon_test($stampList === array('/var/www/c', '/var/www/a', '/var/www/b'), 'list sorts by updated_at then created_at');
+$createdList = array();
+foreach ( beacon_list($pdo, false, 'created') as $stampItem ) {
+    if ( $stampItem['wwwroot'] === 'https://stamps.example.edu' ) $createdList[] = $stampItem['dirroot'];
+}
+beacon_test($createdList === array('/var/www/c', '/var/www/b', '/var/www/a'), 'list can sort by created_at then updated_at');
 
 $oldPath = tempnam(sys_get_temp_dir(), 'beaconold');
 unlink($oldPath);

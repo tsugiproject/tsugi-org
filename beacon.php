@@ -36,15 +36,28 @@ if ( ! $unlocked ) {
 
 $view = (isset($_GET['view']) && $_GET['view'] === 'wwwroot') ? 'wwwroot' : 'installs';
 $showLocal = isset($_GET['show_local']) && $_GET['show_local'] === '1';
+$sort = (isset($_GET['sort']) && $_GET['sort'] === 'created') ? 'created' : 'updated';
 $wantId = isset($_GET['id']) ? (string) $_GET['id'] : '';
 
 echo '<p>';
-echo '<a href="' . beacon_page_qs('installs', $showLocal) . '">By install</a>';
-echo ' · <a href="' . beacon_page_qs('wwwroot', $showLocal) . '">By wwwroot</a>';
+echo '<a href="' . beacon_page_qs('installs', $showLocal, $sort) . '">By install</a>';
+echo ' · <a href="' . beacon_page_qs('wwwroot', $showLocal, $sort) . '">By wwwroot</a>';
 if ( $showLocal ) {
-    echo ' · <a href="' . beacon_page_qs($view, false) . '">Hide local</a>';
+    echo ' · <a href="' . beacon_page_qs($view, false, $sort) . '">Hide local</a>';
 } else {
-    echo ' · <a href="' . beacon_page_qs($view, true) . '">Show local</a>';
+    echo ' · <a href="' . beacon_page_qs($view, true, $sort) . '">Show local</a>';
+}
+echo ' · ';
+if ( $sort === 'updated' ) {
+    echo '<strong>Updated</strong>';
+} else {
+    echo '<a href="' . beacon_page_qs($view, $showLocal, 'updated') . '">Updated</a>';
+}
+echo ' · ';
+if ( $sort === 'created' ) {
+    echo '<strong>Created</strong>';
+} else {
+    echo '<a href="' . beacon_page_qs($view, $showLocal, 'created') . '">Created</a>';
 }
 echo "</p>\n";
 if ( ! $showLocal ) {
@@ -74,13 +87,13 @@ if ( $wantId !== '' ) {
             beacon_page_detail($one, beacon_history_for($pdo, $wantId));
         }
     }
-    echo '<p><a href="' . beacon_page_qs($view, $showLocal) . '">Back to the list</a></p>'."\n";
+    echo '<p><a href="' . beacon_page_qs($view, $showLocal, $sort) . '">Back to the list</a></p>'."\n";
     echo "</div>\n";
     $OUTPUT->footer();
     return;
 }
 
-$rows = beacon_list($pdo, $showLocal);
+$rows = beacon_list($pdo, $showLocal, $sort);
 if ( count($rows) < 1 ) {
     echo '<p>No upgrade reports yet.</p>'."\n";
     echo "</div>\n";
@@ -96,19 +109,20 @@ if ( $view === 'wwwroot' ) {
     foreach ( $groups as $wwwroot => $group ) {
         echo '<h2>' . beacon_page_h($wwwroot) . '</h2>'."\n";
         echo '<p>' . count($group) . ' install' . (count($group) === 1 ? '' : 's') . ' share this wwwroot.</p>'."\n";
-        beacon_page_table($group);
+        beacon_page_table($group, $view, $showLocal, $sort);
     }
 } else {
-    beacon_page_table($rows);
+    beacon_page_table($rows, $view, $showLocal, $sort);
 }
 
 echo "</div>\n";
 $OUTPUT->footer();
 
-function beacon_page_qs($view, $showLocal) {
+function beacon_page_qs($view, $showLocal, $sort = 'updated') {
     $q = array();
     if ( $view === 'wwwroot' ) $q['view'] = 'wwwroot';
     if ( $showLocal ) $q['show_local'] = '1';
+    if ( $sort === 'created' ) $q['sort'] = 'created';
     $built = http_build_query($q);
     return $built === '' ? '?' : ('?' . $built);
 }
@@ -117,12 +131,17 @@ function beacon_page_h($value) {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
-function beacon_page_table(array $rows) {
+function beacon_page_table(array $rows, $view, $showLocal, $sort) {
+    $updatedHref = beacon_page_h(beacon_page_qs($view, $showLocal, 'updated'));
+    $createdHref = beacon_page_h(beacon_page_qs($view, $showLocal, 'created'));
     echo '<div style="overflow-x:auto">'."\n";
     echo '<table class="table table-striped">'."\n";
     echo '<thead><tr>';
     echo '<th>wwwroot</th><th>dirroot</th><th>Tsugi</th><th>software_version</th><th>recorded_overall</th>';
-    echo '<th>Upgrades</th><th>Last report</th><th>Updated</th><th>Created</th><th>Git</th><th>Owner</th><th>Schemas</th>';
+    echo '<th>Upgrades</th><th>Last report</th>';
+    echo '<th><a href="' . $updatedHref . '">Updated</a></th>';
+    echo '<th><a href="' . $createdHref . '">Created</a></th>';
+    echo '<th>Git</th><th>Owner</th><th>Schemas</th>';
     echo "</tr></thead>\n<tbody>\n";
     foreach ( $rows as $row ) {
         $href = '?id=' . rawurlencode($row['id']);

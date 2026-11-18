@@ -383,7 +383,7 @@ function beacon_handle($method, $raw, $pdo = null) {
     return array($status, array('ok' => true));
 }
 
-function beacon_list(PDO $pdo, $showLocal) {
+function beacon_list(PDO $pdo, $showLocal, $sort = 'updated') {
     $sql = 'SELECT id, wwwroot, apphome, dirroot, servicename, servicedesc, ownername, owneremail,
             developer, local, lessons, tsugi_version, minimum_php, minimum_mysql,
             software_version, highest_migration, highest_migration_path, recorded_overall,
@@ -393,7 +393,11 @@ function beacon_list(PDO $pdo, $showLocal) {
             (SELECT COUNT(*) FROM beacon_history h WHERE h.install_id = beacon_install.id) AS upgrade_count
         FROM beacon_install';
     if ( ! $showLocal ) $sql .= ' WHERE local = 0';
-    $sql .= ' ORDER BY updated_at DESC, created_at DESC, wwwroot ASC';
+    if ( $sort === 'created' ) {
+        $sql .= ' ORDER BY created_at DESC, updated_at DESC, wwwroot ASC';
+    } else {
+        $sql .= ' ORDER BY updated_at DESC, created_at DESC, wwwroot ASC';
+    }
     return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 }
 
