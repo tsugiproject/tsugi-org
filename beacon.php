@@ -104,10 +104,11 @@ if ( $wantId !== '' ) {
         } else {
             $history = beacon_history_for($pdo, $wantId);
             $places = beacon_ip_places($pdo, beacon_page_ips($one, $history));
-            beacon_page_back($showLocal, $sort, $dir, $search);
+            $rows = beacon_list($pdo, $showLocal, $sort, $dir, $search);
+            beacon_page_nav($wantId, $rows, $showLocal, $sort, $dir, $search);
             beacon_page_detail($one, $history, $places);
             beacon_page_delete_form($wantId, $showLocal, $sort, $dir, $search);
-            beacon_page_back($showLocal, $sort, $dir, $search);
+            beacon_page_nav($wantId, $rows, $showLocal, $sort, $dir, $search);
         }
     }
     echo "</div>\n";
@@ -161,6 +162,26 @@ function beacon_page_id_href($id, $showLocal, $sort, $dir, $search) {
 
 function beacon_page_back($showLocal, $sort, $dir, $search) {
     echo '<p><a href="' . beacon_page_h(beacon_page_qs($showLocal, $sort, $dir, $search)) . '">Back to the list</a></p>'."\n";
+}
+
+function beacon_page_nav($id, array $rows, $showLocal, $sort, $dir, $search) {
+    $ids = array();
+    foreach ( $rows as $row ) $ids[] = $row['id'];
+    $index = array_search($id, $ids, true);
+    $parts = array();
+    if ( $index !== false && $index > 0 ) {
+        $href = beacon_page_id_href($ids[$index - 1], $showLocal, $sort, $dir, $search);
+        $parts[] = '<a href="' . beacon_page_h($href) . '">Back</a>';
+    }
+    if ( $index !== false ) {
+        $parts[] = ($index + 1) . ' of ' . count($ids);
+    }
+    if ( $index !== false && $index < count($ids) - 1 ) {
+        $href = beacon_page_id_href($ids[$index + 1], $showLocal, $sort, $dir, $search);
+        $parts[] = '<a href="' . beacon_page_h($href) . '">Next</a>';
+    }
+    $parts[] = '<a href="' . beacon_page_h(beacon_page_qs($showLocal, $sort, $dir, $search)) . '">Back to the list</a>';
+    echo '<p>' . implode(' · ', $parts) . '</p>'."\n";
 }
 
 function beacon_page_qs($showLocal, $sort = 'updated_at', $dir = 'desc', $search = '') {
