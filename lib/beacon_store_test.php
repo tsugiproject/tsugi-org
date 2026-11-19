@@ -16,79 +16,42 @@ function beacon_test($cond, $message) {
     fwrite(STDERR, "FAIL: " . $message . "\n");
 }
 
-function beacon_test_preimage($wwwroot, $dirroot, $owneremail) {
+function beacon_test_preimage($host, $owneremail) {
+    $preimage = (string) $host;
     if ( is_string($owneremail) && $owneremail !== '' ) {
-        return $wwwroot . "\n" . $dirroot . "\n" . $owneremail . "\n" . "42";
+        $preimage .= "\n" . $owneremail;
     }
-    return $wwwroot . "\n" . $dirroot . "\n" . "42";
+    return $preimage . "\n" . "42";
 }
 
 function beacon_test_payload($over = array()) {
-    $install = array(
-        'wwwroot' => 'https://learn.example.edu/tsugi',
-        'apphome' => 'https://learn.example.edu',
-        'dirroot' => '/var/www/tsugi',
-        'servicename' => 'Example',
-        'servicedesc' => null,
-        'ownername' => 'Pat',
-        'owneremail' => 'pat@example.edu',
-        'developer' => false,
-        'local' => false,
-        'lessons' => true,
-    );
-    if ( isset($over['install']) ) $install = array_merge($install, $over['install']);
-    $dirroot = array_key_exists('dirroot', $install) ? $install['dirroot'] : '';
-    $dirrootBytes = $dirroot === null ? '' : (string) $dirroot;
-    $email = $install['owneremail'] ?? null;
-    $emailBytes = (is_string($email) && $email !== '') ? $email : null;
-    $install['id'] = hash('sha256', beacon_test_preimage($install['wwwroot'], $dirrootBytes, $emailBytes));
     $body = array(
         'report_version' => 1,
         'marker' => 'tsugi-upgrade-beacon',
-        'event' => 'database_upgrade',
-        'source' => 'admin/upgrade.php',
-        'install' => $install,
-        'software' => array(
-            'tsugi_version' => '26.11.5',
-            'minimum_php' => '8.4',
-            'minimum_mysql' => '8.0.16',
-        ),
-        'database' => array(
-            'software_version' => 20261105,
-            'highest_migration' => 20261101,
-            'highest_migration_path' => 'lib/src/Services/Lti/database.php',
-            'recorded_overall' => 20261101,
-            'server_version' => '8.0.36',
-            'server_below_minimum' => false,
-            'driver' => 'mysql',
-            'prefix' => 'lti_',
-            'schemas' => array(
-                'lib/src/Services/Lti/database.php' => 20261101,
-                'mod/quiz/database.php' => 12,
-            ),
-        ),
-        'git' => array(
-            'commit' => '3D6F55584',
-            'branch' => 'upgrade-beacon',
-        ),
-        'runtime' => array(
-            'php' => '8.4.1',
-            'sapi' => 'apache2handler',
-            'os' => 'Linux',
-            'os_release' => '6.1.0',
-            'hostname' => 'web1',
-            'timezone' => 'UTC',
-            'server_software' => 'Apache',
-        ),
         'reported_at' => '2026-11-18T18:28:00Z',
         'comment' => 'after migrations',
+        'host' => 'learn.example.edu',
+        'servicename' => 'Example',
+        'ownername' => 'Pat',
+        'owneremail' => 'pat@example.edu',
+        'tsugi_version' => '26.11.5',
+        'database_version' => 20261105,
+        'php_version' => '8.4.1',
+        'mysql_version' => '8.0.36',
+        'timezone' => 'Pacific/Honolulu',
+        'git_commit' => '3D6F55584',
+        'git_branch' => 'upgrade-beacon',
         'scale' => 99,
         'google_login' => true,
     );
     foreach ( $over as $key => $value ) {
-        if ( $key === 'install' ) continue;
         $body[$key] = $value;
     }
+    $email = $body['owneremail'] ?? null;
+    $emailBytes = (is_string($email) && $email !== '') ? $email : null;
+    $host = array_key_exists('host', $body) && $body['host'] !== null ? (string) $body['host'] : '';
+    $body['install_id'] = hash('sha256', beacon_test_preimage($host, $emailBytes));
+    if ( array_key_exists('install_id', $over) ) $body['install_id'] = $over['install_id'];
     return $body;
 }
 
@@ -98,15 +61,15 @@ function beacon_test_open() {
     return array(beacon_open($path), $path);
 }
 
-$withEmail = beacon_test_preimage('https://learn.example.edu/tsugi', '/var/www/tsugi', 'pat@example.edu');
-$noEmail = beacon_test_preimage('https://learn.example.edu/tsugi', '/var/www/tsugi', null);
-beacon_test(beacon_install_id('https://learn.example.edu/tsugi', '/var/www/tsugi', 'pat@example.edu') === hash('sha256', $withEmail), 'id includes owner email');
-beacon_test(beacon_install_id('https://learn.example.edu/tsugi', '/var/www/tsugi', null) === hash('sha256', $noEmail), 'id omits empty owner');
-beacon_test(beacon_install_id('https://learn.example.edu/tsugi', '/var/www/tsugi', '') === hash('sha256', $noEmail), 'blank owner is omitted');
-beacon_test(beacon_install_id('https://learn.example.edu/tsugi', '', null) === hash('sha256', beacon_test_preimage('https://learn.example.edu/tsugi', '', null)), 'null dirroot is empty in the preimage');
+$withEmail = beacon_test_preimage('learn.example.edu', 'pat@example.edu');
+$noEmail = beacon_test_preimage('learn.example.edu', null);
+beacon_test(beacon_install_id('learn.example.edu', 'pat@example.edu') === hash('sha256', $withEmail), 'id includes owner email');
+beacon_test(beacon_install_id('learn.example.edu', null) === hash('sha256', $noEmail), 'id omits empty owner');
+beacon_test(beacon_install_id('learn.example.edu', '') === hash('sha256', $noEmail), 'blank owner is omitted');
+beacon_test(beacon_install_id('', null) === hash('sha256', beacon_test_preimage('', null)), 'a missing host is an empty string');
 $spaced = ' Pat@Example.edu ';
 beacon_test(
-    beacon_install_id('https://learn.example.edu', '/var', $spaced) !== beacon_install_id('https://learn.example.edu', '/var', 'pat@example.edu'),
+    beacon_install_id('learn.example.edu', $spaced) !== beacon_install_id('learn.example.edu', 'pat@example.edu'),
     'owner email is not trimmed or lowercased'
 );
 
@@ -123,7 +86,11 @@ $accepted = beacon_accept($raw);
 beacon_test($accepted['ok'] === true, 'accepts a report');
 beacon_test( ! array_key_exists('scale', $accepted['snapshot']), 'unknown field is not stored');
 beacon_test($accepted['snapshot']['git_commit'] === '3d6f55584', 'commit is stored lowercase');
-beacon_test($accepted['snapshot']['recorded_overall'] === 20261101, 'recorded_overall may lag software_version');
+beacon_test((int) $accepted['snapshot']['software_version'] === 20261105, 'database version is stored');
+beacon_test($accepted['snapshot']['php'] === '8.4.1', 'php version is stored');
+beacon_test($accepted['snapshot']['timezone'] === 'Pacific/Honolulu', 'timezone is stored');
+beacon_test($accepted['snapshot']['server_version'] === '8.0.36', 'mysql version is stored');
+beacon_test($accepted['snapshot']['wwwroot'] === 'learn.example.edu', 'host is stored');
 beacon_test($accepted['snapshot']['local'] === 0, 'public host is not local');
 beacon_test($accepted['snapshot']['owneremail'] === 'pat@example.edu', 'email stored as posted');
 
@@ -133,18 +100,8 @@ beacon_test(strpos(json_encode($body), $withEmail) === false, 'response does not
 beacon_test(strpos(json_encode($body), '42') === false, 'response does not contain the preimage line');
 
 $changed = beacon_test_payload(array(
-    'software' => array('tsugi_version' => '26.12.0', 'minimum_php' => '8.4', 'minimum_mysql' => '8.0.16'),
-    'database' => array(
-        'software_version' => 20261200,
-        'highest_migration' => 20261101,
-        'highest_migration_path' => 'lib/src/Services/Lti/database.php',
-        'recorded_overall' => 20261101,
-        'server_version' => '8.0.36',
-        'server_below_minimum' => false,
-        'driver' => 'mysql',
-        'prefix' => 'lti_',
-        'schemas' => array('lib/src/Services/Lti/database.php' => 20261101),
-    ),
+    'tsugi_version' => '26.12.0',
+    'database_version' => 20261200,
     'reported_at' => '2026-12-01T00:00:00Z',
 ));
 list($status2, $body2) = beacon_handle('POST', json_encode($changed), $pdo);
@@ -160,39 +117,45 @@ beacon_test(count($history) === 2, 'two history rows');
 beacon_test((int) $history[0]['software_version'] === 20261200, 'newest history is first');
 beacon_test((int) $history[0]['http_status'] === 200, 'history records the status we returned');
 beacon_test($history[0]['git_branch'] === 'upgrade-beacon', 'history keeps the branch');
+beacon_test($history[0]['php'] === '8.4.1' && $history[1]['php'] === '8.4.1', 'history keeps the php version');
+$countedId = $rows[0]['id'];
+$pdo->prepare('DELETE FROM beacon_history WHERE id = (
+    SELECT id FROM beacon_history WHERE install_id = ? ORDER BY id ASC LIMIT 1
+)')->execute(array($countedId));
+$keptCount = beacon_one($pdo, $countedId);
+beacon_test((int) $keptCount['upgrade_count'] === 2, 'upgrade count stays after a history row is removed');
+beacon_test($history[0]['server_version'] === '8.0.36' && $history[1]['server_version'] === '8.0.36', 'history keeps the mysql version');
 
 $badId = beacon_test_payload();
-$badId['install']['id'] = str_repeat('a', 64);
+$badId['install_id'] = str_repeat('a', 64);
 list($badStatus, $badBody) = beacon_handle('POST', json_encode($badId), $pdo);
 beacon_test($badStatus === 400 && $badBody === array('error' => 'bad request'), 'mismatched id is 400');
 beacon_test(count(beacon_list($pdo, true)) === 1, 'rejected id writes nothing');
 
-$localBody = beacon_test_payload(array('install' => array(
-    'wwwroot' => 'http://localhost:8888/tsugi-org/tsugi',
-    'dirroot' => '/Users/csev/htdocs/tsugi-org/tsugi',
+$localBody = beacon_test_payload(array(
+    'host' => 'localhost',
     'owneremail' => null,
-    'local' => false,
-)));
+));
 list($localStatus,) = beacon_handle('POST', json_encode($localBody), $pdo);
 beacon_test($localStatus === 200, 'local report is stored');
 beacon_test(count(beacon_list($pdo, false)) === 1, 'default list hides local');
 $withLocal = beacon_list($pdo, true);
 beacon_test(count($withLocal) === 2, 'local row is still stored');
 
-$moved = beacon_test_payload(array('install' => array(
-    'wwwroot' => 'https://learn.example.edu/tsugi',
-    'dirroot' => '/var/www/releases/26.12.0',
-)));
+$moved = beacon_test_payload(array(
+    'host' => 'learn.example.edu',
+    'owneremail' => 'other@example.edu',
+));
 list($movedStatus,) = beacon_handle('POST', json_encode($moved), $pdo);
-beacon_test($movedStatus === 200, 'a new dirroot is a new install');
+beacon_test($movedStatus === 200, 'a different owner email is a new install');
 $publicRows = beacon_list($pdo, false);
-beacon_test(count($publicRows) === 2, 'same wwwroot has two installs');
+beacon_test(count($publicRows) === 2, 'same host has two installs');
 $seen = array();
 foreach ( $publicRows as $row ) $seen[$row['wwwroot']] = true;
-beacon_test(count($seen) === 1, 'those installs group by wwwroot');
+beacon_test(count($seen) === 1, 'those installs group by host');
 
 $version = $pdo->query('SELECT version FROM beacon_schema')->fetchColumn();
-beacon_test((int) $version === 4, 'migration records schema version 4');
+beacon_test((int) $version === 6, 'migration records schema version 6');
 beacon_open($path);
 $versionRows = $pdo->query('SELECT COUNT(*) FROM beacon_schema')->fetchColumn();
 beacon_test((int) $versionRows === 1, 'migration does not insert a second version row');
@@ -201,26 +164,16 @@ $cases = array(
     array('report_version' => 2),
     array('report_version' => '1'),
     array('marker' => 'nope'),
-    array('event' => 'launch'),
-    array('source' => 'cron'),
     array('reported_at' => '2026-11-18 18:28:00'),
-    array('git' => array('commit' => 'not-hex', 'branch' => 'main')),
-    array('database' => array('schemas' => array('only'))),
+    array('git_commit' => 'not-hex'),
+    array('database_version' => '20261105'),
+    array('host' => null, 'install_id' => str_repeat('b', 64)),
 );
 foreach ( $cases as $case ) {
     $payload = beacon_test_payload($case);
-    if ( isset($case['database']) ) {
-        $payload['database'] = $case['database'];
-    }
     $result = beacon_accept(json_encode($payload));
     beacon_test($result['ok'] === false, 'rejects ' . json_encode($case));
 }
-
-$tooMany = array();
-for ( $i = 0; $i < 301; $i++ ) $tooMany['mod/p' . $i . '/database.php'] = $i;
-$many = beacon_test_payload();
-$many['database']['schemas'] = $tooMany;
-beacon_test(beacon_accept(json_encode($many))['ok'] === false, 'rejects more than 300 schemas');
 
 $garbage = array(
     '{',
@@ -243,36 +196,36 @@ beacon_test(beacon_accept(str_repeat('x', BEACON_MAX_BODY))['ok'] === false, '5K
 beacon_test($beforeBig === (int) $pdo->query('SELECT COUNT(*) FROM beacon_install')->fetchColumn(), 'rejected body does not add a row');
 
 $cli = beacon_test_payload();
-$cli['runtime']['server_software'] = null;
-$cli['git'] = array('commit' => null, 'branch' => null);
+$cli['mysql_version'] = null;
+$cli['git_commit'] = null;
+$cli['git_branch'] = null;
 unset($cli['comment']);
 $cliAccepted = beacon_accept(json_encode($cli));
-beacon_test($cliAccepted['ok'] === true, 'cli runtime and a missing comment are accepted');
-beacon_test($cliAccepted['snapshot']['server_software'] === null, 'null server_software stays null');
+beacon_test($cliAccepted['ok'] === true, 'a missing comment and null git are accepted');
+beacon_test($cliAccepted['snapshot']['server_version'] === null, 'null mysql version stays null');
 beacon_test($cliAccepted['snapshot']['git_commit'] === null && $cliAccepted['snapshot']['git_branch'] === null, 'detached git is null');
 beacon_test($cliAccepted['snapshot']['comment'] === '', 'missing comment stores empty');
 
-$spacedBody = beacon_test_payload(array('install' => array(
-    'wwwroot' => 'https://spaced.example.edu',
-    'dirroot' => '/opt/tsugi',
+$spacedBody = beacon_test_payload(array(
+    'host' => 'spaced.example.edu',
     'owneremail' => ' Pat@Example.edu ',
-)));
+));
 $spacedAccepted = beacon_accept(json_encode($spacedBody));
 beacon_test($spacedAccepted['ok'] === true, 'spaced email matches the untrimmed preimage');
 beacon_test($spacedAccepted['snapshot']['owneremail'] === ' Pat@Example.edu ', 'stored email keeps spaces and case');
 
-$stampAccepted = beacon_accept(json_encode(beacon_test_payload(array('install' => array(
-    'wwwroot' => 'https://stamps.example.edu',
-    'dirroot' => '/var/www/a',
-)))));
-$otherAccepted = beacon_accept(json_encode(beacon_test_payload(array('install' => array(
-    'wwwroot' => 'https://stamps.example.edu',
-    'dirroot' => '/var/www/b',
-)))));
-$tieAccepted = beacon_accept(json_encode(beacon_test_payload(array('install' => array(
-    'wwwroot' => 'https://stamps.example.edu',
-    'dirroot' => '/var/www/c',
-)))));
+$stampAccepted = beacon_accept(json_encode(beacon_test_payload(array(
+    'host' => 'stamps.example.edu',
+    'owneremail' => 'a@example.edu',
+))));
+$otherAccepted = beacon_accept(json_encode(beacon_test_payload(array(
+    'host' => 'stamps.example.edu',
+    'owneremail' => 'b@example.edu',
+))));
+$tieAccepted = beacon_accept(json_encode(beacon_test_payload(array(
+    'host' => 'stamps.example.edu',
+    'owneremail' => 'c@example.edu',
+))));
 beacon_save($pdo, $stampAccepted['snapshot'], $stampAccepted['history'], 200, '2026-01-01T00:00:00Z');
 beacon_save($pdo, $otherAccepted['snapshot'], $otherAccepted['history'], 200, '2026-06-01T00:00:00Z');
 beacon_save($pdo, $stampAccepted['snapshot'], $stampAccepted['history'], 200, '2026-08-01T00:00:00Z');
@@ -285,33 +238,38 @@ beacon_test($stampHistory[0]['updated_at'] === '2026-08-01T00:00:00Z', 'history 
 beacon_test($stampHistory[1]['created_at'] === '2026-01-01T00:00:00Z', 'older history row keeps its created_at');
 $stampList = array();
 foreach ( beacon_list($pdo, false) as $stampItem ) {
-    if ( $stampItem['wwwroot'] === 'https://stamps.example.edu' ) $stampList[] = $stampItem['dirroot'];
+    if ( $stampItem['wwwroot'] === 'stamps.example.edu' ) $stampList[] = $stampItem['owneremail'];
 }
-beacon_test($stampList === array('/var/www/c', '/var/www/a', '/var/www/b'), 'list sorts by updated_at then created_at');
+beacon_test($stampList === array('c@example.edu', 'a@example.edu', 'b@example.edu'), 'list sorts by updated_at then created_at');
 $createdList = array();
 foreach ( beacon_list($pdo, false, 'created_at') as $stampItem ) {
-    if ( $stampItem['wwwroot'] === 'https://stamps.example.edu' ) $createdList[] = $stampItem['dirroot'];
+    if ( $stampItem['wwwroot'] === 'stamps.example.edu' ) $createdList[] = $stampItem['owneremail'];
 }
-beacon_test($createdList === array('/var/www/c', '/var/www/b', '/var/www/a'), 'list can sort by created_at then updated_at');
+beacon_test($createdList === array('c@example.edu', 'b@example.edu', 'a@example.edu'), 'list can sort by created_at then updated_at');
 $createdAsc = array();
 foreach ( beacon_list($pdo, false, 'created_at', 'asc') as $stampItem ) {
-    if ( $stampItem['wwwroot'] === 'https://stamps.example.edu' ) $createdAsc[] = $stampItem['dirroot'];
+    if ( $stampItem['wwwroot'] === 'stamps.example.edu' ) $createdAsc[] = $stampItem['owneremail'];
 }
-beacon_test($createdAsc === array('/var/www/a', '/var/www/b', '/var/www/c'), 'created_at can sort ascending');
+beacon_test($createdAsc === array('a@example.edu', 'b@example.edu', 'c@example.edu'), 'created_at can sort ascending');
 $foundDirs = array();
-foreach ( beacon_list($pdo, false, 'updated_at', 'desc', '/var/www/b') as $stampItem ) {
-    if ( $stampItem['wwwroot'] === 'https://stamps.example.edu' ) $foundDirs[] = $stampItem['dirroot'];
+foreach ( beacon_list($pdo, false, 'updated_at', 'desc', 'b@example.edu') as $stampItem ) {
+    if ( $stampItem['wwwroot'] === 'stamps.example.edu' ) $foundDirs[] = $stampItem['owneremail'];
 }
-beacon_test($foundDirs === array('/var/www/b'), 'search matches a dirroot');
+beacon_test($foundDirs === array('b@example.edu'), 'search matches an owner email');
 $caseHits = 0;
 foreach ( beacon_list($pdo, false, 'wwwroot', 'asc', 'StAmPs.ExAmPle') as $stampItem ) {
-    if ( $stampItem['wwwroot'] === 'https://stamps.example.edu' ) $caseHits++;
+    if ( $stampItem['wwwroot'] === 'stamps.example.edu' ) $caseHits++;
 }
 beacon_test($caseHits === 3, 'search is case insensitive');
+$phpHits = 0;
+foreach ( beacon_list($pdo, false, 'php', 'asc', '8.4.1') as $stampItem ) {
+    if ( $stampItem['wwwroot'] === 'stamps.example.edu' ) $phpHits++;
+}
+beacon_test($phpHits === 3, 'search matches a php version');
 beacon_test(count(beacon_list($pdo, false, 'updated_at', 'desc', 'no-such-beacon-xyz')) === 0, 'a miss returns no rows');
 $fallback = array();
 foreach ( beacon_list($pdo, false, 'not-a-column', 'sideways') as $stampItem ) {
-    if ( $stampItem['wwwroot'] === 'https://stamps.example.edu' ) $fallback[] = $stampItem['dirroot'];
+    if ( $stampItem['wwwroot'] === 'stamps.example.edu' ) $fallback[] = $stampItem['owneremail'];
 }
 beacon_test($fallback === $stampList, 'an unknown sort falls back to updated_at descending');
 
@@ -329,11 +287,18 @@ $old->exec('INSERT INTO beacon_install (
     \'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\',
     \'https://old.example.edu\', 0, 0, 0, 0, \'{}\', \'2024-05-01T00:00:00Z\', \'\'
 )');
+$old->exec('INSERT INTO beacon_history (
+    install_id, reported_at, software_version, recorded_overall, http_status
+) VALUES (
+    \'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\',
+    \'2024-05-01T00:00:00Z\', 1, 1, 200
+)');
 unset($old);
 $upgraded = beacon_open($oldPath);
 $oldRow = beacon_one($upgraded, '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef');
 beacon_test($oldRow['created_at'] === '2024-05-01T00:00:00Z' && $oldRow['updated_at'] === '2024-05-01T00:00:00Z', 'migration 2 backfills both timestamps from reported_at');
 beacon_test($oldRow['client_ip'] === null && $oldRow['client_host'] === null, 'migration 3 leaves older rows without an address');
+beacon_test((int) $oldRow['upgrade_count'] === 1, 'migration 6 counts the history rows already stored');
 unset($upgraded);
 unlink($oldPath);
 
@@ -361,6 +326,20 @@ beacon_test($kept === array(
 ), 'prune keeps the 3 most recent installs');
 $goneHistory = (int) $pdo->query('SELECT COUNT(*) FROM beacon_history WHERE install_id = \'' . str_repeat('1', 64) . '\'')->fetchColumn();
 beacon_test($goneHistory === 0, 'prune deletes history for the earliest install');
+beacon_test(BEACON_MAX_HISTORY === 20000, 'history is capped at 20000 rows');
+for ( $n = 1; $n <= 3; $n++ ) {
+    $stamp = '2019-0' . $n . '-01T00:00:00Z';
+    $insertHist->execute(array(str_repeat('2', 64), $stamp, $stamp, $stamp));
+}
+beacon_prune_history($pdo, 4);
+$historyLeft = $pdo->query('SELECT reported_at FROM beacon_history ORDER BY updated_at ASC, created_at ASC, id ASC')->fetchAll(PDO::FETCH_COLUMN);
+beacon_test($historyLeft === array(
+    '2019-03-01T00:00:00Z',
+    '2020-02-01T00:00:00Z',
+    '2020-03-01T00:00:00Z',
+    '2020-04-01T00:00:00Z',
+), 'history prune keeps the most recent rows');
+beacon_test((int) $pdo->query('SELECT COUNT(*) FROM beacon_install')->fetchColumn() === 3, 'history prune leaves the installs');
 $deleteId = str_repeat('d', 64);
 $pdo->prepare('INSERT INTO beacon_install (
         id, wwwroot, developer, local, lessons, server_below_minimum, schemas_json,
@@ -388,19 +367,18 @@ beacon_test(beacon_clean_host('203.0.113.9', "bad\nhost") === null, 'a reverse n
 
 $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 unset($_SERVER['HTTP_CF_CONNECTING_IP']);
-$ipBody = beacon_test_payload(array('install' => array(
-    'wwwroot' => 'https://ip.example.edu/tsugi',
-    'dirroot' => '/var/www/ip',
+$ipBody = beacon_test_payload(array(
+    'host' => 'ip.example.edu',
     'owneremail' => null,
-)));
+));
 list($ipStatus,) = beacon_handle('POST', json_encode($ipBody), $pdo);
-$ipRow = beacon_one($pdo, $ipBody['install']['id']);
+$ipRow = beacon_one($pdo, $ipBody['install_id']);
 beacon_test($ipStatus === 200 && $ipRow['client_ip'] === '127.0.0.1', 'a report records the incoming address');
-$ipHistory = beacon_history_for($pdo, $ipBody['install']['id']);
+$ipHistory = beacon_history_for($pdo, $ipBody['install_id']);
 beacon_test(count($ipHistory) === 1 && $ipHistory[0]['client_ip'] === '127.0.0.1', 'history records the incoming address');
 beacon_test($ipRow['client_host'] === null && beacon_reverse_host('127.0.0.1') === null, 'localhost gets no reverse lookup');
 $foundIp = beacon_list($pdo, false, 'client_ip', 'asc', '127.0.0.1');
-beacon_test(count($foundIp) === 1 && $foundIp[0]['wwwroot'] === 'https://ip.example.edu/tsugi', 'search finds the recorded address');
+beacon_test(count($foundIp) === 1 && $foundIp[0]['wwwroot'] === 'ip.example.edu', 'search finds the recorded address');
 unset($_SERVER['REMOTE_ADDR']);
 
 $placeCalls = 0;

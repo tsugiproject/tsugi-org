@@ -9,11 +9,11 @@
  * is never stored.
  */
 
-const BEACON_SCHEMA_VERSION = 4;
+const BEACON_SCHEMA_VERSION = 6;
 const BEACON_IP_PLACE_DAYS = 21;
 const BEACON_MAX_BODY = 5120;
 const BEACON_MAX_INSTALLS = 5000;
-const BEACON_MAX_SCHEMAS = 300;
+const BEACON_MAX_HISTORY = 20000;
 
 function beacon_sqlite_path() {
     $fromEnv = getenv('TSUGI_BEACON_SQLITE');
@@ -63,7 +63,15 @@ function beacon_migrate(PDO $pdo) {
         beacon_migrate_3($pdo);
         $version = 3;
     }
-    if ( $version < 4 ) beacon_migrate_4($pdo);
+    if ( $version < 4 ) {
+        beacon_migrate_4($pdo);
+        $version = 4;
+    }
+    if ( $version < 5 ) {
+        beacon_migrate_5($pdo);
+        $version = 5;
+    }
+    if ( $version < 6 ) beacon_migrate_6($pdo);
 }
 
 function beacon_migrate_1(PDO $pdo) {
@@ -160,6 +168,24 @@ function beacon_migrate_4(PDO $pdo) {
     $pdo->commit();
 }
 
+function beacon_migrate_5(PDO $pdo) {
+    $pdo->beginTransaction();
+    $pdo->exec('ALTER TABLE beacon_history ADD COLUMN php TEXT');
+    $pdo->exec('ALTER TABLE beacon_history ADD COLUMN server_version TEXT');
+    beacon_schema_set($pdo, 5);
+    $pdo->commit();
+}
+
+function beacon_migrate_6(PDO $pdo) {
+    $pdo->beginTransaction();
+    $pdo->exec('ALTER TABLE beacon_install ADD COLUMN upgrade_count INTEGER NOT NULL DEFAULT 0');
+    $pdo->exec('UPDATE beacon_install SET upgrade_count = (
+        SELECT COUNT(*) FROM beacon_history h WHERE h.install_id = beacon_install.id
+    )');
+    beacon_schema_set($pdo, 6);
+    $pdo->commit();
+}
+
 function beacon_schema_set(PDO $pdo, $version) {
     $stmt = $pdo->prepare('INSERT INTO beacon_schema (id, version) VALUES (1, :version)
         ON CONFLICT(id) DO UPDATE SET version = excluded.version');
@@ -183,93 +209,70 @@ function beacon_accept($raw) {
     if ( ! beacon_exact($data, 'marker', 'tsugi-upgrade-beacon') ) {
         return array('ok' => false, 'error' => 'marker');
     }
-    if ( ! beacon_exact($data, 'event', 'database_upgrade') ) {
-        return array('ok' => false, 'error' => 'event');
-    }
-    if ( ! beacon_exact($data, 'source', 'admin/upgrade.php') ) {
-        return array('ok' => false, 'error' => 'source');
-    }
-
-    $install = beacon_object($data, 'install');
-    $software = beacon_object($data, 'software');
-    $database = beacon_object($data, 'database');
-    $git = beacon_object($data, 'git');
-    $runtime = beacon_object($data, 'runtime');
-    if ( $install === null || $software === null || $database === null || $git === null || $runtime === null ) {
-        return array('ok' => false, 'error' => 'shape');
-    }
 
     $bad = false;
-    $wwwroot = beacon_required_string($install, 'wwwroot', 2000, $bad);
-    $dirrootValue = beacon_optional_string($install, 'dirroot', 2000, $bad);
-    $owneremail = beacon_optional_string($install, 'owneremail', 320, $bad);
-    $postedId = beacon_required_string($install, 'id', 64, $bad);
-    if ( $bad || ! is_string($wwwroot) || ! is_string($postedId) ) {
+    $host = beacon_optional_string($data, 'host', 255, $bad);
+    if ( $host === null ) $host = '';
+    $owneremail = beacon_optional_string($data, 'owneremail', 320, $bad);
+    $postedId = beacon_required_string($data, 'install_id', 64, $bad);
+    if ( $bad || ! is_string($postedId) ) {
         return array('ok' => false, 'error' => 'shape');
     }
 
-    $dirrootPreimage = $dirrootValue === null ? '' : $dirrootValue;
     $emailPreimage = (is_string($owneremail) && $owneremail !== '') ? $owneremail : null;
-    $expected = beacon_install_id($wwwroot, $dirrootPreimage, $emailPreimage);
+    $expected = beacon_install_id($host, $emailPreimage);
     if ( ! preg_match('/^[0-9a-f]{64}$/', $postedId) || ! hash_equals($expected, $postedId) ) {
         return array('ok' => false, 'error' => 'id');
     }
 
-    $developer = beacon_bool($install, 'developer', $bad);
-    $lessons = beacon_bool($install, 'lessons', $bad);
-    beacon_bool($install, 'local', $bad);
-    $serverBelow = beacon_bool($database, 'server_below_minimum', $bad);
-    $softwareVersion = beacon_int($database, 'software_version', true, $bad);
-    $highestMigration = beacon_int($database, 'highest_migration', true, $bad);
-    $recordedOverall = beacon_int($database, 'recorded_overall', false, $bad);
+    $databaseVersion = beacon_int($data, 'database_version', false, $bad);
     $reportedAt = beacon_reported_at(property_exists($data, 'reported_at') ? $data->reported_at : null);
     if ( $reportedAt === null ) $bad = true;
     $comment = beacon_comment($data, $bad);
-    $schemas = beacon_schemas($database, $bad);
+    $git = new stdClass();
+    $git->commit = property_exists($data, 'git_commit') ? $data->git_commit : null;
+    $git->branch = property_exists($data, 'git_branch') ? $data->git_branch : null;
     $gitCommit = beacon_git_commit($git, $bad);
     $gitBranch = beacon_git_branch($git, $bad);
-    if ( $bad || $schemas === null ) {
-        return array('ok' => false, 'error' => 'shape');
-    }
-
-    $schemasJson = json_encode($schemas, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-    if ( ! is_string($schemasJson) ) {
+    $tsugiVersion = beacon_required_string($data, 'tsugi_version', 64, $bad);
+    $phpVersion = beacon_required_string($data, 'php_version', 64, $bad);
+    if ( $bad || ! is_string($tsugiVersion) || ! is_string($phpVersion) ) {
         return array('ok' => false, 'error' => 'shape');
     }
 
     $snapshot = array(
         'id' => $postedId,
-        'wwwroot' => $wwwroot,
-        'apphome' => beacon_optional_string($install, 'apphome', 2000, $bad),
-        'dirroot' => $dirrootValue,
-        'servicename' => beacon_optional_string($install, 'servicename', 200, $bad),
-        'servicedesc' => beacon_optional_string($install, 'servicedesc', 2000, $bad),
-        'ownername' => beacon_optional_string($install, 'ownername', 200, $bad),
+        'wwwroot' => $host,
+        'apphome' => null,
+        'dirroot' => null,
+        'servicename' => beacon_optional_string($data, 'servicename', 200, $bad),
+        'servicedesc' => null,
+        'ownername' => beacon_optional_string($data, 'ownername', 200, $bad),
         'owneremail' => $emailPreimage,
-        'developer' => $developer ? 1 : 0,
-        'local' => beacon_wwwroot_is_local($wwwroot) ? 1 : 0,
-        'lessons' => $lessons ? 1 : 0,
-        'tsugi_version' => beacon_optional_string($software, 'tsugi_version', 64, $bad),
-        'minimum_php' => beacon_optional_string($software, 'minimum_php', 64, $bad),
-        'minimum_mysql' => beacon_optional_string($software, 'minimum_mysql', 64, $bad),
-        'software_version' => $softwareVersion,
-        'highest_migration' => $highestMigration,
-        'highest_migration_path' => beacon_optional_string($database, 'highest_migration_path', 300, $bad),
-        'recorded_overall' => $recordedOverall,
-        'server_version' => beacon_optional_string($database, 'server_version', 64, $bad),
-        'server_below_minimum' => $serverBelow ? 1 : 0,
-        'driver' => beacon_optional_string($database, 'driver', 32, $bad),
-        'prefix' => beacon_optional_string($database, 'prefix', 64, $bad),
-        'schemas_json' => $schemasJson,
+        'developer' => 0,
+        'local' => beacon_wwwroot_is_local($host) ? 1 : 0,
+        'lessons' => 0,
+        'tsugi_version' => $tsugiVersion,
+        'minimum_php' => null,
+        'minimum_mysql' => null,
+        'software_version' => $databaseVersion,
+        'highest_migration' => null,
+        'highest_migration_path' => null,
+        'recorded_overall' => null,
+        'server_version' => beacon_optional_string($data, 'mysql_version', 64, $bad),
+        'server_below_minimum' => 0,
+        'driver' => null,
+        'prefix' => null,
+        'schemas_json' => '{}',
         'git_commit' => $gitCommit,
         'git_branch' => $gitBranch,
-        'php' => beacon_optional_string($runtime, 'php', 64, $bad),
-        'sapi' => beacon_optional_string($runtime, 'sapi', 64, $bad),
-        'os' => beacon_optional_string($runtime, 'os', 64, $bad),
-        'os_release' => beacon_optional_string($runtime, 'os_release', 128, $bad),
-        'hostname' => beacon_optional_string($runtime, 'hostname', 255, $bad),
-        'timezone' => beacon_optional_string($runtime, 'timezone', 64, $bad),
-        'server_software' => beacon_optional_string($runtime, 'server_software', 255, $bad),
+        'php' => $phpVersion,
+        'sapi' => null,
+        'os' => null,
+        'os_release' => null,
+        'hostname' => null,
+        'timezone' => beacon_optional_string($data, 'timezone', 64, $bad),
+        'server_software' => null,
         'reported_at' => $reportedAt,
         'comment' => $comment,
     );
@@ -280,23 +283,24 @@ function beacon_accept($raw) {
     $history = array(
         'install_id' => $postedId,
         'reported_at' => $reportedAt,
-        'software_version' => $softwareVersion,
-        'recorded_overall' => $recordedOverall,
+        'software_version' => $databaseVersion,
+        'recorded_overall' => null,
         'git_commit' => $gitCommit,
         'git_branch' => $gitBranch,
+        'php' => $phpVersion,
+        'server_version' => $snapshot['server_version'],
     );
     return array('ok' => true, 'snapshot' => $snapshot, 'history' => $history);
 }
 
-function beacon_install_id($wwwroot, $dirroot, $owneremail) {
+function beacon_install_id($host, $owneremail) {
     // The last line of the preimage is not part of the posted comment.
     // Do not return it, log it, or put it on a page.
+    $preimage = (string) $host;
     if ( is_string($owneremail) && $owneremail !== '' ) {
-        $preimage = $wwwroot . "\n" . $dirroot . "\n" . $owneremail . "\n" . '42';
-    } else {
-        $preimage = $wwwroot . "\n" . $dirroot . "\n" . '42';
+        $preimage .= "\n" . $owneremail;
     }
-    return hash('sha256', $preimage);
+    return hash('sha256', $preimage . "\n" . '42');
 }
 
 function beacon_wwwroot_is_local($wwwroot) {
@@ -341,14 +345,16 @@ function beacon_save(PDO $pdo, array $snapshot, array $history, $httpStatus, $no
             software_version, highest_migration, highest_migration_path, recorded_overall,
             server_version, server_below_minimum, driver, prefix, schemas_json,
             git_commit, git_branch, php, sapi, os, os_release, hostname, timezone,
-            server_software, reported_at, comment, created_at, updated_at, client_ip, client_host
+            server_software, reported_at, comment, created_at, updated_at, client_ip, client_host,
+            upgrade_count
         ) VALUES (
             :id, :wwwroot, :apphome, :dirroot, :servicename, :servicedesc, :ownername, :owneremail,
             :developer, :local, :lessons, :tsugi_version, :minimum_php, :minimum_mysql,
             :software_version, :highest_migration, :highest_migration_path, :recorded_overall,
             :server_version, :server_below_minimum, :driver, :prefix, :schemas_json,
             :git_commit, :git_branch, :php, :sapi, :os, :os_release, :hostname, :timezone,
-            :server_software, :reported_at, :comment, :created_at, :updated_at, :client_ip, :client_host
+            :server_software, :reported_at, :comment, :created_at, :updated_at, :client_ip, :client_host,
+            1
         )
         ON CONFLICT(id) DO UPDATE SET
             wwwroot = excluded.wwwroot,
@@ -386,15 +392,18 @@ function beacon_save(PDO $pdo, array $snapshot, array $history, $httpStatus, $no
             comment = excluded.comment,
             updated_at = excluded.updated_at,
             client_ip = excluded.client_ip,
-            client_host = excluded.client_host';
+            client_host = excluded.client_host,
+            upgrade_count = beacon_install.upgrade_count + 1';
     $stmt = $pdo->prepare($sql);
     $stmt->execute($snapshot);
     $hist = $pdo->prepare('INSERT INTO beacon_history (
             install_id, reported_at, software_version, recorded_overall,
-            git_commit, git_branch, http_status, created_at, updated_at, client_ip, client_host
+            git_commit, git_branch, http_status, created_at, updated_at, client_ip, client_host,
+            php, server_version
         ) VALUES (
             :install_id, :reported_at, :software_version, :recorded_overall,
-            :git_commit, :git_branch, :http_status, :created_at, :updated_at, :client_ip, :client_host
+            :git_commit, :git_branch, :http_status, :created_at, :updated_at, :client_ip, :client_host,
+            :php, :server_version
         )');
     $history['http_status'] = (int) $httpStatus;
     $hist->execute($history);
@@ -430,14 +439,30 @@ function beacon_prune(PDO $pdo, $keep = BEACON_MAX_INSTALLS) {
     if ( $keep < 1 ) $keep = BEACON_MAX_INSTALLS;
     $count = (int) $pdo->query('SELECT COUNT(*) FROM beacon_install')->fetchColumn();
     $extra = $count - $keep;
+    if ( $extra > 0 ) {
+        $ids = $pdo->query('SELECT id FROM beacon_install ORDER BY updated_at ASC, created_at ASC, id ASC LIMIT ' . $extra)
+            ->fetchAll(PDO::FETCH_COLUMN);
+        foreach ( array_chunk($ids, 400) as $chunk ) {
+            $marks = implode(',', array_fill(0, count($chunk), '?'));
+            $pdo->prepare('DELETE FROM beacon_history WHERE install_id IN (' . $marks . ')')->execute($chunk);
+            $pdo->prepare('DELETE FROM beacon_install WHERE id IN (' . $marks . ')')->execute($chunk);
+        }
+    }
+    beacon_prune_history($pdo);
+}
+
+function beacon_prune_history(PDO $pdo, $keep = BEACON_MAX_HISTORY) {
+    $keep = (int) $keep;
+    if ( $keep < 1 ) $keep = BEACON_MAX_HISTORY;
+    $count = (int) $pdo->query('SELECT COUNT(*) FROM beacon_history')->fetchColumn();
+    $extra = $count - $keep;
     if ( $extra < 1 ) return;
-    $ids = $pdo->query('SELECT id FROM beacon_install ORDER BY updated_at ASC, created_at ASC, id ASC LIMIT ' . $extra)
+    $ids = $pdo->query('SELECT id FROM beacon_history ORDER BY updated_at ASC, created_at ASC, id ASC LIMIT ' . $extra)
         ->fetchAll(PDO::FETCH_COLUMN);
     if ( ! $ids ) return;
     foreach ( array_chunk($ids, 400) as $chunk ) {
         $marks = implode(',', array_fill(0, count($chunk), '?'));
-        $pdo->prepare('DELETE FROM beacon_history WHERE install_id IN (' . $marks . ')')->execute($chunk);
-        $pdo->prepare('DELETE FROM beacon_install WHERE id IN (' . $marks . ')')->execute($chunk);
+        $pdo->prepare('DELETE FROM beacon_history WHERE id IN (' . $marks . ')')->execute($chunk);
     }
 }
 
@@ -628,18 +653,17 @@ function beacon_handle($method, $raw, $pdo = null) {
 function beacon_list_columns() {
     return array(
         'wwwroot' => 'text',
-        'dirroot' => 'text',
+        'servicename' => 'text',
         'tsugi_version' => 'version',
         'software_version' => 'number',
-        'recorded_overall' => 'number',
+        'php' => 'text',
+        'server_version' => 'text',
         'upgrade_count' => 'number',
-        'reported_at' => 'text',
         'updated_at' => 'text',
         'created_at' => 'text',
         'client_ip' => 'text',
         'git' => 'text',
         'owner' => 'text',
-        'schemas' => 'number',
     );
 }
 
@@ -655,7 +679,7 @@ function beacon_list(PDO $pdo, $showLocal, $sort = 'updated_at', $dir = 'desc', 
             server_version, server_below_minimum, driver, prefix, schemas_json,
             git_commit, git_branch, php, sapi, os, os_release, hostname, timezone,
             server_software, reported_at, comment, created_at, updated_at, client_ip, client_host,
-            (SELECT COUNT(*) FROM beacon_history h WHERE h.install_id = beacon_install.id) AS upgrade_count
+            upgrade_count
         FROM beacon_install';
     if ( ! $showLocal ) $sql .= ' WHERE local = 0';
     $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
@@ -683,6 +707,7 @@ function beacon_row_matches(array $row, $search) {
         $row['wwwroot'], $row['dirroot'], $row['apphome'], $row['servicename'],
         $row['servicedesc'], $row['ownername'], $row['owneremail'],
         $row['tsugi_version'], $row['software_version'], $row['recorded_overall'],
+        $row['php'], $row['server_version'], $row['timezone'],
         $row['git_commit'], $row['git_branch'], $row['reported_at'],
         $row['created_at'], $row['updated_at'], $row['comment'],
         $row['hostname'], $row['client_ip'], $row['client_host'], $row['schemas_json'], $row['highest_migration_path'],
@@ -751,7 +776,7 @@ function beacon_one(PDO $pdo, $id) {
             server_version, server_below_minimum, driver, prefix, schemas_json,
             git_commit, git_branch, php, sapi, os, os_release, hostname, timezone,
             server_software, reported_at, comment, created_at, updated_at, client_ip, client_host,
-            (SELECT COUNT(*) FROM beacon_history h WHERE h.install_id = beacon_install.id) AS upgrade_count
+            upgrade_count
         FROM beacon_install WHERE id = ?');
     $stmt->execute(array($id));
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -761,7 +786,7 @@ function beacon_one(PDO $pdo, $id) {
 function beacon_history_for(PDO $pdo, $id) {
     if ( ! is_string($id) || ! preg_match('/^[0-9a-f]{64}$/', $id) ) return array();
     $stmt = $pdo->prepare('SELECT reported_at, software_version, recorded_overall, git_commit, git_branch, http_status,
-            created_at, updated_at, client_ip, client_host
+            created_at, updated_at, client_ip, client_host, php, server_version
         FROM beacon_history WHERE install_id = ? ORDER BY updated_at DESC, created_at DESC, id DESC');
     $stmt->execute(array($id));
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -769,11 +794,6 @@ function beacon_history_for(PDO $pdo, $id) {
 
 function beacon_exact($obj, $key, $expected) {
     return is_object($obj) && property_exists($obj, $key) && is_string($obj->$key) && $obj->$key === $expected;
-}
-
-function beacon_object($obj, $key) {
-    if ( ! is_object($obj) || ! property_exists($obj, $key) || ! is_object($obj->$key) ) return null;
-    return $obj->$key;
 }
 
 function beacon_required_string($obj, $key, $max, &$bad) {
@@ -795,14 +815,6 @@ function beacon_optional_string($obj, $key, $max, &$bad) {
     if ( ! is_string($obj->$key) || strlen($obj->$key) > $max || strpos($obj->$key, "\0") !== false ) {
         $bad = true;
         return null;
-    }
-    return $obj->$key;
-}
-
-function beacon_bool($obj, $key, &$bad) {
-    if ( ! is_object($obj) || ! property_exists($obj, $key) || ! is_bool($obj->$key) ) {
-        $bad = true;
-        return false;
     }
     return $obj->$key;
 }
@@ -859,30 +871,4 @@ function beacon_git_branch($git, &$bad) {
         return null;
     }
     return $git->branch;
-}
-
-function beacon_schemas($database, &$bad) {
-    if ( ! property_exists($database, 'schemas') || $database->schemas === null ) {
-        return new stdClass();
-    }
-    $schemas = $database->schemas;
-    if ( ! is_object($schemas) ) {
-        $bad = true;
-        return null;
-    }
-    $clean = new stdClass();
-    $n = 0;
-    foreach ( $schemas as $path => $version ) {
-        $n++;
-        if ( $n > BEACON_MAX_SCHEMAS || ! is_string($path) || $path === '' || strlen($path) > 300 || strpos($path, "\0") !== false ) {
-            $bad = true;
-            return null;
-        }
-        if ( ! is_int($version) ) {
-            $bad = true;
-            return null;
-        }
-        $clean->$path = $version;
-    }
-    return $clean;
 }

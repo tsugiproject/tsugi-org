@@ -63,7 +63,7 @@ if ( ! $unlocked ) {
 
 echo '<p>';
 echo '<a href="' . beacon_page_qs('installs', $showLocal, $sort, $dir, $search) . '">By install</a>';
-echo ' · <a href="' . beacon_page_qs('wwwroot', $showLocal, $sort, $dir, $search) . '">By wwwroot</a>';
+echo ' · <a href="' . beacon_page_qs('wwwroot', $showLocal, $sort, $dir, $search) . '">By host</a>';
 if ( $showLocal ) {
     echo ' · <a href="' . beacon_page_qs($view, false, $sort, $dir, $search) . '">Hide local</a>';
 } else {
@@ -71,7 +71,7 @@ if ( $showLocal ) {
 }
 echo "</p>\n";
 if ( ! $showLocal ) {
-    echo '<p>Local installs stay in the database and are left out of this list. A local wwwroot uses localhost, 127.0.0.1, ::1, a host that starts with local., or a host that ends with .local or .localhost.</p>'."\n";
+    echo '<p>Local installs stay in the database and are left out of this list. A local host is localhost, 127.0.0.1, ::1, a name that starts with local., or a name that ends with .local or .localhost.</p>'."\n";
 }
 
 try {
@@ -140,7 +140,7 @@ if ( $view === 'wwwroot' ) {
     }
     foreach ( $groups as $wwwroot => $group ) {
         echo '<h2>' . beacon_page_h($wwwroot) . '</h2>'."\n";
-        echo '<p>' . count($group) . ' install' . (count($group) === 1 ? '' : 's') . ' share this wwwroot.</p>'."\n";
+        echo '<p>' . count($group) . ' install' . (count($group) === 1 ? '' : 's') . ' share this host.</p>'."\n";
         beacon_page_table($group, $view, $showLocal, $sort, $dir, $search);
     }
 } else {
@@ -174,7 +174,7 @@ function beacon_page_header_link($column, $label, $view, $showLocal, $sort, $dir
 
 function beacon_sort_default_dir($column) {
     $kind = beacon_list_columns()[$column] ?? 'text';
-    if ( $kind === 'number' || $column === 'reported_at' || $column === 'updated_at' || $column === 'created_at' ) {
+    if ( $kind === 'number' || $column === 'updated_at' || $column === 'created_at' ) {
         return 'desc';
     }
     return 'asc';
@@ -186,19 +186,18 @@ function beacon_page_h($value) {
 
 function beacon_page_table(array $rows, $view, $showLocal, $sort, $dir, $search) {
     $headers = array(
-        'wwwroot' => 'wwwroot',
-        'dirroot' => 'dirroot',
+        'wwwroot' => 'Host',
+        'servicename' => 'Service',
         'tsugi_version' => 'Tsugi',
-        'software_version' => 'software_version',
-        'recorded_overall' => 'recorded_overall',
+        'software_version' => 'Database',
+        'php' => 'PHP',
+        'server_version' => 'MySQL',
         'upgrade_count' => 'Upgrades',
-        'reported_at' => 'Last report',
         'updated_at' => 'Updated',
         'created_at' => 'Created',
         'client_ip' => 'IP',
         'git' => 'Git',
         'owner' => 'Owner',
-        'schemas' => 'Schemas',
     );
     echo '<div style="overflow-x:auto">'."\n";
     echo '<table class="table table-striped">'."\n";
@@ -216,12 +215,12 @@ function beacon_page_table(array $rows, $view, $showLocal, $sort, $dir, $search)
         echo '<td><a href="' . beacon_page_h($href) . '">' . beacon_page_h($row['wwwroot']) . '</a>';
         if ( (int) $row['local'] === 1 ) echo ' <span>(local)</span>';
         echo '</td>';
-        echo '<td>' . beacon_page_h($row['dirroot']) . '</td>';
+        echo '<td>' . beacon_page_h($row['servicename']) . '</td>';
         echo '<td>' . beacon_page_h($row['tsugi_version']) . '</td>';
         echo '<td>' . beacon_page_h($row['software_version']) . '</td>';
-        echo '<td>' . beacon_page_h($row['recorded_overall']) . '</td>';
+        echo '<td>' . beacon_page_h($row['php']) . '</td>';
+        echo '<td>' . beacon_page_h($row['server_version']) . '</td>';
         echo '<td>' . (int) $row['upgrade_count'] . '</td>';
-        echo '<td>' . beacon_page_h($row['reported_at']) . '</td>';
         echo '<td>' . beacon_page_h($row['updated_at']) . '</td>';
         echo '<td>' . beacon_page_h($row['created_at']) . '</td>';
         echo '<td>' . beacon_page_client($row) . '</td>';
@@ -231,7 +230,6 @@ function beacon_page_table(array $rows, $view, $showLocal, $sort, $dir, $search)
             echo '<br/>' . beacon_page_h($row['owneremail']);
         }
         echo '</td>';
-        echo '<td>' . beacon_page_schemas($row['schemas_json']) . '</td>';
         echo '<td>';
         beacon_page_delete_form($row['id'], $view, $showLocal, $sort, $dir, $search);
         echo '</td>';
@@ -284,46 +282,22 @@ function beacon_page_git(array $row) {
     return implode(' ', $parts);
 }
 
-function beacon_page_schemas($json) {
-    $decoded = json_decode((string) $json, true);
-    if ( ! is_array($decoded) ) return '';
-    $n = count($decoded);
-    if ( $n < 1 ) return '0';
-    $html = '<details><summary>' . $n . '</summary><ul>';
-    foreach ( $decoded as $path => $version ) {
-        $html .= '<li>' . beacon_page_h($path) . ' ' . beacon_page_h($version) . '</li>';
-    }
-    $html .= '</ul></details>';
-    return $html;
-}
-
 function beacon_page_detail(array $row, array $history, array $places = array()) {
     echo '<p><a href="' . beacon_page_h('?id=' . $row['id']) . '">' . beacon_page_h($row['wwwroot']) . '</a>';
     if ( (int) $row['local'] === 1 ) echo ' (local, hidden from the default list)';
     echo '</p>'."\n";
     echo '<table class="table">'."\n";
     $fields = array(
-        'dirroot' => 'dirroot',
-        'apphome' => 'apphome',
+        'wwwroot' => 'host',
         'servicename' => 'service',
         'ownername' => 'owner',
         'owneremail' => 'owner email',
         'tsugi_version' => 'Tsugi',
-        'software_version' => 'database software_version',
-        'recorded_overall' => 'recorded_overall',
-        'highest_migration' => 'highest migration',
-        'highest_migration_path' => 'highest migration path',
-        'server_version' => 'database server',
-        'driver' => 'driver',
-        'prefix' => 'prefix',
+        'software_version' => 'database version',
+        'server_version' => 'MySQL',
         'php' => 'PHP',
-        'sapi' => 'SAPI',
-        'os' => 'OS',
-        'os_release' => 'OS release',
-        'hostname' => 'hostname',
-        'timezone' => 'timezone',
-        'server_software' => 'server software',
         'reported_at' => 'last report',
+        'timezone' => 'timezone',
         'updated_at' => 'updated',
         'created_at' => 'created',
         'client_ip' => 'client IP',
@@ -343,7 +317,6 @@ function beacon_page_detail(array $row, array $history, array $places = array())
     }
     echo '<tr><th>upgrades</th><td>' . (int) $row['upgrade_count'] . '</td></tr>'."\n";
     echo '<tr><th>git</th><td>' . beacon_page_git($row) . '</td></tr>'."\n";
-    echo '<tr><th>schemas</th><td>' . beacon_page_schemas($row['schemas_json']) . '</td></tr>'."\n";
     echo "</table>\n";
 
     echo '<h2>Upgrade history</h2>'."\n";
@@ -352,15 +325,14 @@ function beacon_page_detail(array $row, array $history, array $places = array())
         return;
     }
     echo '<table class="table table-striped">'."\n";
-    echo '<thead><tr><th>Reported</th><th>Updated</th><th>Created</th><th>IP</th><th>software_version</th><th>recorded_overall</th><th>Git</th><th>HTTP</th></tr></thead><tbody>'."\n";
+    echo '<thead><tr><th>Reported</th><th>PHP</th><th>MySQL</th><th>IP</th><th>Database</th><th>Git</th><th>HTTP</th></tr></thead><tbody>'."\n";
     foreach ( $history as $item ) {
         echo '<tr>';
         echo '<td>' . beacon_page_h($item['reported_at']) . '</td>';
-        echo '<td>' . beacon_page_h($item['updated_at']) . '</td>';
-        echo '<td>' . beacon_page_h($item['created_at']) . '</td>';
+        echo '<td>' . beacon_page_h($item['php']) . '</td>';
+        echo '<td>' . beacon_page_h($item['server_version']) . '</td>';
         echo '<td>' . beacon_page_client($item, beacon_page_place($places[$item['client_ip'] ?? ''] ?? null)) . '</td>';
         echo '<td>' . beacon_page_h($item['software_version']) . '</td>';
-        echo '<td>' . beacon_page_h($item['recorded_overall']) . '</td>';
         echo '<td>' . beacon_page_git($item) . '</td>';
         echo '<td>' . beacon_page_h($item['http_status']) . '</td>';
         echo "</tr>\n";
