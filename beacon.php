@@ -67,15 +67,17 @@ tr.beacon-new > td { background-color: #e7f6ea !important; }
 #beacon-detail.beacon-show-ip tr.beacon-ip { display: table-row; }
 #beacon-detail.beacon-show-ip .beacon-ip { display: table-cell; }
 </style>'."\n";
-echo '<p>';
-if ( $showLocal ) {
-    echo '<a href="' . beacon_page_qs(false, $sort, $dir, $search) . '">Real URLs</a>';
-} else {
-    echo '<a href="' . beacon_page_qs(true, $sort, $dir, $search) . '">Local</a>';
-}
-echo "</p>\n";
-if ( $showLocal ) {
-    echo '<p>This list is local hosts only. A local host is localhost, 127.0.0.1, ::1, a name that starts with local., or a name that ends with .local or .localhost.</p>'."\n";
+if ( $wantId === '' ) {
+    echo '<p>';
+    if ( $showLocal ) {
+        echo '<a href="' . beacon_page_qs(false, $sort, $dir, $search) . '">Real URLs</a>';
+    } else {
+        echo '<a href="' . beacon_page_qs(true, $sort, $dir, $search) . '">Local</a>';
+    }
+    echo "</p>\n";
+    if ( $showLocal ) {
+        echo '<p>This list is local hosts only. A local host is localhost, 127.0.0.1, ::1, a name that starts with local., or a name that ends with .local or .localhost.</p>'."\n";
+    }
 }
 
 try {
@@ -92,23 +94,21 @@ if ( $wantId !== '' ) {
     if ( ! preg_match('/^[0-9a-f]{64}$/', $wantId) ) {
         http_response_code(404);
         echo '<p>Unknown install.</p>'."\n";
+        beacon_page_back($showLocal, $sort, $dir, $search);
     } else {
         $one = beacon_one($pdo, $wantId);
         if ( ! $one ) {
             http_response_code(404);
             echo '<p>Unknown install.</p>'."\n";
+            beacon_page_back($showLocal, $sort, $dir, $search);
         } else {
             $history = beacon_history_for($pdo, $wantId);
             $places = beacon_ip_places($pdo, beacon_page_ips($one, $history));
-            $rows = beacon_list($pdo, $showLocal, $sort, $dir, $search);
-            beacon_page_nav($wantId, $rows, $showLocal, $sort, $dir, $search);
+            beacon_page_back($showLocal, $sort, $dir, $search);
             beacon_page_detail($one, $history, $places);
             beacon_page_delete_form($wantId, $showLocal, $sort, $dir, $search);
-            beacon_page_nav($wantId, $rows, $showLocal, $sort, $dir, $search);
+            beacon_page_back($showLocal, $sort, $dir, $search);
         }
-    }
-    if ( ! isset($rows) ) {
-        echo '<p><a href="' . beacon_page_qs($showLocal, $sort, $dir, $search) . '">Back to the list</a></p>'."\n";
     }
     echo "</div>\n";
     $OUTPUT->footer();
@@ -159,29 +159,8 @@ function beacon_page_id_href($id, $showLocal, $sort, $dir, $search) {
     return $href . rawurlencode($id);
 }
 
-function beacon_page_sequence(array $rows) {
-    $ids = array();
-    foreach ( $rows as $row ) $ids[] = $row['id'];
-    return $ids;
-}
-
-function beacon_page_nav($id, array $rows, $showLocal, $sort, $dir, $search) {
-    $ids = beacon_page_sequence($rows);
-    $index = array_search($id, $ids, true);
-    $parts = array();
-    if ( $index !== false && $index > 0 ) {
-        $href = beacon_page_id_href($ids[$index - 1], $showLocal, $sort, $dir, $search);
-        $parts[] = '<a href="' . beacon_page_h($href) . '">Back</a>';
-    }
-    if ( $index !== false ) {
-        $parts[] = ($index + 1) . ' of ' . count($ids);
-    }
-    if ( $index !== false && $index < count($ids) - 1 ) {
-        $href = beacon_page_id_href($ids[$index + 1], $showLocal, $sort, $dir, $search);
-        $parts[] = '<a href="' . beacon_page_h($href) . '">Next</a>';
-    }
-    $parts[] = '<a href="' . beacon_page_h(beacon_page_qs($showLocal, $sort, $dir, $search)) . '">Back to the list</a>';
-    echo '<p>' . implode(' · ', $parts) . '</p>'."\n";
+function beacon_page_back($showLocal, $sort, $dir, $search) {
+    echo '<p><a href="' . beacon_page_h(beacon_page_qs($showLocal, $sort, $dir, $search)) . '">Back to the list</a></p>'."\n";
 }
 
 function beacon_page_qs($showLocal, $sort = 'updated_at', $dir = 'desc', $search = '') {
