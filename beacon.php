@@ -376,7 +376,8 @@ function beacon_page_detail(array $row, array $history, array $places = array())
     );
     foreach ( $fields as $key => $label ) {
         $value = $row[$key];
-        if ( $value === null || $value === '' ) continue;
+        $ownerField = $key === 'ownername' || $key === 'owneremail';
+        if ( ! $ownerField && ($value === null || $value === '') ) continue;
         echo '<tr><th>' . beacon_page_h($label) . '</th><td>' . beacon_page_h($value) . '</td></tr>'."\n";
         if ( $key === 'client_ip' ) {
             $where = beacon_page_place($places[$value] ?? null);
