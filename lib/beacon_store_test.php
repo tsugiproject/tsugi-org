@@ -334,6 +334,16 @@ foreach ( beacon_list($pdo, false, 'not-a-column', 'sideways') as $stampItem ) {
     if ( $stampItem['wwwroot'] === 'stamps.example.edu' ) $fallback[] = $stampItem['owneremail'];
 }
 beacon_test($fallback === $stampList, 'an unknown sort falls back to updated_at descending');
+$byInstalls = array();
+foreach ( beacon_list($pdo, false, 'install_count', 'desc') as $stampItem ) {
+    $byInstalls[] = $stampItem['wwwroot'];
+    if ( $stampItem['wwwroot'] === 'stamps.example.edu' ) {
+        beacon_test((int) $stampItem['install_count'] === 3, 'install count is how many rows share the host');
+    }
+}
+beacon_test($byInstalls[0] === 'stamps.example.edu' && $byInstalls[count($byInstalls) - 1] === 'learn.example.edu', 'list sorts by number of installs');
+$searchedCount = beacon_list($pdo, false, 'install_count', 'desc', 'b@example.edu');
+beacon_test(count($searchedCount) === 1 && (int) $searchedCount[0]['install_count'] === 1, 'install count follows the rows in the list');
 
 $pdo->exec('DELETE FROM `' . $tHistory . '`');
 $pdo->exec('DELETE FROM `' . $tInstall . '`');

@@ -61,6 +61,10 @@ if ( ! $unlocked ) {
     return;
 }
 
+echo '<style>
+.beacon-new-note { color: #157347; font-weight: 600; }
+tr.beacon-new > td { background-color: #e7f6ea !important; }
+</style>'."\n";
 echo '<p>';
 echo '<a href="' . beacon_page_qs('installs', $showLocal, $sort, $dir, $search) . '">By install</a>';
 echo ' · <a href="' . beacon_page_qs('wwwroot', $showLocal, $sort, $dir, $search) . '">By host</a>';
@@ -132,6 +136,13 @@ if ( count($rows) < 1 ) {
 if ( $search !== '' ) {
     echo '<p>' . count($rows) . ' match' . (count($rows) === 1 ? '' : 'es') . '.</p>'."\n";
 }
+$newCount = 0;
+foreach ( $rows as $row ) {
+    if ( beacon_page_is_new($row) ) $newCount++;
+}
+if ( $newCount > 0 ) {
+    echo '<p class="beacon-new-note">' . $newCount . ' new</p>'."\n";
+}
 
 if ( $view === 'wwwroot' ) {
     $groups = array();
@@ -184,9 +195,19 @@ function beacon_page_h($value) {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
+function beacon_page_upgrades(array $row) {
+    $count = (int) ($row['upgrade_count'] ?? 0);
+    return $count > 0 ? $count - 1 : 0;
+}
+
+function beacon_page_is_new(array $row) {
+    return beacon_page_upgrades($row) === 0;
+}
+
 function beacon_page_table(array $rows, $view, $showLocal, $sort, $dir, $search) {
     $headers = array(
         'wwwroot' => 'Host',
+        'install_count' => 'Installs',
         'servicename' => 'Service',
         'tsugi_version' => 'Tsugi',
         'software_version' => 'Database',
@@ -211,16 +232,20 @@ function beacon_page_table(array $rows, $view, $showLocal, $sort, $dir, $search)
         $href = beacon_page_qs($view, $showLocal, $sort, $dir, $search);
         $href .= ($href === '?') ? 'id=' : '&id=';
         $href .= rawurlencode($row['id']);
-        echo '<tr>';
+        $upgrades = beacon_page_upgrades($row);
+        echo beacon_page_is_new($row) ? '<tr class="beacon-new">' : '<tr>';
         echo '<td><a href="' . beacon_page_h($href) . '">' . beacon_page_h($row['wwwroot']) . '</a>';
         if ( (int) $row['local'] === 1 ) echo ' <span>(local)</span>';
         echo '</td>';
+        echo '<td>' . (int) ($row['install_count'] ?? 0) . '</td>';
         echo '<td>' . beacon_page_h($row['servicename']) . '</td>';
         echo '<td>' . beacon_page_h($row['tsugi_version']) . '</td>';
         echo '<td>' . beacon_page_h($row['software_version']) . '</td>';
         echo '<td>' . beacon_page_h($row['php']) . '</td>';
         echo '<td>' . beacon_page_h($row['server_version']) . '</td>';
-        echo '<td>' . (int) $row['upgrade_count'] . '</td>';
+        echo '<td>' . $upgrades;
+        if ( $upgrades === 0 ) echo ' <span class="beacon-new-note">new</span>';
+        echo '</td>';
         echo '<td>' . beacon_page_h($row['updated_at']) . '</td>';
         echo '<td>' . beacon_page_h($row['created_at']) . '</td>';
         echo '<td>' . beacon_page_client($row) . '</td>';
@@ -315,7 +340,10 @@ function beacon_page_detail(array $row, array $history, array $places = array())
             }
         }
     }
-    echo '<tr><th>upgrades</th><td>' . (int) $row['upgrade_count'] . '</td></tr>'."\n";
+    $upgrades = beacon_page_upgrades($row);
+    echo '<tr><th>upgrades</th><td>' . $upgrades;
+    if ( $upgrades === 0 ) echo ' <span class="beacon-new-note">new</span>';
+    echo '</td></tr>'."\n";
     echo '<tr><th>git</th><td>' . beacon_page_git($row) . '</td></tr>'."\n";
     echo "</table>\n";
 

@@ -575,6 +575,7 @@ function beacon_handle($method, $raw, $pdo = null) {
 function beacon_list_columns() {
     return array(
         'wwwroot' => 'text',
+        'install_count' => 'number',
         'servicename' => 'text',
         'tsugi_version' => 'version',
         'software_version' => 'number',
@@ -605,6 +606,15 @@ function beacon_list(PDO $pdo, $showLocal, $sort = 'updated_at', $dir = 'desc', 
         $rows = array_values(array_filter($rows, function ($row) use ($search) {
             return beacon_row_matches($row, $search);
         }));
+    }
+    $counts = array();
+    foreach ( $rows as $row ) {
+        $host = (string) $row['wwwroot'];
+        if ( ! isset($counts[$host]) ) $counts[$host] = 0;
+        $counts[$host]++;
+    }
+    foreach ( $rows as $i => $row ) {
+        $rows[$i]['install_count'] = $counts[(string) $row['wwwroot']];
     }
     usort($rows, function ($a, $b) use ($sort, $dir) {
         return beacon_row_cmp($a, $b, $sort, $dir);
