@@ -100,11 +100,16 @@ if ( $wantId !== '' ) {
         } else {
             $history = beacon_history_for($pdo, $wantId);
             $places = beacon_ip_places($pdo, beacon_page_ips($one, $history));
+            $rows = beacon_list($pdo, $showLocal, $sort, $dir, $search);
+            beacon_page_nav($wantId, $rows, $view, $showLocal, $sort, $dir, $search);
             beacon_page_detail($one, $history, $places);
             beacon_page_delete_form($wantId, $view, $showLocal, $sort, $dir, $search);
+            beacon_page_nav($wantId, $rows, $view, $showLocal, $sort, $dir, $search);
         }
     }
-    echo '<p><a href="' . beacon_page_qs($view, $showLocal, $sort, $dir, $search) . '">Back to the list</a></p>'."\n";
+    if ( ! isset($rows) ) {
+        echo '<p><a href="' . beacon_page_qs($view, $showLocal, $sort, $dir, $search) . '">Back to the list</a></p>'."\n";
+    }
     echo "</div>\n";
     $OUTPUT->footer();
     return;
@@ -160,6 +165,48 @@ if ( $view === 'wwwroot' ) {
 
 echo "</div>\n";
 $OUTPUT->footer();
+
+function beacon_page_id_href($id, $view, $showLocal, $sort, $dir, $search) {
+    $href = beacon_page_qs($view, $showLocal, $sort, $dir, $search);
+    $href .= ($href === '?') ? 'id=' : '&id=';
+    return $href . rawurlencode($id);
+}
+
+function beacon_page_sequence(array $rows, $view) {
+    if ( $view !== 'wwwroot' ) {
+        $ids = array();
+        foreach ( $rows as $row ) $ids[] = $row['id'];
+        return $ids;
+    }
+    $groups = array();
+    foreach ( $rows as $row ) {
+        $groups[$row['wwwroot']][] = $row['id'];
+    }
+    $ids = array();
+    foreach ( $groups as $group ) {
+        foreach ( $group as $id ) $ids[] = $id;
+    }
+    return $ids;
+}
+
+function beacon_page_nav($id, array $rows, $view, $showLocal, $sort, $dir, $search) {
+    $ids = beacon_page_sequence($rows, $view);
+    $index = array_search($id, $ids, true);
+    $parts = array();
+    if ( $index !== false && $index > 0 ) {
+        $href = beacon_page_id_href($ids[$index - 1], $view, $showLocal, $sort, $dir, $search);
+        $parts[] = '<a href="' . beacon_page_h($href) . '">Back</a>';
+    }
+    if ( $index !== false ) {
+        $parts[] = ($index + 1) . ' of ' . count($ids);
+    }
+    if ( $index !== false && $index < count($ids) - 1 ) {
+        $href = beacon_page_id_href($ids[$index + 1], $view, $showLocal, $sort, $dir, $search);
+        $parts[] = '<a href="' . beacon_page_h($href) . '">Next</a>';
+    }
+    $parts[] = '<a href="' . beacon_page_h(beacon_page_qs($view, $showLocal, $sort, $dir, $search)) . '">Back to the list</a>';
+    echo '<p>' . implode(' · ', $parts) . '</p>'."\n";
+}
 
 function beacon_page_qs($view, $showLocal, $sort = 'updated_at', $dir = 'desc', $search = '') {
     $q = array();
@@ -229,9 +276,7 @@ function beacon_page_table(array $rows, $view, $showLocal, $sort, $dir, $search)
     echo "<th></th>";
     echo "</tr></thead>\n<tbody>\n";
     foreach ( $rows as $row ) {
-        $href = beacon_page_qs($view, $showLocal, $sort, $dir, $search);
-        $href .= ($href === '?') ? 'id=' : '&id=';
-        $href .= rawurlencode($row['id']);
+        $href = beacon_page_id_href($row['id'], $view, $showLocal, $sort, $dir, $search);
         $upgrades = beacon_page_upgrades($row);
         echo beacon_page_is_new($row) ? '<tr class="beacon-new">' : '<tr>';
         echo '<td><a href="' . beacon_page_h($href) . '">' . beacon_page_h($row['wwwroot']) . '</a>';
