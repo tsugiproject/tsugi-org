@@ -353,10 +353,11 @@ function beacon_page_detail(array $row, array $history, array $places = array())
         return;
     }
     echo '<table class="table table-striped">'."\n";
-    echo '<thead><tr><th>Reported</th><th>PHP</th><th>MySQL</th><th>IP</th><th>Database</th><th>Git</th><th>HTTP</th></tr></thead><tbody>'."\n";
+    echo '<thead><tr><th>Reported</th><th>Updated</th><th>PHP</th><th>MySQL</th><th>IP</th><th>Database</th><th>Git</th><th>HTTP</th></tr></thead><tbody>'."\n";
     foreach ( $history as $item ) {
         echo '<tr>';
         echo '<td>' . beacon_page_h($item['reported_at']) . '</td>';
+        echo '<td>' . beacon_page_h($item['updated_at']) . '</td>';
         echo '<td>' . beacon_page_h($item['php']) . '</td>';
         echo '<td>' . beacon_page_h($item['server_version']) . '</td>';
         echo '<td>' . beacon_page_client($item, beacon_page_place($places[$item['client_ip'] ?? ''] ?? null)) . '</td>';
@@ -366,7 +367,7 @@ function beacon_page_detail(array $row, array $history, array $places = array())
         echo "</tr>\n";
         $comment = is_string($item['comment'] ?? null) ? $item['comment'] : '';
         if ( $comment !== '' ) {
-            echo '<tr><td colspan="7" style="border-top:0;padding-top:0;white-space:pre-wrap;">' . beacon_page_h($comment) . '</td></tr>'."\n";
+            echo '<tr><td colspan="8" style="border-top:0;padding-top:0;white-space:pre-wrap;">' . beacon_page_h($comment) . '</td></tr>'."\n";
         }
     }
     echo "</tbody></table>\n";

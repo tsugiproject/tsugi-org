@@ -177,7 +177,7 @@ foreach ( $publicRows as $row ) $seen[$row['wwwroot']] = true;
 beacon_test(count($seen) === 1, 'those installs group by host');
 
 $version = $pdo->query('SELECT version FROM `' . $tSchema . '`')->fetchColumn();
-beacon_test((int) $version === 2, 'migration records schema version 2');
+beacon_test((int) $version === 3, 'migration records schema version 3');
 beacon_open();
 $versionRows = $pdo->query('SELECT COUNT(*) FROM `' . $tSchema . '`')->fetchColumn();
 beacon_test((int) $versionRows === 1, 'migration does not insert a second version row');
@@ -186,6 +186,11 @@ beacon_schema_set($pdo, 1);
 beacon_migrate($pdo);
 $migratedHistory = beacon_history_for($pdo, $rows[0]['id']);
 beacon_test($migratedHistory[0]['comment'] === '', 'migration 2 adds comment onto history rows already stored');
+$pdo->exec('ALTER TABLE `' . $tHistory . '` DROP COLUMN updated_at');
+beacon_schema_set($pdo, 2);
+beacon_migrate($pdo);
+$migratedTimes = beacon_history_for($pdo, $rows[0]['id']);
+beacon_test($migratedTimes[0]['updated_at'] === $migratedTimes[0]['received_at'], 'migration 3 copies the received time onto updated_at');
 
 $cases = array(
     array('report_version' => 2),
@@ -298,6 +303,8 @@ beacon_test($stampRow['updated_at'] === '2026-08-01T00:00:00Z', 'updated_at move
 $stampHistory = beacon_history_for($pdo, $stampAccepted['snapshot']['id']);
 beacon_test($stampHistory[0]['received_at'] === '2026-08-01T00:00:00Z', 'history sorts by when the report was received');
 beacon_test($stampHistory[1]['received_at'] === '2026-01-01T00:00:00Z', 'an older history row keeps its received time');
+beacon_test($stampHistory[0]['updated_at'] === '2026-08-01T00:00:00Z', 'history records when the report was stored');
+beacon_test($stampHistory[1]['updated_at'] === '2026-01-01T00:00:00Z', 'an older history row keeps its updated time');
 $stampList = array();
 foreach ( beacon_list($pdo, false) as $stampItem ) {
     if ( $stampItem['wwwroot'] === 'stamps.example.edu' ) $stampList[] = $stampItem['owneremail'];
@@ -351,13 +358,13 @@ $insertOld = $pdo->prepare('INSERT INTO `' . $tInstall . '` (
         id, wwwroot, local, reported_at, comment, created_at, updated_at, upgrade_count
     ) VALUES (?, ?, 0, ?, \'\', ?, ?, 0)');
 $insertHist = $pdo->prepare('INSERT INTO `' . $tHistory . '` (
-        install_id, reported_at, software_version, http_status, received_at
-    ) VALUES (?, ?, 1, 200, ?)');
+        install_id, reported_at, software_version, http_status, received_at, updated_at
+    ) VALUES (?, ?, 1, 200, ?, ?)');
 for ( $n = 1; $n <= 4; $n++ ) {
     $oldId = str_repeat((string) $n, 64);
     $stamp = '2020-0' . $n . '-01T00:00:00Z';
     $insertOld->execute(array($oldId, 'https://old-' . $n . '.example.edu', $stamp, $stamp, $stamp));
-    $insertHist->execute(array($oldId, $stamp, $stamp));
+    $insertHist->execute(array($oldId, $stamp, $stamp, $stamp));
 }
 beacon_prune($pdo, 3);
 $kept = $pdo->query('SELECT wwwroot FROM `' . $tInstall . '` ORDER BY updated_at ASC')->fetchAll(PDO::FETCH_COLUMN);
@@ -371,7 +378,7 @@ beacon_test($goneHistory === 0, 'prune deletes history for the earliest install'
 beacon_test(BEACON_MAX_HISTORY === 20000, 'history is capped at 20000 rows');
 for ( $n = 1; $n <= 3; $n++ ) {
     $stamp = '2019-0' . $n . '-01T00:00:00Z';
-    $insertHist->execute(array(str_repeat('2', 64), $stamp, $stamp));
+    $insertHist->execute(array(str_repeat('2', 64), $stamp, $stamp, $stamp));
 }
 beacon_prune_history($pdo, 4);
 $historyLeft = $pdo->query('SELECT reported_at FROM `' . $tHistory . '` ORDER BY received_at ASC, id ASC')->fetchAll(PDO::FETCH_COLUMN);
@@ -387,8 +394,8 @@ $pdo->prepare('INSERT INTO `' . $tInstall . '` (
         id, wwwroot, local, reported_at, comment, created_at, updated_at, upgrade_count
     ) VALUES (?, \'https://delete.example.edu\', 0, \'2020-01-01T00:00:00Z\', \'\', \'2020-01-01T00:00:00Z\', \'2020-01-01T00:00:00Z\', 0)')->execute(array($deleteId));
 $pdo->prepare('INSERT INTO `' . $tHistory . '` (
-        install_id, reported_at, software_version, http_status, received_at
-    ) VALUES (?, \'2020-01-01T00:00:00Z\', 1, 200, \'2020-01-01T00:00:00Z\')')->execute(array($deleteId));
+        install_id, reported_at, software_version, http_status, received_at, updated_at
+    ) VALUES (?, \'2020-01-01T00:00:00Z\', 1, 200, \'2020-01-01T00:00:00Z\', \'2020-01-01T00:00:00Z\')')->execute(array($deleteId));
 beacon_test(beacon_delete($pdo, 'not-an-id') === false, 'delete rejects a bad id');
 beacon_test(beacon_delete($pdo, $deleteId) === true, 'delete removes an install');
 beacon_test(beacon_one($pdo, $deleteId) === null, 'deleted install is gone');

@@ -9,7 +9,7 @@
  * are ignored, and the install id preimage is never stored.
  */
 
-const BEACON_SCHEMA_VERSION = 2;
+const BEACON_SCHEMA_VERSION = 3;
 const BEACON_IP_PLACE_DAYS = 21;
 const BEACON_MAX_BODY = 5120;
 const BEACON_MAX_COMMENT = 1024;
@@ -102,6 +102,7 @@ function beacon_migrate(PDO $pdo) {
         git_branch VARCHAR(255) NULL,
         http_status SMALLINT NOT NULL,
         received_at CHAR(20) NOT NULL,
+        updated_at CHAR(20) NOT NULL,
         comment TEXT NOT NULL DEFAULT (\'\'),
         client_ip VARCHAR(45) NULL,
         client_host VARCHAR(255) NULL,
@@ -118,6 +119,7 @@ function beacon_migrate(PDO $pdo) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci');
     if ( beacon_schema_version($pdo) < 1 ) beacon_schema_set($pdo, 1);
     if ( beacon_schema_version($pdo) < 2 ) beacon_migrate_2($pdo);
+    if ( beacon_schema_version($pdo) < 3 ) beacon_migrate_3($pdo);
 }
 
 function beacon_migrate_2(PDO $pdo) {
@@ -126,6 +128,16 @@ function beacon_migrate_2(PDO $pdo) {
         $pdo->exec('ALTER TABLE `' . $history . '` ADD COLUMN comment TEXT NOT NULL DEFAULT (\'\')');
     }
     beacon_schema_set($pdo, 2);
+}
+
+function beacon_migrate_3(PDO $pdo) {
+    $history = beacon_table('history');
+    if ( ! beacon_column_exists($pdo, $history, 'updated_at') ) {
+        $pdo->exec('ALTER TABLE `' . $history . '` ADD COLUMN updated_at CHAR(20) NULL');
+    }
+    $pdo->exec('UPDATE `' . $history . '` SET updated_at = received_at WHERE updated_at IS NULL');
+    $pdo->exec('ALTER TABLE `' . $history . '` MODIFY updated_at CHAR(20) NOT NULL');
+    beacon_schema_set($pdo, 3);
 }
 
 function beacon_column_exists(PDO $pdo, $table, $column) {
@@ -271,6 +283,7 @@ function beacon_save(PDO $pdo, array $snapshot, array $history, $httpStatus, $no
     $snapshot['client_ip'] = $client['ip'];
     $snapshot['client_host'] = $client['host'];
     $history['received_at'] = $now;
+    $history['updated_at'] = $now;
     $history['client_ip'] = $client['ip'];
     $history['client_host'] = $client['host'];
     $pdo->beginTransaction();
@@ -307,10 +320,10 @@ function beacon_save(PDO $pdo, array $snapshot, array $history, $httpStatus, $no
     $stmt->execute($snapshot);
     $hist = $pdo->prepare('INSERT INTO `' . $historyTable . '` (
             install_id, reported_at, software_version, git_commit, git_branch, http_status,
-            received_at, client_ip, client_host, php, server_version, comment
+            received_at, updated_at, client_ip, client_host, php, server_version, comment
         ) VALUES (
             :install_id, :reported_at, :software_version, :git_commit, :git_branch, :http_status,
-            :received_at, :client_ip, :client_host, :php, :server_version, :comment
+            :received_at, :updated_at, :client_ip, :client_host, :php, :server_version, :comment
         )');
     $history['http_status'] = (int) $httpStatus;
     $hist->execute($history);
@@ -704,8 +717,8 @@ function beacon_one(PDO $pdo, $id) {
 function beacon_history_for(PDO $pdo, $id) {
     if ( ! is_string($id) || ! preg_match('/^[0-9a-f]{64}$/', $id) ) return array();
     $stmt = $pdo->prepare('SELECT reported_at, software_version, git_commit, git_branch, http_status,
-            received_at, client_ip, client_host, php, server_version, comment
-        FROM `' . beacon_table('history') . '` WHERE install_id = ? ORDER BY received_at DESC, id DESC');
+            received_at, updated_at, client_ip, client_host, php, server_version, comment
+        FROM `' . beacon_table('history') . '` WHERE install_id = ? ORDER BY updated_at DESC, id DESC');
     $stmt->execute(array($id));
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
