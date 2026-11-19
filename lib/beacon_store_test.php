@@ -192,7 +192,7 @@ foreach ( $publicRows as $row ) $seen[$row['wwwroot']] = true;
 beacon_test(count($seen) === 1, 'those installs group by wwwroot');
 
 $version = $pdo->query('SELECT version FROM beacon_schema')->fetchColumn();
-beacon_test((int) $version === 2, 'migration records schema version 2');
+beacon_test((int) $version === 4, 'migration records schema version 4');
 beacon_open($path);
 $versionRows = $pdo->query('SELECT COUNT(*) FROM beacon_schema')->fetchColumn();
 beacon_test((int) $versionRows === 1, 'migration does not insert a second version row');
@@ -333,6 +333,7 @@ unset($old);
 $upgraded = beacon_open($oldPath);
 $oldRow = beacon_one($upgraded, '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef');
 beacon_test($oldRow['created_at'] === '2024-05-01T00:00:00Z' && $oldRow['updated_at'] === '2024-05-01T00:00:00Z', 'migration 2 backfills both timestamps from reported_at');
+beacon_test($oldRow['client_ip'] === null && $oldRow['client_host'] === null, 'migration 3 leaves older rows without an address');
 unset($upgraded);
 unlink($oldPath);
 
@@ -373,6 +374,78 @@ beacon_test(beacon_delete($pdo, $deleteId) === true, 'delete removes an install'
 beacon_test(beacon_one($pdo, $deleteId) === null, 'deleted install is gone');
 beacon_test(count(beacon_history_for($pdo, $deleteId)) === 0, 'delete removes that install history');
 beacon_test((int) $pdo->query('SELECT COUNT(*) FROM beacon_install')->fetchColumn() === 3, 'prune stops at the cap');
+
+unset($_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_CF_CONNECTING_IP']);
+beacon_test(beacon_client_ip() === null, 'a missing address stays empty');
+$_SERVER['REMOTE_ADDR'] = '198.51.100.20';
+$_SERVER['HTTP_CF_CONNECTING_IP'] = 'not an ip';
+beacon_test(beacon_client_ip() === '198.51.100.20', 'an invalid cloudflare header falls back to the socket address');
+$_SERVER['HTTP_CF_CONNECTING_IP'] = ' 203.0.113.9 ';
+beacon_test(beacon_client_ip() === '203.0.113.9', 'the cloudflare connecting address is the client');
+beacon_test(beacon_clean_host('203.0.113.9', '203.0.113.9') === null, 'a reverse lookup that echoes the address is empty');
+beacon_test(beacon_clean_host('203.0.113.9', 'learn.example.edu.') === 'learn.example.edu', 'a reverse name drops the trailing dot');
+beacon_test(beacon_clean_host('203.0.113.9', "bad\nhost") === null, 'a reverse name with a control character is dropped');
+
+$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+unset($_SERVER['HTTP_CF_CONNECTING_IP']);
+$ipBody = beacon_test_payload(array('install' => array(
+    'wwwroot' => 'https://ip.example.edu/tsugi',
+    'dirroot' => '/var/www/ip',
+    'owneremail' => null,
+)));
+list($ipStatus,) = beacon_handle('POST', json_encode($ipBody), $pdo);
+$ipRow = beacon_one($pdo, $ipBody['install']['id']);
+beacon_test($ipStatus === 200 && $ipRow['client_ip'] === '127.0.0.1', 'a report records the incoming address');
+$ipHistory = beacon_history_for($pdo, $ipBody['install']['id']);
+beacon_test(count($ipHistory) === 1 && $ipHistory[0]['client_ip'] === '127.0.0.1', 'history records the incoming address');
+beacon_test($ipRow['client_host'] === null && beacon_reverse_host('127.0.0.1') === null, 'localhost gets no reverse lookup');
+$foundIp = beacon_list($pdo, false, 'client_ip', 'asc', '127.0.0.1');
+beacon_test(count($foundIp) === 1 && $foundIp[0]['wwwroot'] === 'https://ip.example.edu/tsugi', 'search finds the recorded address');
+unset($_SERVER['REMOTE_ADDR']);
+
+$placeCalls = 0;
+$placeFetch = function ($ip) use (&$placeCalls) {
+    $placeCalls++;
+    return array('success' => true, 'city' => 'Ann Arbor', 'country_code' => 'us');
+};
+$placeNow = '2026-11-18T00:00:00Z';
+$place = beacon_ip_place($pdo, '8.8.8.8', $placeNow, $placeFetch);
+beacon_test($place['city'] === 'Ann Arbor' && $place['country_code'] === 'US', 'a detail lookup keeps the city and country');
+beacon_ip_place($pdo, '8.8.8.8', '2026-12-01T00:00:00Z', $placeFetch);
+beacon_test($placeCalls === 1, 'a lookup from the past few weeks is reused');
+beacon_ip_place($pdo, '8.8.8.8', '2026-12-20T00:00:00Z', $placeFetch);
+beacon_test($placeCalls === 2, 'a lookup older than three weeks is refreshed');
+$skipped = array('127.0.0.1', '::1', '10.1.2.3', '192.168.1.9', '169.254.1.1', '100.64.1.1', '224.0.0.1', '203.0.113.9', 'localhost');
+$skippedOk = true;
+foreach ( $skipped as $skip ) {
+    if ( beacon_ip_place($pdo, $skip, $placeNow, $placeFetch) !== null ) $skippedOk = false;
+}
+beacon_test($skippedOk && $placeCalls === 2 && beacon_reverse_host('10.9.8.7') === null, 'local and non-routable addresses are not looked up');
+$misses = 0;
+$missFetch = function ($ip) use (&$misses) {
+    $misses++;
+    return array('success' => false);
+};
+$missed = beacon_ip_place($pdo, '1.1.1.1', $placeNow, $missFetch);
+beacon_ip_place($pdo, '1.1.1.1', $placeNow, $missFetch);
+beacon_test($missed['city'] === null && $missed['country_code'] === null && $misses === 1, 'a failed lookup is cached');
+$blips = 0;
+$blipFetch = function ($ip) use (&$blips) {
+    $blips++;
+    return null;
+};
+beacon_test(beacon_ip_place($pdo, '9.9.9.9', $placeNow, $blipFetch) === null, 'a location timeout is left empty');
+beacon_ip_place($pdo, '9.9.9.9', $placeNow, $blipFetch);
+beacon_test($blips === 2, 'a location timeout is tried again later');
+$capped = 0;
+$capFetch = function ($ip) use (&$capped) {
+    $capped++;
+    return array('success' => true, 'city' => 'City', 'country_code' => 'US');
+};
+$many = array();
+for ( $i = 1; $i <= 6; $i++ ) $many[] = '8.8.4.' . $i;
+$got = beacon_ip_places($pdo, $many, $placeNow, $capFetch);
+beacon_test($capped === 4 && count($got) === 4, 'one detail page looks up at most four new addresses');
 
 unset($pdo);
 $blob = file_get_contents($path);

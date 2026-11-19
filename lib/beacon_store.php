@@ -9,7 +9,8 @@
  * is never stored.
  */
 
-const BEACON_SCHEMA_VERSION = 2;
+const BEACON_SCHEMA_VERSION = 4;
+const BEACON_IP_PLACE_DAYS = 21;
 const BEACON_MAX_BODY = 5120;
 const BEACON_MAX_INSTALLS = 5000;
 const BEACON_MAX_SCHEMAS = 300;
@@ -54,7 +55,15 @@ function beacon_migrate(PDO $pdo) {
         beacon_migrate_1($pdo);
         $version = 1;
     }
-    if ( $version < 2 ) beacon_migrate_2($pdo);
+    if ( $version < 2 ) {
+        beacon_migrate_2($pdo);
+        $version = 2;
+    }
+    if ( $version < 3 ) {
+        beacon_migrate_3($pdo);
+        $version = 3;
+    }
+    if ( $version < 4 ) beacon_migrate_4($pdo);
 }
 
 function beacon_migrate_1(PDO $pdo) {
@@ -126,6 +135,28 @@ function beacon_migrate_2(PDO $pdo) {
     $pdo->exec('CREATE INDEX IF NOT EXISTS beacon_install_times ON beacon_install (updated_at, created_at)');
     $pdo->exec('CREATE INDEX IF NOT EXISTS beacon_history_times ON beacon_history (updated_at, created_at)');
     beacon_schema_set($pdo, 2);
+    $pdo->commit();
+}
+
+function beacon_migrate_3(PDO $pdo) {
+    $pdo->beginTransaction();
+    $pdo->exec('ALTER TABLE beacon_install ADD COLUMN client_ip TEXT');
+    $pdo->exec('ALTER TABLE beacon_install ADD COLUMN client_host TEXT');
+    $pdo->exec('ALTER TABLE beacon_history ADD COLUMN client_ip TEXT');
+    $pdo->exec('ALTER TABLE beacon_history ADD COLUMN client_host TEXT');
+    beacon_schema_set($pdo, 3);
+    $pdo->commit();
+}
+
+function beacon_migrate_4(PDO $pdo) {
+    $pdo->beginTransaction();
+    $pdo->exec('CREATE TABLE IF NOT EXISTS beacon_ip_place (
+        ip TEXT PRIMARY KEY,
+        city TEXT,
+        country_code TEXT,
+        looked_up_at TEXT NOT NULL
+    )');
+    beacon_schema_set($pdo, 4);
     $pdo->commit();
 }
 
@@ -295,8 +326,13 @@ function beacon_save(PDO $pdo, array $snapshot, array $history, $httpStatus, $no
     if ( ! is_string($now) || $now === '' ) $now = gmdate('Y-m-d\TH:i:s\Z');
     $snapshot['created_at'] = $now;
     $snapshot['updated_at'] = $now;
+    $client = beacon_client_address();
+    $snapshot['client_ip'] = $client['ip'];
+    $snapshot['client_host'] = $client['host'];
     $history['created_at'] = $now;
     $history['updated_at'] = $now;
+    $history['client_ip'] = $client['ip'];
+    $history['client_host'] = $client['host'];
     $pdo->beginTransaction();
     try {
     $sql = 'INSERT INTO beacon_install (
@@ -305,14 +341,14 @@ function beacon_save(PDO $pdo, array $snapshot, array $history, $httpStatus, $no
             software_version, highest_migration, highest_migration_path, recorded_overall,
             server_version, server_below_minimum, driver, prefix, schemas_json,
             git_commit, git_branch, php, sapi, os, os_release, hostname, timezone,
-            server_software, reported_at, comment, created_at, updated_at
+            server_software, reported_at, comment, created_at, updated_at, client_ip, client_host
         ) VALUES (
             :id, :wwwroot, :apphome, :dirroot, :servicename, :servicedesc, :ownername, :owneremail,
             :developer, :local, :lessons, :tsugi_version, :minimum_php, :minimum_mysql,
             :software_version, :highest_migration, :highest_migration_path, :recorded_overall,
             :server_version, :server_below_minimum, :driver, :prefix, :schemas_json,
             :git_commit, :git_branch, :php, :sapi, :os, :os_release, :hostname, :timezone,
-            :server_software, :reported_at, :comment, :created_at, :updated_at
+            :server_software, :reported_at, :comment, :created_at, :updated_at, :client_ip, :client_host
         )
         ON CONFLICT(id) DO UPDATE SET
             wwwroot = excluded.wwwroot,
@@ -348,15 +384,17 @@ function beacon_save(PDO $pdo, array $snapshot, array $history, $httpStatus, $no
             server_software = excluded.server_software,
             reported_at = excluded.reported_at,
             comment = excluded.comment,
-            updated_at = excluded.updated_at';
+            updated_at = excluded.updated_at,
+            client_ip = excluded.client_ip,
+            client_host = excluded.client_host';
     $stmt = $pdo->prepare($sql);
     $stmt->execute($snapshot);
     $hist = $pdo->prepare('INSERT INTO beacon_history (
             install_id, reported_at, software_version, recorded_overall,
-            git_commit, git_branch, http_status, created_at, updated_at
+            git_commit, git_branch, http_status, created_at, updated_at, client_ip, client_host
         ) VALUES (
             :install_id, :reported_at, :software_version, :recorded_overall,
-            :git_commit, :git_branch, :http_status, :created_at, :updated_at
+            :git_commit, :git_branch, :http_status, :created_at, :updated_at, :client_ip, :client_host
         )');
     $history['http_status'] = (int) $httpStatus;
     $hist->execute($history);
@@ -403,6 +441,166 @@ function beacon_prune(PDO $pdo, $keep = BEACON_MAX_INSTALLS) {
     }
 }
 
+function beacon_client_address() {
+    $ip = beacon_client_ip();
+    return array(
+        'ip' => $ip,
+        'host' => beacon_reverse_host($ip),
+    );
+}
+
+function beacon_client_ip() {
+    $forwarded = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? '';
+    if ( is_string($forwarded) ) {
+        $forwarded = trim($forwarded);
+        if ( filter_var($forwarded, FILTER_VALIDATE_IP) ) return $forwarded;
+    }
+    $remote = $_SERVER['REMOTE_ADDR'] ?? '';
+    if ( is_string($remote) && filter_var($remote, FILTER_VALIDATE_IP) ) return $remote;
+    return null;
+}
+
+function beacon_reverse_host($ip) {
+    if ( ! beacon_ip_routable($ip) ) return null;
+    $previous = getenv('RES_OPTIONS');
+    putenv('RES_OPTIONS=timeout:1 attempts:1');
+    $name = @gethostbyaddr($ip);
+    if ( $previous === false ) {
+        putenv('RES_OPTIONS');
+    } else {
+        putenv('RES_OPTIONS=' . $previous);
+    }
+    return beacon_clean_host($ip, $name);
+}
+
+function beacon_clean_host($ip, $name) {
+    if ( ! is_string($name) ) return null;
+    $name = rtrim($name, '.');
+    if ( $name === '' || $name === $ip || strlen($name) > 255 ) return null;
+    if ( preg_match('/[\x00-\x1f\x7f]/', $name) ) return null;
+    return $name;
+}
+
+function beacon_ip_places(PDO $pdo, array $ips, $now = null, $fetch = null) {
+    $places = array();
+    $fetched = 0;
+    foreach ( $ips as $ip ) {
+        if ( ! is_string($ip) || $ip === '' || array_key_exists($ip, $places) ) continue;
+        $cached = beacon_ip_place_cached($pdo, $ip, $now);
+        if ( $cached !== null ) {
+            $places[$ip] = $cached;
+            continue;
+        }
+        if ( $fetched >= 4 ) continue;
+        $places[$ip] = beacon_ip_place($pdo, $ip, $now, $fetch);
+        if ( beacon_ip_routable($ip) ) $fetched++;
+    }
+    return $places;
+}
+
+function beacon_ip_place(PDO $pdo, $ip, $now = null, $fetch = null) {
+    if ( ! beacon_ip_routable($ip) ) return null;
+    if ( ! is_string($now) || $now === '' ) $now = gmdate('Y-m-d\TH:i:s\Z');
+    $cached = beacon_ip_place_cached($pdo, $ip, $now);
+    if ( $cached !== null ) return $cached;
+    if ( $fetch === null ) $fetch = 'beacon_ipwho_fetch';
+    $data = $fetch($ip);
+    if ( ! is_array($data) ) return null;
+    $city = null;
+    $country = null;
+    if ( ($data['success'] ?? false) ) {
+        $city = beacon_ip_place_text($data['city'] ?? null, 80);
+        $country = beacon_ip_place_text($data['country_code'] ?? null, 2);
+        if ( is_string($country) ) $country = strtoupper($country);
+        if ( ! is_string($country) || ! preg_match('/^[A-Z]{2}$/', $country) ) $country = null;
+    }
+    $stmt = $pdo->prepare('INSERT INTO beacon_ip_place (ip, city, country_code, looked_up_at)
+        VALUES (:ip, :city, :country_code, :looked_up_at)
+        ON CONFLICT(ip) DO UPDATE SET
+            city = excluded.city,
+            country_code = excluded.country_code,
+            looked_up_at = excluded.looked_up_at');
+    $stmt->execute(array(
+        ':ip' => $ip,
+        ':city' => $city,
+        ':country_code' => $country,
+        ':looked_up_at' => $now,
+    ));
+    return array('city' => $city, 'country_code' => $country);
+}
+
+function beacon_ip_place_cached(PDO $pdo, $ip, $now = null) {
+    if ( ! beacon_ip_routable($ip) ) return null;
+    if ( ! is_string($now) || $now === '' ) $now = gmdate('Y-m-d\TH:i:s\Z');
+    $stmt = $pdo->prepare('SELECT city, country_code, looked_up_at FROM beacon_ip_place WHERE ip = ?');
+    $stmt->execute(array($ip));
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ( ! $row || ! beacon_ip_place_fresh($row['looked_up_at'], $now) ) return null;
+    return array(
+        'city' => $row['city'],
+        'country_code' => $row['country_code'],
+    );
+}
+
+function beacon_ip_place_fresh($lookedUpAt, $now) {
+    $then = DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s\Z', (string) $lookedUpAt, new DateTimeZone('UTC'));
+    $current = DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s\Z', (string) $now, new DateTimeZone('UTC'));
+    if ( ! $then || ! $current ) return false;
+    $age = $current->getTimestamp() - $then->getTimestamp();
+    return $age < BEACON_IP_PLACE_DAYS * 24 * 3600;
+}
+
+function beacon_ip_routable($ip) {
+    if ( ! is_string($ip) ) return false;
+    $ip = trim($ip);
+    if ( filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ) {
+        if ( filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false ) {
+            return false;
+        }
+        $long = ip2long($ip);
+        if ( $long === false ) return false;
+        // Multicast, carrier-grade NAT, and the documentation ranges.
+        if ( ($long & 0xF0000000) === 0xE0000000 ) return false;
+        if ( ($long & 0xFFC00000) === 0x64400000 ) return false;
+        if ( ($long & 0xFFFFFF00) === 0xC0000200 ) return false;
+        if ( ($long & 0xFFFFFF00) === 0xC6336400 ) return false;
+        if ( ($long & 0xFFFFFF00) === 0xCB007100 ) return false;
+        return true;
+    }
+    if ( filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false ) return false;
+    if ( filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false ) {
+        return false;
+    }
+    $bin = inet_pton($ip);
+    if ( ! is_string($bin) || strlen($bin) !== 16 ) return false;
+    if ( ord($bin[0]) === 0xff ) return false;
+    if ( substr($bin, 0, 4) === "\x20\x01\x0d\xb8" ) return false;
+    return true;
+}
+
+function beacon_ip_place_text($value, $max) {
+    if ( ! is_string($value) ) return null;
+    $value = trim($value);
+    if ( $value === '' || strlen($value) > $max ) return null;
+    if ( preg_match('/[\x00-\x1f\x7f]/', $value) ) return null;
+    return $value;
+}
+
+function beacon_ipwho_fetch($ip) {
+    $url = 'https://ipwho.is/' . urlencode($ip);
+    $context = stream_context_create(array(
+        'http' => array(
+            'timeout' => 2,
+            'max_redirects' => 2,
+            'header' => "Accept: application/json\r\nUser-Agent: tsugi-beacon\r\n",
+        ),
+    ));
+    $raw = @file_get_contents($url, false, $context);
+    if ( ! is_string($raw) || $raw === '' || strlen($raw) > 20000 ) return null;
+    $data = json_decode($raw, true);
+    return is_array($data) ? $data : null;
+}
+
 function beacon_read_body() {
     $declared = isset($_SERVER['CONTENT_LENGTH']) ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
     if ( $declared > BEACON_MAX_BODY ) return false;
@@ -438,6 +636,7 @@ function beacon_list_columns() {
         'reported_at' => 'text',
         'updated_at' => 'text',
         'created_at' => 'text',
+        'client_ip' => 'text',
         'git' => 'text',
         'owner' => 'text',
         'schemas' => 'number',
@@ -455,7 +654,7 @@ function beacon_list(PDO $pdo, $showLocal, $sort = 'updated_at', $dir = 'desc', 
             software_version, highest_migration, highest_migration_path, recorded_overall,
             server_version, server_below_minimum, driver, prefix, schemas_json,
             git_commit, git_branch, php, sapi, os, os_release, hostname, timezone,
-            server_software, reported_at, comment, created_at, updated_at,
+            server_software, reported_at, comment, created_at, updated_at, client_ip, client_host,
             (SELECT COUNT(*) FROM beacon_history h WHERE h.install_id = beacon_install.id) AS upgrade_count
         FROM beacon_install';
     if ( ! $showLocal ) $sql .= ' WHERE local = 0';
@@ -486,7 +685,7 @@ function beacon_row_matches(array $row, $search) {
         $row['tsugi_version'], $row['software_version'], $row['recorded_overall'],
         $row['git_commit'], $row['git_branch'], $row['reported_at'],
         $row['created_at'], $row['updated_at'], $row['comment'],
-        $row['hostname'], $row['schemas_json'], $row['highest_migration_path'],
+        $row['hostname'], $row['client_ip'], $row['client_host'], $row['schemas_json'], $row['highest_migration_path'],
     );
     $haystack = beacon_lower(implode("\n", array_map(function ($value) {
         return (string) $value;
@@ -551,7 +750,7 @@ function beacon_one(PDO $pdo, $id) {
             software_version, highest_migration, highest_migration_path, recorded_overall,
             server_version, server_below_minimum, driver, prefix, schemas_json,
             git_commit, git_branch, php, sapi, os, os_release, hostname, timezone,
-            server_software, reported_at, comment, created_at, updated_at,
+            server_software, reported_at, comment, created_at, updated_at, client_ip, client_host,
             (SELECT COUNT(*) FROM beacon_history h WHERE h.install_id = beacon_install.id) AS upgrade_count
         FROM beacon_install WHERE id = ?');
     $stmt->execute(array($id));
@@ -562,7 +761,7 @@ function beacon_one(PDO $pdo, $id) {
 function beacon_history_for(PDO $pdo, $id) {
     if ( ! is_string($id) || ! preg_match('/^[0-9a-f]{64}$/', $id) ) return array();
     $stmt = $pdo->prepare('SELECT reported_at, software_version, recorded_overall, git_commit, git_branch, http_status,
-            created_at, updated_at
+            created_at, updated_at, client_ip, client_host
         FROM beacon_history WHERE install_id = ? ORDER BY updated_at DESC, created_at DESC, id DESC');
     $stmt->execute(array($id));
     return $stmt->fetchAll(PDO::FETCH_ASSOC);

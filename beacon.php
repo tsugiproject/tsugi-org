@@ -94,7 +94,9 @@ if ( $wantId !== '' ) {
             http_response_code(404);
             echo '<p>Unknown install.</p>'."\n";
         } else {
-            beacon_page_detail($one, beacon_history_for($pdo, $wantId));
+            $history = beacon_history_for($pdo, $wantId);
+            $places = beacon_ip_places($pdo, beacon_page_ips($one, $history));
+            beacon_page_detail($one, $history, $places);
             beacon_page_delete_form($wantId, $view, $showLocal, $sort, $dir, $search);
         }
     }
@@ -193,6 +195,7 @@ function beacon_page_table(array $rows, $view, $showLocal, $sort, $dir, $search)
         'reported_at' => 'Last report',
         'updated_at' => 'Updated',
         'created_at' => 'Created',
+        'client_ip' => 'IP',
         'git' => 'Git',
         'owner' => 'Owner',
         'schemas' => 'Schemas',
@@ -221,6 +224,7 @@ function beacon_page_table(array $rows, $view, $showLocal, $sort, $dir, $search)
         echo '<td>' . beacon_page_h($row['reported_at']) . '</td>';
         echo '<td>' . beacon_page_h($row['updated_at']) . '</td>';
         echo '<td>' . beacon_page_h($row['created_at']) . '</td>';
+        echo '<td>' . beacon_page_client($row) . '</td>';
         echo '<td>' . beacon_page_git($row) . '</td>';
         echo '<td>' . beacon_page_h($row['ownername']);
         if ( is_string($row['owneremail']) && $row['owneremail'] !== '' ) {
@@ -245,6 +249,33 @@ function beacon_page_delete_form($id, $view, $showLocal, $sort, $dir, $search) {
     echo "</form>\n";
 }
 
+function beacon_page_ips(array $row, array $history) {
+    $ips = array();
+    if ( is_string($row['client_ip'] ?? null) && $row['client_ip'] !== '' ) $ips[] = $row['client_ip'];
+    foreach ( $history as $item ) {
+        if ( is_string($item['client_ip'] ?? null) && $item['client_ip'] !== '' ) $ips[] = $item['client_ip'];
+    }
+    return $ips;
+}
+
+function beacon_page_place($place) {
+    if ( ! is_array($place) ) return '';
+    $city = is_string($place['city'] ?? null) ? $place['city'] : '';
+    $country = is_string($place['country_code'] ?? null) ? $place['country_code'] : '';
+    if ( $city !== '' && $country !== '' ) return $city . ', ' . $country;
+    if ( $city !== '' ) return $city;
+    return $country;
+}
+
+function beacon_page_client(array $row, $place = '') {
+    $html = beacon_page_h($row['client_ip'] ?? '');
+    if ( is_string($row['client_host'] ?? null) && $row['client_host'] !== '' ) {
+        $html .= '<br/>' . beacon_page_h($row['client_host']);
+    }
+    if ( $place !== '' ) $html .= '<br/>' . beacon_page_h($place);
+    return $html;
+}
+
 function beacon_page_git(array $row) {
     $parts = array();
     if ( is_string($row['git_commit']) && $row['git_commit'] !== '' ) $parts[] = beacon_page_h($row['git_commit']);
@@ -266,7 +297,7 @@ function beacon_page_schemas($json) {
     return $html;
 }
 
-function beacon_page_detail(array $row, array $history) {
+function beacon_page_detail(array $row, array $history, array $places = array()) {
     echo '<p><a href="' . beacon_page_h('?id=' . $row['id']) . '">' . beacon_page_h($row['wwwroot']) . '</a>';
     if ( (int) $row['local'] === 1 ) echo ' (local, hidden from the default list)';
     echo '</p>'."\n";
@@ -295,12 +326,20 @@ function beacon_page_detail(array $row, array $history) {
         'reported_at' => 'last report',
         'updated_at' => 'updated',
         'created_at' => 'created',
+        'client_ip' => 'client IP',
+        'client_host' => 'client host',
         'comment' => 'comment',
     );
     foreach ( $fields as $key => $label ) {
         $value = $row[$key];
         if ( $value === null || $value === '' ) continue;
         echo '<tr><th>' . beacon_page_h($label) . '</th><td>' . beacon_page_h($value) . '</td></tr>'."\n";
+        if ( $key === 'client_ip' ) {
+            $where = beacon_page_place($places[$value] ?? null);
+            if ( $where !== '' ) {
+                echo '<tr><th>location</th><td>' . beacon_page_h($where) . '</td></tr>'."\n";
+            }
+        }
     }
     echo '<tr><th>upgrades</th><td>' . (int) $row['upgrade_count'] . '</td></tr>'."\n";
     echo '<tr><th>git</th><td>' . beacon_page_git($row) . '</td></tr>'."\n";
@@ -313,12 +352,13 @@ function beacon_page_detail(array $row, array $history) {
         return;
     }
     echo '<table class="table table-striped">'."\n";
-    echo '<thead><tr><th>Reported</th><th>Updated</th><th>Created</th><th>software_version</th><th>recorded_overall</th><th>Git</th><th>HTTP</th></tr></thead><tbody>'."\n";
+    echo '<thead><tr><th>Reported</th><th>Updated</th><th>Created</th><th>IP</th><th>software_version</th><th>recorded_overall</th><th>Git</th><th>HTTP</th></tr></thead><tbody>'."\n";
     foreach ( $history as $item ) {
         echo '<tr>';
         echo '<td>' . beacon_page_h($item['reported_at']) . '</td>';
         echo '<td>' . beacon_page_h($item['updated_at']) . '</td>';
         echo '<td>' . beacon_page_h($item['created_at']) . '</td>';
+        echo '<td>' . beacon_page_client($item, beacon_page_place($places[$item['client_ip'] ?? ''] ?? null)) . '</td>';
         echo '<td>' . beacon_page_h($item['software_version']) . '</td>';
         echo '<td>' . beacon_page_h($item['recorded_overall']) . '</td>';
         echo '<td>' . beacon_page_git($item) . '</td>';
