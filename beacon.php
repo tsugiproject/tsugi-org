@@ -308,6 +308,7 @@ function beacon_page_detail(array $row, array $history, array $places = array())
     echo '<div id="beacon-detail">'."\n";
     echo '<table class="table">'."\n";
     $fields = array(
+        'comment' => 'comment',
         'wwwroot' => 'host',
         'servicename' => 'service',
         'ownername' => 'owner',
@@ -322,7 +323,6 @@ function beacon_page_detail(array $row, array $history, array $places = array())
         'created_at' => 'created',
         'client_ip' => 'client IP',
         'client_host' => 'client host',
-        'comment' => 'comment',
     );
     foreach ( $fields as $key => $label ) {
         $value = $row[$key];
