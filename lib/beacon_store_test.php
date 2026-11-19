@@ -56,10 +56,27 @@ function beacon_test_payload($over = array()) {
 }
 
 function beacon_test_open() {
-    $path = tempnam(sys_get_temp_dir(), 'beacon');
-    unlink($path);
-    return array(beacon_open($path), $path);
+    global $BEACON_TABLE_PREFIX, $BEACON_TEST_PDO;
+    $BEACON_TABLE_PREFIX = 'zbeacon' . getmypid() . '_';
+    $pdo = beacon_connect();
+    $pdo->exec('DROP TABLE IF EXISTS `' . beacon_table('history') . '`');
+    $pdo->exec('DROP TABLE IF EXISTS `' . beacon_table('install') . '`');
+    $pdo->exec('DROP TABLE IF EXISTS `' . beacon_table('schema') . '`');
+    beacon_migrate($pdo);
+    $BEACON_TEST_PDO = $pdo;
+    return $pdo;
 }
+
+function beacon_test_close() {
+    global $BEACON_TEST_PDO;
+    if ( ! $BEACON_TEST_PDO instanceof PDO ) return;
+    $BEACON_TEST_PDO->exec('DROP TABLE IF EXISTS `' . beacon_table('history') . '`');
+    $BEACON_TEST_PDO->exec('DROP TABLE IF EXISTS `' . beacon_table('install') . '`');
+    $BEACON_TEST_PDO->exec('DROP TABLE IF EXISTS `' . beacon_table('schema') . '`');
+    $BEACON_TEST_PDO = null;
+}
+
+register_shutdown_function('beacon_test_close');
 
 $withEmail = beacon_test_preimage('learn.example.edu', 'pat@example.edu');
 $noEmail = beacon_test_preimage('learn.example.edu', null);
@@ -80,7 +97,10 @@ foreach ( array('https://www.tsugi.org/', 'https://localhost.example.com/', 'htt
     beacon_test( ! beacon_wwwroot_is_local($publicUrl), 'public ' . $publicUrl);
 }
 
-list($pdo, $path) = beacon_test_open();
+$pdo = beacon_test_open();
+$tInstall = beacon_table('install');
+$tHistory = beacon_table('history');
+$tSchema = beacon_table('schema');
 $raw = json_encode(beacon_test_payload());
 $accepted = beacon_accept($raw);
 beacon_test($accepted['ok'] === true, 'accepts a report');
@@ -103,6 +123,7 @@ $changed = beacon_test_payload(array(
     'tsugi_version' => '26.12.0',
     'database_version' => 20261200,
     'reported_at' => '2026-12-01T00:00:00Z',
+    'comment' => 'second note',
 ));
 list($status2, $body2) = beacon_handle('POST', json_encode($changed), $pdo);
 beacon_test($status2 === 200, 'second report updates the same install');
@@ -117,11 +138,12 @@ beacon_test(count($history) === 2, 'two history rows');
 beacon_test((int) $history[0]['software_version'] === 20261200, 'newest history is first');
 beacon_test((int) $history[0]['http_status'] === 200, 'history records the status we returned');
 beacon_test($history[0]['git_branch'] === 'upgrade-beacon', 'history keeps the branch');
+beacon_test($history[0]['comment'] === 'second note' && $history[1]['comment'] === 'after migrations', 'history keeps each report comment');
 beacon_test($history[0]['php'] === '8.4.1' && $history[1]['php'] === '8.4.1', 'history keeps the php version');
 $countedId = $rows[0]['id'];
-$pdo->prepare('DELETE FROM beacon_history WHERE id = (
-    SELECT id FROM beacon_history WHERE install_id = ? ORDER BY id ASC LIMIT 1
-)')->execute(array($countedId));
+$oldHistoryId = $pdo->prepare('SELECT id FROM `' . $tHistory . '` WHERE install_id = ? ORDER BY id ASC LIMIT 1');
+$oldHistoryId->execute(array($countedId));
+$pdo->prepare('DELETE FROM `' . $tHistory . '` WHERE id = ?')->execute(array($oldHistoryId->fetchColumn()));
 $keptCount = beacon_one($pdo, $countedId);
 beacon_test((int) $keptCount['upgrade_count'] === 2, 'upgrade count stays after a history row is removed');
 beacon_test($history[0]['server_version'] === '8.0.36' && $history[1]['server_version'] === '8.0.36', 'history keeps the mysql version');
@@ -154,11 +176,16 @@ $seen = array();
 foreach ( $publicRows as $row ) $seen[$row['wwwroot']] = true;
 beacon_test(count($seen) === 1, 'those installs group by host');
 
-$version = $pdo->query('SELECT version FROM beacon_schema')->fetchColumn();
-beacon_test((int) $version === 6, 'migration records schema version 6');
-beacon_open($path);
-$versionRows = $pdo->query('SELECT COUNT(*) FROM beacon_schema')->fetchColumn();
+$version = $pdo->query('SELECT version FROM `' . $tSchema . '`')->fetchColumn();
+beacon_test((int) $version === 2, 'migration records schema version 2');
+beacon_open();
+$versionRows = $pdo->query('SELECT COUNT(*) FROM `' . $tSchema . '`')->fetchColumn();
 beacon_test((int) $versionRows === 1, 'migration does not insert a second version row');
+$pdo->exec('ALTER TABLE `' . $tHistory . '` DROP COLUMN comment');
+beacon_schema_set($pdo, 1);
+beacon_migrate($pdo);
+$migratedHistory = beacon_history_for($pdo, $rows[0]['id']);
+beacon_test($migratedHistory[0]['comment'] === '', 'migration 2 adds comment onto history rows already stored');
 
 $cases = array(
     array('report_version' => 2),
@@ -188,12 +215,42 @@ foreach ( $garbage as $item ) {
 }
 list($getStatus,) = beacon_handle('GET', $raw, $pdo);
 beacon_test($getStatus === 405, 'GET is not a stored report');
-$beforeBig = (int) $pdo->query('SELECT COUNT(*) FROM beacon_install')->fetchColumn();
+putenv('TSUGI_BEACON_REFUSE_CONNECT=1');
+$refusedBad = false;
+$refusedStatus = 0;
+try {
+    list($refusedStatus,) = beacon_handle('POST', '{');
+} catch ( Throwable $e ) {
+    $refusedBad = true;
+}
+$refusedComment = false;
+$commentStatus = 0;
+try {
+    list($commentStatus,) = beacon_handle('POST', json_encode(beacon_test_payload(array(
+        'comment' => str_repeat('a', BEACON_MAX_COMMENT + 1),
+    ))));
+} catch ( Throwable $e ) {
+    $refusedComment = true;
+}
+$refusedGood = false;
+try {
+    beacon_handle('POST', json_encode(beacon_test_payload(array(
+        'host' => 'refuse.example.edu',
+        'owneremail' => 'refuse@example.edu',
+    ))));
+} catch ( Throwable $e ) {
+    $refusedGood = true;
+}
+putenv('TSUGI_BEACON_REFUSE_CONNECT');
+beacon_test( ! $refusedBad && $refusedStatus === 400, 'a report that cannot be stored does not open the database');
+beacon_test( ! $refusedComment && $commentStatus === 400, 'a comment over 1K does not open the database');
+beacon_test($refusedGood, 'a storeable report is what opens the database');
+$beforeBig = (int) $pdo->query('SELECT COUNT(*) FROM `' . $tInstall . '`')->fetchColumn();
 $oversized = str_repeat('x', BEACON_MAX_BODY + 1);
 list($bigStatus, $bigBody) = beacon_handle('POST', $oversized, $pdo);
 beacon_test($bigStatus === 400 && $bigBody === array('error' => 'bad request'), 'a body over 5KB is rejected');
 beacon_test(beacon_accept(str_repeat('x', BEACON_MAX_BODY))['ok'] === false, '5KB of junk is not stored');
-beacon_test($beforeBig === (int) $pdo->query('SELECT COUNT(*) FROM beacon_install')->fetchColumn(), 'rejected body does not add a row');
+beacon_test($beforeBig === (int) $pdo->query('SELECT COUNT(*) FROM `' . $tInstall . '`')->fetchColumn(), 'rejected body does not add a row');
 
 $cli = beacon_test_payload();
 $cli['mysql_version'] = null;
@@ -205,6 +262,11 @@ beacon_test($cliAccepted['ok'] === true, 'a missing comment and null git are acc
 beacon_test($cliAccepted['snapshot']['server_version'] === null, 'null mysql version stays null');
 beacon_test($cliAccepted['snapshot']['git_commit'] === null && $cliAccepted['snapshot']['git_branch'] === null, 'detached git is null');
 beacon_test($cliAccepted['snapshot']['comment'] === '', 'missing comment stores empty');
+beacon_test($cliAccepted['history']['comment'] === '', 'history keeps a missing comment empty');
+$commentOk = beacon_test_payload(array('comment' => str_repeat('a', BEACON_MAX_COMMENT)));
+beacon_test(beacon_accept(json_encode($commentOk))['ok'] === true, 'a 1K comment can be stored');
+$commentBig = beacon_test_payload(array('comment' => str_repeat('a', BEACON_MAX_COMMENT + 1)));
+beacon_test(beacon_accept(json_encode($commentBig))['ok'] === false, 'a comment over 1K cannot be stored');
 
 $spacedBody = beacon_test_payload(array(
     'host' => 'spaced.example.edu',
@@ -234,8 +296,8 @@ $stampRow = beacon_one($pdo, $stampAccepted['snapshot']['id']);
 beacon_test($stampRow['created_at'] === '2026-01-01T00:00:00Z', 'created_at stays on the first write');
 beacon_test($stampRow['updated_at'] === '2026-08-01T00:00:00Z', 'updated_at moves on the next write');
 $stampHistory = beacon_history_for($pdo, $stampAccepted['snapshot']['id']);
-beacon_test($stampHistory[0]['updated_at'] === '2026-08-01T00:00:00Z', 'history sorts by updated_at');
-beacon_test($stampHistory[1]['created_at'] === '2026-01-01T00:00:00Z', 'older history row keeps its created_at');
+beacon_test($stampHistory[0]['received_at'] === '2026-08-01T00:00:00Z', 'history sorts by when the report was received');
+beacon_test($stampHistory[1]['received_at'] === '2026-01-01T00:00:00Z', 'an older history row keeps its received time');
 $stampList = array();
 foreach ( beacon_list($pdo, false) as $stampItem ) {
     if ( $stampItem['wwwroot'] === 'stamps.example.edu' ) $stampList[] = $stampItem['owneremail'];
@@ -273,86 +335,55 @@ foreach ( beacon_list($pdo, false, 'not-a-column', 'sideways') as $stampItem ) {
 }
 beacon_test($fallback === $stampList, 'an unknown sort falls back to updated_at descending');
 
-$oldPath = tempnam(sys_get_temp_dir(), 'beaconold');
-unlink($oldPath);
-$old = new PDO('sqlite:' . $oldPath, null, null, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
-$old->exec('CREATE TABLE beacon_schema (
-    id INTEGER PRIMARY KEY CHECK (id = 1),
-    version INTEGER NOT NULL
-)');
-beacon_migrate_1($old);
-$old->exec('INSERT INTO beacon_install (
-    id, wwwroot, developer, local, lessons, server_below_minimum, schemas_json, reported_at, comment
-) VALUES (
-    \'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\',
-    \'https://old.example.edu\', 0, 0, 0, 0, \'{}\', \'2024-05-01T00:00:00Z\', \'\'
-)');
-$old->exec('INSERT INTO beacon_history (
-    install_id, reported_at, software_version, recorded_overall, http_status
-) VALUES (
-    \'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\',
-    \'2024-05-01T00:00:00Z\', 1, 1, 200
-)');
-unset($old);
-$upgraded = beacon_open($oldPath);
-$oldRow = beacon_one($upgraded, '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef');
-beacon_test($oldRow['created_at'] === '2024-05-01T00:00:00Z' && $oldRow['updated_at'] === '2024-05-01T00:00:00Z', 'migration 2 backfills both timestamps from reported_at');
-beacon_test($oldRow['client_ip'] === null && $oldRow['client_host'] === null, 'migration 3 leaves older rows without an address');
-beacon_test((int) $oldRow['upgrade_count'] === 1, 'migration 6 counts the history rows already stored');
-unset($upgraded);
-unlink($oldPath);
-
-$pdo->exec('DELETE FROM beacon_history');
-$pdo->exec('DELETE FROM beacon_install');
-$insertOld = $pdo->prepare('INSERT INTO beacon_install (
-        id, wwwroot, developer, local, lessons, server_below_minimum, schemas_json,
-        reported_at, comment, created_at, updated_at
-    ) VALUES (?, ?, 0, 0, 0, 0, \'{}\', ?, \'\', ?, ?)');
-$insertHist = $pdo->prepare('INSERT INTO beacon_history (
-        install_id, reported_at, software_version, recorded_overall, http_status, created_at, updated_at
-    ) VALUES (?, ?, 1, 1, 200, ?, ?)');
+$pdo->exec('DELETE FROM `' . $tHistory . '`');
+$pdo->exec('DELETE FROM `' . $tInstall . '`');
+$insertOld = $pdo->prepare('INSERT INTO `' . $tInstall . '` (
+        id, wwwroot, local, reported_at, comment, created_at, updated_at, upgrade_count
+    ) VALUES (?, ?, 0, ?, \'\', ?, ?, 0)');
+$insertHist = $pdo->prepare('INSERT INTO `' . $tHistory . '` (
+        install_id, reported_at, software_version, http_status, received_at
+    ) VALUES (?, ?, 1, 200, ?)');
 for ( $n = 1; $n <= 4; $n++ ) {
     $oldId = str_repeat((string) $n, 64);
     $stamp = '2020-0' . $n . '-01T00:00:00Z';
     $insertOld->execute(array($oldId, 'https://old-' . $n . '.example.edu', $stamp, $stamp, $stamp));
-    $insertHist->execute(array($oldId, $stamp, $stamp, $stamp));
+    $insertHist->execute(array($oldId, $stamp, $stamp));
 }
 beacon_prune($pdo, 3);
-$kept = $pdo->query('SELECT wwwroot FROM beacon_install ORDER BY updated_at ASC')->fetchAll(PDO::FETCH_COLUMN);
+$kept = $pdo->query('SELECT wwwroot FROM `' . $tInstall . '` ORDER BY updated_at ASC')->fetchAll(PDO::FETCH_COLUMN);
 beacon_test($kept === array(
     'https://old-2.example.edu',
     'https://old-3.example.edu',
     'https://old-4.example.edu',
 ), 'prune keeps the 3 most recent installs');
-$goneHistory = (int) $pdo->query('SELECT COUNT(*) FROM beacon_history WHERE install_id = \'' . str_repeat('1', 64) . '\'')->fetchColumn();
+$goneHistory = (int) $pdo->query('SELECT COUNT(*) FROM `' . $tHistory . '` WHERE install_id = \'' . str_repeat('1', 64) . '\'')->fetchColumn();
 beacon_test($goneHistory === 0, 'prune deletes history for the earliest install');
 beacon_test(BEACON_MAX_HISTORY === 20000, 'history is capped at 20000 rows');
 for ( $n = 1; $n <= 3; $n++ ) {
     $stamp = '2019-0' . $n . '-01T00:00:00Z';
-    $insertHist->execute(array(str_repeat('2', 64), $stamp, $stamp, $stamp));
+    $insertHist->execute(array(str_repeat('2', 64), $stamp, $stamp));
 }
 beacon_prune_history($pdo, 4);
-$historyLeft = $pdo->query('SELECT reported_at FROM beacon_history ORDER BY updated_at ASC, created_at ASC, id ASC')->fetchAll(PDO::FETCH_COLUMN);
+$historyLeft = $pdo->query('SELECT reported_at FROM `' . $tHistory . '` ORDER BY received_at ASC, id ASC')->fetchAll(PDO::FETCH_COLUMN);
 beacon_test($historyLeft === array(
     '2019-03-01T00:00:00Z',
     '2020-02-01T00:00:00Z',
     '2020-03-01T00:00:00Z',
     '2020-04-01T00:00:00Z',
 ), 'history prune keeps the most recent rows');
-beacon_test((int) $pdo->query('SELECT COUNT(*) FROM beacon_install')->fetchColumn() === 3, 'history prune leaves the installs');
+beacon_test((int) $pdo->query('SELECT COUNT(*) FROM `' . $tInstall . '`')->fetchColumn() === 3, 'history prune leaves the installs');
 $deleteId = str_repeat('d', 64);
-$pdo->prepare('INSERT INTO beacon_install (
-        id, wwwroot, developer, local, lessons, server_below_minimum, schemas_json,
-        reported_at, comment, created_at, updated_at
-    ) VALUES (?, \'https://delete.example.edu\', 0, 0, 0, 0, \'{}\', \'2020-01-01T00:00:00Z\', \'\', \'2020-01-01T00:00:00Z\', \'2020-01-01T00:00:00Z\')')->execute(array($deleteId));
-$pdo->prepare('INSERT INTO beacon_history (
-        install_id, reported_at, software_version, recorded_overall, http_status, created_at, updated_at
-    ) VALUES (?, \'2020-01-01T00:00:00Z\', 1, 1, 200, \'2020-01-01T00:00:00Z\', \'2020-01-01T00:00:00Z\')')->execute(array($deleteId));
+$pdo->prepare('INSERT INTO `' . $tInstall . '` (
+        id, wwwroot, local, reported_at, comment, created_at, updated_at, upgrade_count
+    ) VALUES (?, \'https://delete.example.edu\', 0, \'2020-01-01T00:00:00Z\', \'\', \'2020-01-01T00:00:00Z\', \'2020-01-01T00:00:00Z\', 0)')->execute(array($deleteId));
+$pdo->prepare('INSERT INTO `' . $tHistory . '` (
+        install_id, reported_at, software_version, http_status, received_at
+    ) VALUES (?, \'2020-01-01T00:00:00Z\', 1, 200, \'2020-01-01T00:00:00Z\')')->execute(array($deleteId));
 beacon_test(beacon_delete($pdo, 'not-an-id') === false, 'delete rejects a bad id');
 beacon_test(beacon_delete($pdo, $deleteId) === true, 'delete removes an install');
 beacon_test(beacon_one($pdo, $deleteId) === null, 'deleted install is gone');
 beacon_test(count(beacon_history_for($pdo, $deleteId)) === 0, 'delete removes that install history');
-beacon_test((int) $pdo->query('SELECT COUNT(*) FROM beacon_install')->fetchColumn() === 3, 'prune stops at the cap');
+beacon_test((int) $pdo->query('SELECT COUNT(*) FROM `' . $tInstall . '`')->fetchColumn() === 3, 'prune stops at the cap');
 
 unset($_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_CF_CONNECTING_IP']);
 beacon_test(beacon_client_ip() === null, 'a missing address stays empty');
@@ -380,6 +411,12 @@ beacon_test($ipRow['client_host'] === null && beacon_reverse_host('127.0.0.1') =
 $foundIp = beacon_list($pdo, false, 'client_ip', 'asc', '127.0.0.1');
 beacon_test(count($foundIp) === 1 && $foundIp[0]['wwwroot'] === 'ip.example.edu', 'search finds the recorded address');
 unset($_SERVER['REMOTE_ADDR']);
+
+$placeInstall = $pdo->prepare('INSERT INTO `' . $tInstall . '` (
+    id, wwwroot, local, reported_at, comment, created_at, updated_at, client_ip, upgrade_count
+) VALUES (?, ?, 0, \'2026-01-01T00:00:00Z\', \'\', \'2026-01-01T00:00:00Z\', \'2026-01-01T00:00:00Z\', ?, 0)');
+$placeInstall->execute(array(hash('sha256', 'place-8.8.8.8'), 'place-8.example.edu', '8.8.8.8'));
+$placeInstall->execute(array(hash('sha256', 'place-1.1.1.1'), 'place-1.example.edu', '1.1.1.1'));
 
 $placeCalls = 0;
 $placeFetch = function ($ip) use (&$placeCalls) {
@@ -425,11 +462,11 @@ for ( $i = 1; $i <= 6; $i++ ) $many[] = '8.8.4.' . $i;
 $got = beacon_ip_places($pdo, $many, $placeNow, $capFetch);
 beacon_test($capped === 4 && count($got) === 4, 'one detail page looks up at most four new addresses');
 
+$stored = json_encode($pdo->query('SELECT * FROM `' . $tInstall . '`')->fetchAll());
+beacon_test(strpos($stored, $withEmail) === false, 'stored rows do not contain the preimage');
+beacon_test(strpos($stored, "pat@example.edu\n42") === false, 'stored rows do not contain the preimage line');
+beacon_test_close();
 unset($pdo);
-$blob = file_get_contents($path);
-beacon_test(strpos($blob, $withEmail) === false, 'database file does not contain the preimage');
-beacon_test(strpos($blob, "pat@example.edu\n42") === false, 'database file does not contain the preimage line');
-unlink($path);
 
 if ( $failures > 0 ) {
     fwrite(STDERR, $failures . " failed\n");

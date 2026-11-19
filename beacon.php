@@ -49,7 +49,7 @@ $OUTPUT->header();
 require_once __DIR__ . '/nav.php';
 
 echo '<div id="container" class="container">'."\n";
-echo '<h1>Upgrade reports</h1>'."\n";
+echo '<h1>Beacon Reports</h1>'."\n";
 if ( $deleteError !== '' ) echo '<p>' . beacon_page_h($deleteError) . '</p>'."\n";
 
 if ( ! $unlocked ) {
@@ -319,7 +319,7 @@ function beacon_page_detail(array $row, array $history, array $places = array())
     echo '<tr><th>git</th><td>' . beacon_page_git($row) . '</td></tr>'."\n";
     echo "</table>\n";
 
-    echo '<h2>Upgrade history</h2>'."\n";
+    echo '<h2>Beacon History</h2>'."\n";
     if ( count($history) < 1 ) {
         echo '<p>No history rows.</p>'."\n";
         return;
@@ -336,6 +336,10 @@ function beacon_page_detail(array $row, array $history, array $places = array())
         echo '<td>' . beacon_page_git($item) . '</td>';
         echo '<td>' . beacon_page_h($item['http_status']) . '</td>';
         echo "</tr>\n";
+        $comment = is_string($item['comment'] ?? null) ? $item['comment'] : '';
+        if ( $comment !== '' ) {
+            echo '<tr><td colspan="7" style="border-top:0;padding-top:0;white-space:pre-wrap;">' . beacon_page_h($comment) . '</td></tr>'."\n";
+        }
     }
     echo "</tbody></table>\n";
 }
