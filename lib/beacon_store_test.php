@@ -152,7 +152,7 @@ $badId = beacon_test_payload();
 $badId['install_id'] = str_repeat('a', 64);
 list($badStatus, $badBody) = beacon_handle('POST', json_encode($badId), $pdo);
 beacon_test($badStatus === 400 && $badBody === array('error' => 'bad request'), 'mismatched id is 400');
-beacon_test(count(beacon_list($pdo, true)) === 1, 'rejected id writes nothing');
+beacon_test(count(beacon_list($pdo, false)) === 1, 'rejected id writes nothing');
 
 $localBody = beacon_test_payload(array(
     'host' => 'localhost',
@@ -160,9 +160,9 @@ $localBody = beacon_test_payload(array(
 ));
 list($localStatus,) = beacon_handle('POST', json_encode($localBody), $pdo);
 beacon_test($localStatus === 200, 'local report is stored');
-beacon_test(count(beacon_list($pdo, false)) === 1, 'default list hides local');
-$withLocal = beacon_list($pdo, true);
-beacon_test(count($withLocal) === 2, 'local row is still stored');
+beacon_test(count(beacon_list($pdo, false)) === 1, 'the public list leaves out local hosts');
+$onlyLocal = beacon_list($pdo, true);
+beacon_test(count($onlyLocal) === 1 && $onlyLocal[0]['wwwroot'] === 'localhost', 'the local list is only local hosts');
 
 $moved = beacon_test_payload(array(
     'host' => 'learn.example.edu',
@@ -341,16 +341,6 @@ foreach ( beacon_list($pdo, false, 'not-a-column', 'sideways') as $stampItem ) {
     if ( $stampItem['wwwroot'] === 'stamps.example.edu' ) $fallback[] = $stampItem['owneremail'];
 }
 beacon_test($fallback === $stampList, 'an unknown sort falls back to updated_at descending');
-$byInstalls = array();
-foreach ( beacon_list($pdo, false, 'install_count', 'desc') as $stampItem ) {
-    $byInstalls[] = $stampItem['wwwroot'];
-    if ( $stampItem['wwwroot'] === 'stamps.example.edu' ) {
-        beacon_test((int) $stampItem['install_count'] === 3, 'install count is how many rows share the host');
-    }
-}
-beacon_test($byInstalls[0] === 'stamps.example.edu' && $byInstalls[count($byInstalls) - 1] === 'learn.example.edu', 'list sorts by number of installs');
-$searchedCount = beacon_list($pdo, false, 'install_count', 'desc', 'b@example.edu');
-beacon_test(count($searchedCount) === 1 && (int) $searchedCount[0]['install_count'] === 1, 'install count follows the rows in the list');
 
 $pdo->exec('DELETE FROM `' . $tHistory . '`');
 $pdo->exec('DELETE FROM `' . $tInstall . '`');

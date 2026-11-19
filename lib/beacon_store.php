@@ -588,7 +588,6 @@ function beacon_handle($method, $raw, $pdo = null) {
 function beacon_list_columns() {
     return array(
         'wwwroot' => 'text',
-        'install_count' => 'number',
         'servicename' => 'text',
         'tsugi_version' => 'version',
         'software_version' => 'number',
@@ -613,21 +612,12 @@ function beacon_list(PDO $pdo, $showLocal, $sort = 'updated_at', $dir = 'desc', 
             software_version, server_version, git_commit, git_branch, php, timezone,
             reported_at, comment, created_at, updated_at, client_ip, client_host, upgrade_count
         FROM `' . beacon_table('install') . '`';
-    if ( ! $showLocal ) $sql .= ' WHERE local = 0';
+    $sql .= $showLocal ? ' WHERE local = 1' : ' WHERE local = 0';
     $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     if ( $search !== '' ) {
         $rows = array_values(array_filter($rows, function ($row) use ($search) {
             return beacon_row_matches($row, $search);
         }));
-    }
-    $counts = array();
-    foreach ( $rows as $row ) {
-        $host = (string) $row['wwwroot'];
-        if ( ! isset($counts[$host]) ) $counts[$host] = 0;
-        $counts[$host]++;
-    }
-    foreach ( $rows as $i => $row ) {
-        $rows[$i]['install_count'] = $counts[(string) $row['wwwroot']];
     }
     usort($rows, function ($a, $b) use ($sort, $dir) {
         return beacon_row_cmp($a, $b, $sort, $dir);

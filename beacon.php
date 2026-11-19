@@ -19,7 +19,6 @@ header('X-Robots-Tag: noindex');
 $unlocked = AdminService::isAdmin();
 if ( ! $unlocked ) http_response_code(403);
 
-$view = (isset($_GET['view']) && $_GET['view'] === 'wwwroot') ? 'wwwroot' : 'installs';
 $showLocal = isset($_GET['show_local']) && $_GET['show_local'] === '1';
 $sortColumns = beacon_list_columns();
 $sort = (isset($_GET['sort']) && isset($sortColumns[$_GET['sort']])) ? $_GET['sort'] : 'updated_at';
@@ -36,7 +35,7 @@ if ( $unlocked && (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') && isset($_POS
         } else {
             $deleteId = (string) $_POST['delete_id'];
             if ( preg_match('/^[0-9a-f]{64}$/', $deleteId) ) beacon_delete($deletePdo, $deleteId);
-            header('Location: ' . beacon_page_qs($view, $showLocal, $sort, $dir, $search), true, 303);
+            header('Location: ' . beacon_page_qs($showLocal, $sort, $dir, $search), true, 303);
             exit;
         }
     } catch ( Throwable $e ) {
@@ -66,16 +65,14 @@ echo '<style>
 tr.beacon-new > td { background-color: #e7f6ea !important; }
 </style>'."\n";
 echo '<p>';
-echo '<a href="' . beacon_page_qs('installs', $showLocal, $sort, $dir, $search) . '">By install</a>';
-echo ' · <a href="' . beacon_page_qs('wwwroot', $showLocal, $sort, $dir, $search) . '">By host</a>';
 if ( $showLocal ) {
-    echo ' · <a href="' . beacon_page_qs($view, false, $sort, $dir, $search) . '">Hide local</a>';
+    echo '<a href="' . beacon_page_qs(false, $sort, $dir, $search) . '">Real URLs</a>';
 } else {
-    echo ' · <a href="' . beacon_page_qs($view, true, $sort, $dir, $search) . '">Show local</a>';
+    echo '<a href="' . beacon_page_qs(true, $sort, $dir, $search) . '">Local</a>';
 }
 echo "</p>\n";
-if ( ! $showLocal ) {
-    echo '<p>Local installs stay in the database and are left out of this list. A local host is localhost, 127.0.0.1, ::1, a name that starts with local., or a name that ends with .local or .localhost.</p>'."\n";
+if ( $showLocal ) {
+    echo '<p>This list is local hosts only. A local host is localhost, 127.0.0.1, ::1, a name that starts with local., or a name that ends with .local or .localhost.</p>'."\n";
 }
 
 try {
@@ -101,14 +98,14 @@ if ( $wantId !== '' ) {
             $history = beacon_history_for($pdo, $wantId);
             $places = beacon_ip_places($pdo, beacon_page_ips($one, $history));
             $rows = beacon_list($pdo, $showLocal, $sort, $dir, $search);
-            beacon_page_nav($wantId, $rows, $view, $showLocal, $sort, $dir, $search);
+            beacon_page_nav($wantId, $rows, $showLocal, $sort, $dir, $search);
             beacon_page_detail($one, $history, $places);
-            beacon_page_delete_form($wantId, $view, $showLocal, $sort, $dir, $search);
-            beacon_page_nav($wantId, $rows, $view, $showLocal, $sort, $dir, $search);
+            beacon_page_delete_form($wantId, $showLocal, $sort, $dir, $search);
+            beacon_page_nav($wantId, $rows, $showLocal, $sort, $dir, $search);
         }
     }
     if ( ! isset($rows) ) {
-        echo '<p><a href="' . beacon_page_qs($view, $showLocal, $sort, $dir, $search) . '">Back to the list</a></p>'."\n";
+        echo '<p><a href="' . beacon_page_qs($showLocal, $sort, $dir, $search) . '">Back to the list</a></p>'."\n";
     }
     echo "</div>\n";
     $OUTPUT->footer();
@@ -116,14 +113,13 @@ if ( $wantId !== '' ) {
 }
 
 echo '<form method="get" action="">'."\n";
-if ( $view === 'wwwroot' ) echo '<input type="hidden" name="view" value="wwwroot">'."\n";
 if ( $showLocal ) echo '<input type="hidden" name="show_local" value="1">'."\n";
 if ( $sort !== 'updated_at' ) echo '<input type="hidden" name="sort" value="' . beacon_page_h($sort) . '">'."\n";
 if ( $dir !== 'desc' ) echo '<input type="hidden" name="dir" value="asc">'."\n";
 echo '<label>Search <input type="search" name="q" value="' . beacon_page_h($search) . '" size="40"></label> '."\n";
 echo '<button type="submit">Search</button>'."\n";
 if ( $search !== '' ) {
-    echo ' <a href="' . beacon_page_qs($view, $showLocal, $sort, $dir, '') . '">Clear</a>'."\n";
+    echo ' <a href="' . beacon_page_qs($showLocal, $sort, $dir, '') . '">Clear</a>'."\n";
 }
 echo "</form>\n";
 
@@ -132,7 +128,7 @@ if ( count($rows) < 1 ) {
     if ( $search !== '' ) {
         echo '<p>No matches.</p>'."\n";
     } else {
-        echo '<p>No upgrade reports yet.</p>'."\n";
+        echo '<p>' . ($showLocal ? 'No local reports yet.' : 'No upgrade reports yet.') . '</p>'."\n";
     }
     echo "</div>\n";
     $OUTPUT->footer();
@@ -149,68 +145,44 @@ if ( $newCount > 0 ) {
     echo '<p class="beacon-new-note">' . $newCount . ' new</p>'."\n";
 }
 
-if ( $view === 'wwwroot' ) {
-    $groups = array();
-    foreach ( $rows as $row ) {
-        $groups[$row['wwwroot']][] = $row;
-    }
-    foreach ( $groups as $wwwroot => $group ) {
-        echo '<h2>' . beacon_page_h($wwwroot) . '</h2>'."\n";
-        echo '<p>' . count($group) . ' install' . (count($group) === 1 ? '' : 's') . ' share this host.</p>'."\n";
-        beacon_page_table($group, $view, $showLocal, $sort, $dir, $search);
-    }
-} else {
-    beacon_page_table($rows, $view, $showLocal, $sort, $dir, $search);
-}
+beacon_page_table($rows, $showLocal, $sort, $dir, $search);
 
 echo "</div>\n";
 $OUTPUT->footer();
 
-function beacon_page_id_href($id, $view, $showLocal, $sort, $dir, $search) {
-    $href = beacon_page_qs($view, $showLocal, $sort, $dir, $search);
+function beacon_page_id_href($id, $showLocal, $sort, $dir, $search) {
+    $href = beacon_page_qs($showLocal, $sort, $dir, $search);
     $href .= ($href === '?') ? 'id=' : '&id=';
     return $href . rawurlencode($id);
 }
 
-function beacon_page_sequence(array $rows, $view) {
-    if ( $view !== 'wwwroot' ) {
-        $ids = array();
-        foreach ( $rows as $row ) $ids[] = $row['id'];
-        return $ids;
-    }
-    $groups = array();
-    foreach ( $rows as $row ) {
-        $groups[$row['wwwroot']][] = $row['id'];
-    }
+function beacon_page_sequence(array $rows) {
     $ids = array();
-    foreach ( $groups as $group ) {
-        foreach ( $group as $id ) $ids[] = $id;
-    }
+    foreach ( $rows as $row ) $ids[] = $row['id'];
     return $ids;
 }
 
-function beacon_page_nav($id, array $rows, $view, $showLocal, $sort, $dir, $search) {
-    $ids = beacon_page_sequence($rows, $view);
+function beacon_page_nav($id, array $rows, $showLocal, $sort, $dir, $search) {
+    $ids = beacon_page_sequence($rows);
     $index = array_search($id, $ids, true);
     $parts = array();
     if ( $index !== false && $index > 0 ) {
-        $href = beacon_page_id_href($ids[$index - 1], $view, $showLocal, $sort, $dir, $search);
+        $href = beacon_page_id_href($ids[$index - 1], $showLocal, $sort, $dir, $search);
         $parts[] = '<a href="' . beacon_page_h($href) . '">Back</a>';
     }
     if ( $index !== false ) {
         $parts[] = ($index + 1) . ' of ' . count($ids);
     }
     if ( $index !== false && $index < count($ids) - 1 ) {
-        $href = beacon_page_id_href($ids[$index + 1], $view, $showLocal, $sort, $dir, $search);
+        $href = beacon_page_id_href($ids[$index + 1], $showLocal, $sort, $dir, $search);
         $parts[] = '<a href="' . beacon_page_h($href) . '">Next</a>';
     }
-    $parts[] = '<a href="' . beacon_page_h(beacon_page_qs($view, $showLocal, $sort, $dir, $search)) . '">Back to the list</a>';
+    $parts[] = '<a href="' . beacon_page_h(beacon_page_qs($showLocal, $sort, $dir, $search)) . '">Back to the list</a>';
     echo '<p>' . implode(' · ', $parts) . '</p>'."\n";
 }
 
-function beacon_page_qs($view, $showLocal, $sort = 'updated_at', $dir = 'desc', $search = '') {
+function beacon_page_qs($showLocal, $sort = 'updated_at', $dir = 'desc', $search = '') {
     $q = array();
-    if ( $view === 'wwwroot' ) $q['view'] = 'wwwroot';
     if ( $showLocal ) $q['show_local'] = '1';
     if ( $sort !== 'updated_at' ) $q['sort'] = $sort;
     if ( $dir === 'asc' ) $q['dir'] = 'asc';
@@ -219,14 +191,14 @@ function beacon_page_qs($view, $showLocal, $sort = 'updated_at', $dir = 'desc', 
     return $built === '' ? '?' : ('?' . $built);
 }
 
-function beacon_page_header_link($column, $label, $view, $showLocal, $sort, $dir, $search) {
+function beacon_page_header_link($column, $label, $showLocal, $sort, $dir, $search) {
     $nextDir = beacon_sort_default_dir($column);
     $marker = '';
     if ( $column === $sort ) {
         $nextDir = $dir === 'asc' ? 'desc' : 'asc';
         $marker = $dir === 'asc' ? ' ↑' : ' ↓';
     }
-    $href = beacon_page_qs($view, $showLocal, $column, $nextDir, $search);
+    $href = beacon_page_qs($showLocal, $column, $nextDir, $search);
     return '<a href="' . beacon_page_h($href) . '">' . beacon_page_h($label . $marker) . '</a>';
 }
 
@@ -251,10 +223,9 @@ function beacon_page_is_new(array $row) {
     return beacon_page_upgrades($row) === 0;
 }
 
-function beacon_page_table(array $rows, $view, $showLocal, $sort, $dir, $search) {
+function beacon_page_table(array $rows, $showLocal, $sort, $dir, $search) {
     $headers = array(
         'wwwroot' => 'Host',
-        'install_count' => 'Installs',
         'servicename' => 'Service',
         'tsugi_version' => 'Tsugi',
         'software_version' => 'Database',
@@ -271,18 +242,17 @@ function beacon_page_table(array $rows, $view, $showLocal, $sort, $dir, $search)
     echo '<table class="table table-striped">'."\n";
     echo '<thead><tr>';
     foreach ( $headers as $column => $label ) {
-        echo '<th>' . beacon_page_header_link($column, $label, $view, $showLocal, $sort, $dir, $search) . '</th>';
+        echo '<th>' . beacon_page_header_link($column, $label, $showLocal, $sort, $dir, $search) . '</th>';
     }
     echo "<th></th>";
     echo "</tr></thead>\n<tbody>\n";
     foreach ( $rows as $row ) {
-        $href = beacon_page_id_href($row['id'], $view, $showLocal, $sort, $dir, $search);
+        $href = beacon_page_id_href($row['id'], $showLocal, $sort, $dir, $search);
         $upgrades = beacon_page_upgrades($row);
         echo beacon_page_is_new($row) ? '<tr class="beacon-new">' : '<tr>';
         echo '<td><a href="' . beacon_page_h($href) . '">' . beacon_page_h($row['wwwroot']) . '</a>';
         if ( (int) $row['local'] === 1 ) echo ' <span>(local)</span>';
         echo '</td>';
-        echo '<td>' . (int) ($row['install_count'] ?? 0) . '</td>';
         echo '<td>' . beacon_page_h($row['servicename']) . '</td>';
         echo '<td>' . beacon_page_h($row['tsugi_version']) . '</td>';
         echo '<td>' . beacon_page_h($row['software_version']) . '</td>';
@@ -301,15 +271,15 @@ function beacon_page_table(array $rows, $view, $showLocal, $sort, $dir, $search)
         }
         echo '</td>';
         echo '<td>';
-        beacon_page_delete_form($row['id'], $view, $showLocal, $sort, $dir, $search);
+        beacon_page_delete_form($row['id'], $showLocal, $sort, $dir, $search);
         echo '</td>';
         echo "</tr>\n";
     }
     echo "</tbody></table></div>\n";
 }
 
-function beacon_page_delete_form($id, $view, $showLocal, $sort, $dir, $search) {
-    $action = beacon_page_h(beacon_page_qs($view, $showLocal, $sort, $dir, $search));
+function beacon_page_delete_form($id, $showLocal, $sort, $dir, $search) {
+    $action = beacon_page_h(beacon_page_qs($showLocal, $sort, $dir, $search));
     echo '<form method="post" action="' . $action . '" onsubmit="return confirm(\'Delete this install and its upgrade history?\');">'."\n";
     echo \Tsugi\Controllers\Tool::csrfField();
     echo '<input type="hidden" name="delete_id" value="' . beacon_page_h($id) . '">'."\n";
@@ -354,7 +324,7 @@ function beacon_page_git(array $row) {
 
 function beacon_page_detail(array $row, array $history, array $places = array()) {
     echo '<p><a href="' . beacon_page_h('?id=' . $row['id']) . '">' . beacon_page_h($row['wwwroot']) . '</a>';
-    if ( (int) $row['local'] === 1 ) echo ' (local, hidden from the default list)';
+    if ( (int) $row['local'] === 1 ) echo ' (local host)';
     echo '</p>'."\n";
     echo '<table class="table">'."\n";
     $fields = array(
