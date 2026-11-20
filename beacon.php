@@ -321,8 +321,34 @@ function beacon_page_git(array $row) {
     return implode(' ', $parts);
 }
 
+function beacon_page_site_url($wwwroot) {
+    $wwwroot = trim((string) $wwwroot);
+    if ( $wwwroot === '' || preg_match('/[\s<>"\']/', $wwwroot) ) return '';
+    if ( preg_match('#^[a-z][a-z0-9+.-]*://#i', $wwwroot) ) {
+        $parts = parse_url($wwwroot);
+        if ( ! is_array($parts) ) return '';
+        $scheme = strtolower((string) ($parts['scheme'] ?? ''));
+        if ( ($scheme !== 'http' && $scheme !== 'https') || empty($parts['host']) ) return '';
+        return $wwwroot;
+    }
+    $host = $wwwroot;
+    if ( filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ) {
+        $host = '[' . $host . ']';
+    } else if ( strpos($host, ':') !== false ) {
+        return '';
+    }
+    return 'https://' . $host;
+}
+
+function beacon_page_site_link($wwwroot) {
+    $text = beacon_page_h($wwwroot);
+    $url = beacon_page_site_url($wwwroot);
+    if ( $url === '' ) return $text;
+    return '<a href="' . beacon_page_h($url) . '" target="_blank" rel="noopener noreferrer">' . $text . '</a>';
+}
+
 function beacon_page_detail(array $row, array $history, array $places = array()) {
-    echo '<p><a href="' . beacon_page_h('?id=' . $row['id']) . '">' . beacon_page_h($row['wwwroot']) . '</a>';
+    echo '<p>' . beacon_page_site_link($row['wwwroot']);
     if ( (int) $row['local'] === 1 ) echo ' (local host)';
     echo '</p>'."\n";
     echo '<p><label><input type="checkbox" onchange="document.getElementById(\'beacon-detail\').classList.toggle(\'beacon-show-ip\', this.checked)"> Show IP</label></p>'."\n";
@@ -351,7 +377,8 @@ function beacon_page_detail(array $row, array $history, array $places = array())
         if ( ! $ownerField && ($value === null || $value === '') ) continue;
         $ipField = $key === 'client_ip' || $key === 'client_host';
         $rowClass = $ipField ? ' class="beacon-ip"' : '';
-        echo '<tr' . $rowClass . '><th>' . beacon_page_h($label) . '</th><td>' . beacon_page_h($value) . '</td></tr>'."\n";
+        $cell = $key === 'wwwroot' ? beacon_page_site_link($value) : beacon_page_h($value);
+        echo '<tr' . $rowClass . '><th>' . beacon_page_h($label) . '</th><td>' . $cell . '</td></tr>'."\n";
         if ( $key === 'client_ip' ) {
             $where = beacon_page_place($places[$value] ?? null);
             if ( $where !== '' ) {
